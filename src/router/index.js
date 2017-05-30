@@ -17,6 +17,9 @@ const routes = [
     path: '/dashboard',
     component: Dashboard,
   },
+  {
+    path: '/home',
+  }
 ];
 
 const RouteWithSubRoutes = (route) => (

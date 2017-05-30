@@ -51,20 +51,23 @@ const Topics = ({ match }) => (
   </div>
 );
 
-const Dashboard = () => (
-  <div>
-    <ul>
-      <li><Link to="/home/main">Home</Link></li>
-      <li><Link to="/home/about">About</Link></li>
-      <li><Link to="/home/topics">Topics</Link></li>
-    </ul>
+export default class Dashboard extends React.Component {
+  render() {
+    console.log(this.props);
+    return (
+      <div>
+        <ul>
+          <li><Link to="/dashboard/main">Home</Link></li>
+          <li><Link to="/dashboard/about">About</Link></li>
+          <li><Link to="/dashboard/topics">Topics</Link></li>
+        </ul>
 
-    <hr color="#EBEBEB"/>
+        <hr color="#EBEBEB"/>
 
-    <Route exact path="/home/main" component={Home}/>
-    <Route path="/home/about" component={About}/>
-    <Route path="/home/topics" component={Topics}/>
-  </div>
-);
-
-export default Dashboard;
+        <Route exact path="/dashboard/main" component={Home}/>
+        <Route path="/dashboard/about" component={About}/>
+        <Route path="/dashboard/topics" component={Topics}/>
+      </div>
+    );
+  }
+};
