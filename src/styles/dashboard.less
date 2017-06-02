@@ -1,3 +1,5 @@
+@import "varible";
+
 .dashboard {
   outline: 1px solid red;
   width: 100%;
@@ -15,6 +17,8 @@
     margin: 0;
   }
 }
+
+
 
 .board-nav {
   display: flex;
@@ -126,3 +130,134 @@
     border-bottom: 3px solid #FFF;
   }
 }
+
+.main-board {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  position: relative;
+  box-sizing: border-box;
+  padding: 10px 10px 0 10px;
+}
+.board-layout {
+  background-color: #E4E4E4;
+  padding: 5px 10px 20px 10px;
+  box-sizing: border-box;
+  margin-right: 10px;
+}
+
+.mail-box {
+  box-sizing: border-box;
+  position: relative;
+  .header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    width: 260px;
+  }
+  .title {
+    color: #797979;
+    font-size: 14px;
+  }
+}
+
+.message-item {
+  width: 260px;
+  height: auto;
+  background-color: #FFF;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  padding: 10px 5px;
+  position: relative;
+  cursor: pointer;
+  &:not(:last-child) {
+    margin-bottom: 5px;
+  }
+
+  .message-content {
+    font-size: 12px;
+    color: #4A4A4A;
+    .mutiline-ellipsis(16px, 2, 12px); //mixin
+  }
+
+  input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    top: 5px;
+  }
+}
+
+.message-title {
+  font-size: 14px;
+  color: #4A4A4A;
+  .text-ellipsis; //mixin
+}
+
+.message-detail {
+  flex: 1;
+  padding: 0 10px 0 5px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.message-bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  margin-top: 10px;
+
+  .tag {
+    display: inline-block;
+    width: 46px;
+    height: 16px;
+    border-radius: 4px;
+    line-height: 16px;
+    vertical-align: middle;
+    text-align: center;
+
+    &:not(:last-child) {
+      margin-right: 5px;
+    }
+  }
+
+  .source {
+    width: 100px;
+    text-align: right;
+    .text-ellipsis;
+  }
+}
+
+.styled-select {
+  height: 20px;
+  overflow: hidden;
+  width: 100px;
+  color: #797979;
+}
+
+.styled-select select {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  height: 20px;
+  padding: 5px;
+  width: 100px;
+}
+
+.styled-select.slate select {
+  border: 1px solid #ccc;
+  font-size: 14px;
+  height: 20px;
+  width: 100px;
+}
+
+.slate { background-color: #ddd; }
+.slate select { color: #000; }
+

@@ -1,0 +1,35 @@
+// single line ellipsis
+.text-ellipsis() {
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* styles for multiLine (default 2) line '...' */
+.mutiline-ellipsis (@lineHeight: 24px, @line: 2, @fontSize: 16px, @backgroundColor: white) {
+  overflow: hidden;
+  position: relative;
+  line-height: @lineHeight;
+  max-height: @lineHeight * @line;
+  text-align: justify;
+  margin-right: @fontSize * -1;
+  padding-right: @fontSize;
+
+  &:before {
+    content: '...';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: @fontSize;
+    height: @fontSize;
+    margin-top: 4px;
+    background: @backgroundColor;
+  }
+}

@@ -95,6 +95,7 @@ p {
 .btn-login {
   width: 256px;
 }
+/* styles for multiLine (default 2) line '...' */
 .dashboard {
   outline: 1px solid red;
   width: 100%;
@@ -232,4 +233,163 @@ p {
 }
 .panel-nav .active {
   border-bottom: 3px solid #FFF;
+}
+.main-board {
+  -ms-flex: 1;
+      flex: 1;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  position: relative;
+  box-sizing: border-box;
+  padding: 10px 10px 0 10px;
+}
+.board-layout {
+  background-color: #E4E4E4;
+  padding: 5px 10px 20px 10px;
+  box-sizing: border-box;
+  margin-right: 10px;
+}
+.mail-box {
+  box-sizing: border-box;
+  position: relative;
+}
+.mail-box .header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  margin-bottom: 10px;
+  width: 260px;
+}
+.mail-box .title {
+  color: #797979;
+  font-size: 14px;
+}
+.message-item {
+  width: 260px;
+  height: auto;
+  background-color: #FFF;
+  border-radius: 2px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  box-sizing: border-box;
+  padding: 10px 5px;
+  position: relative;
+  cursor: pointer;
+}
+.message-item:not(:last-child) {
+  margin-bottom: 5px;
+}
+.message-item .message-content {
+  font-size: 12px;
+  color: #4A4A4A;
+  overflow: hidden;
+  position: relative;
+  line-height: 16px;
+  max-height: 32px;
+  text-align: justify;
+  margin-right: -12px;
+  padding-right: 12px;
+}
+.message-item .message-content:before {
+  content: '...';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.message-item .message-content:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  background: white;
+}
+.message-item input[type="checkbox"] {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  top: 5px;
+}
+.message-title {
+  font-size: 14px;
+  color: #4A4A4A;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-detail {
+  -ms-flex: 1;
+      flex: 1;
+  padding: 0 10px 0 5px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.message-bottom {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  font-size: 10px;
+  margin-top: 10px;
+}
+.message-bottom .tag {
+  display: inline-block;
+  width: 46px;
+  height: 16px;
+  border-radius: 4px;
+  line-height: 16px;
+  vertical-align: middle;
+  text-align: center;
+}
+.message-bottom .tag:not(:last-child) {
+  margin-right: 5px;
+}
+.message-bottom .source {
+  width: 100px;
+  text-align: right;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.styled-select {
+  height: 20px;
+  overflow: hidden;
+  width: 100px;
+  color: #797979;
+}
+.styled-select select {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  height: 20px;
+  padding: 5px;
+  width: 100px;
+}
+.styled-select.slate select {
+  border: 1px solid #ccc;
+  font-size: 14px;
+  height: 20px;
+  width: 100px;
+}
+.slate {
+  background-color: #ddd;
+}
+.slate select {
+  color: #000;
 }

@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import Login from '../views/Login';
 import Dashboard from '../views/Dashboard';
+import MessageDetail from '../views/MessageDetail';
 import {
   MainDashboard,
   Analysis,
@@ -48,7 +49,8 @@ const routes = [
     ],
   },
   {
-    path: '/home',
+    path: '/message/:id',
+    component: MessageDetail,
   }
 ];
 

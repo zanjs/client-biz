@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  Link,
-  Redirect,
-} from 'react-router-dom';
 import FontIcon from 'material-ui/FontIcon';
-import NavLink from "react-router-dom/es/NavLink";
+import MainBoard from './main/MainBoard';
 
 export default class MainDashboard extends React.PureComponent {
   state={
@@ -37,7 +33,7 @@ export default class MainDashboard extends React.PureComponent {
 
   PanelContent = () => {
     switch (this.state.activeTab) {
-      case 0: return <p>看板内容</p>;
+      case 0: return <MainBoard/>;
       case 1: return <p>采购内容</p>;
       case 2: return <p>销售内容</p>;
       case 3: return <p>日历内容</p>;
