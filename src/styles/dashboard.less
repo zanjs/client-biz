@@ -1,0 +1,128 @@
+.dashboard {
+  outline: 1px solid red;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+
+  a {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    outline: none;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.board-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #4bbcb7;
+
+  a {
+    outline: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .icon-button {
+    display: block;
+    margin: 0;
+    width: 60px;
+    padding: 15px 0;
+    text-align: center;
+    text-decoration: none;
+    color: #a1fffb;
+    cursor: pointer;
+    outline: none;
+    font-size: 14px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, .1);
+    }
+  }
+
+  .btn-link {
+    display: block;
+    font-size: 0;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    position: relative;
+    &:hover {
+      background-color: rgba(0, 0, 0, .1);
+    }
+    .display-name {
+      display: inline-block;
+      width: 44px;
+      height: 44px;
+      color: #FFF;
+      font-size: 14px;
+      line-height: 44px;
+      border-radius: 22px;
+      background-color: rgb(132, 117, 207);
+      position: relative;
+      top: 8px;
+    }
+  }
+}
+
+.work-panel {
+  flex: 1;
+}
+
+.panel-nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #3F51B5;
+  color: #FFF;
+
+  .title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 110px;
+    height: 50px;
+    justify-content: space-between;
+    margin-left: 20px;
+  }
+  .tab-container {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+  }
+  .tab {
+    display: inline-block;
+    width: 60px;
+    height: 50px;
+    line-height: 50px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: inherit;
+    font-size: inherit;
+    &:hover {
+      background-color: rgba(0, 0, 0, .1);
+      border-bottom: 3px solid #FFF;
+    }
+  }
+  .active {
+    border-bottom: 3px solid #FFF;
+  }
+}

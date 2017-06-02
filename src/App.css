@@ -96,3 +96,141 @@ p {
 .btn-login {
   width: 256px;
 }
+.dashboard {
+  outline: 1px solid red;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+}
+.dashboard a {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+.board-nav {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #4bbcb7;
+}
+.board-nav a {
+  outline: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.board-nav .icon-button {
+  display: block;
+  margin: 0;
+  width: 60px;
+  padding: 15px 0;
+  text-align: center;
+  text-decoration: none;
+  color: #a1fffb;
+  cursor: pointer;
+  outline: none;
+  font-size: 14px;
+}
+.board-nav .icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.board-nav .btn-link {
+  display: block;
+  font-size: 0;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  position: relative;
+}
+.board-nav .btn-link:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.board-nav .btn-link .display-name {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  color: #FFF;
+  font-size: 14px;
+  line-height: 44px;
+  border-radius: 22px;
+  background-color: #8475cf;
+  position: relative;
+  top: 8px;
+}
+.work-panel {
+  -ms-flex: 1;
+      flex: 1;
+}
+.panel-nav {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  background-color: #3F51B5;
+  color: #FFF;
+}
+.panel-nav .title {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  width: 110px;
+  height: 50px;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  margin-left: 20px;
+}
+.panel-nav .tab-container {
+  -ms-flex: 1;
+      flex: 1;
+  text-align: center;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+  padding: 0 10px;
+}
+.panel-nav .tab {
+  display: inline-block;
+  width: 60px;
+  height: 50px;
+  line-height: 50px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+  font-size: inherit;
+}
+.panel-nav .tab:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 3px solid #FFF;
+}
+.panel-nav .active {
+  border-bottom: 3px solid #FFF;
+}

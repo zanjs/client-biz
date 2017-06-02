@@ -1,73 +1,58 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom'
-
-const Home = () => (
-  <div>
-    <h2>Home</h2>
-  </div>
-);
-
-const About = () => (
-  <div>
-    <h2>About</h2>
-  </div>
-);
-
-const Topic = ({ match }) => (
-  <div>
-    <h3>{match.params.topicId}</h3>
-  </div>
-);
-
-const Topics = ({ match }) => (
-  <div>
-    <h2>Topics</h2>
-    <ul>
-      <li>
-        <Link to={`${match.url}/rendering`}>
-          Rendering with React
-        </Link>
-      </li>
-      <li>
-        <Link to={`${match.url}/components`}>
-          Components
-        </Link>
-      </li>
-      <li>
-        <Link to={`${match.url}/props-v-state`}>
-          Props v. State
-        </Link>
-      </li>
-    </ul>
-
-    <Route path={`${match.url}/:topicId`} component={Topic}/>
-    <Route exact path={match.url} render={() => (
-      <h3>Please select a topic.</h3>
-    )}/>
-  </div>
-);
+  Link,
+  Redirect,
+} from 'react-router-dom';
+import FontIcon from 'material-ui/FontIcon';
+import {RouteWithSubRoutes} from "../router/index";
 
 export default class Dashboard extends React.Component {
-  render() {
+  componentWillMount() {
     console.log(this.props);
+    if (this.props.match.path === '/dashboard') {
+
+    }
+  }
+  render() {
+    // console.log(this.props);
+    const {routes, match} = this.props;
+    // if (match.path === '/dashboard') {
+    //   return <Redirect to/>
+    // }
     return (
-      <div>
-        <ul>
-          <li><Link to="/dashboard/main">Home</Link></li>
-          <li><Link to="/dashboard/about">About</Link></li>
-          <li><Link to="/dashboard/topics">Topics</Link></li>
-        </ul>
-
-        <hr color="#EBEBEB"/>
-
-        <Route exact path="/dashboard/main" component={Home}/>
-        <Route path="/dashboard/about" component={About}/>
-        <Route path="/dashboard/topics" component={Topics}/>
+      <div className="dashboard">
+        <DashboardNav />
+        {routes && routes.map((route, i) => (
+          <RouteWithSubRoutes key={i} {...route}/>
+        ))}
       </div>
     );
   }
 };
+
+const DashboardNav = ({user}) => (
+  <nav className="board-nav">
+    <div>
+      <LinkButton icon='dashboard' text='我的' to="/dashboard/main"/>
+      <LinkButton icon='search' text='搜索' to="/dashboard/search"/>
+      <LinkButton icon='person' text='伙伴' to="/dashboard/partner"/>
+      <LinkButton icon='archive' text='产品' to="/dashboard/product"/>
+      <LinkButton icon='trending_up' text='分析' to="/dashboard/analysis"/>
+    </div>
+    <div>
+      <a className="btn-link">
+        <FontIcon className="material-icons" color="#a1fffb" style={{fontSize: 50, top: 5}}>add_circle_outline</FontIcon>
+      </a>
+      <a className="btn-link">
+        <span className="display-name">{(user && user.display_name) || '我'}</span>
+      </a>
+    </div>
+  </nav>
+);
+
+const LinkButton = ({icon, text, to}) => (
+  <Link className="icon-button" to={to}>
+    <FontIcon className="material-icons" color="#a1fffb">{icon}</FontIcon>
+    <p>{text}</p>
+  </Link>
+);
