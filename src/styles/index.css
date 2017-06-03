@@ -25,6 +25,13 @@ p {
   margin: 0;
   padding: 0;
 }
+a,
+button {
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  outline: 0;
+}
 .layout-login {
   display: -ms-flexbox;
   display: flex;
@@ -528,6 +535,16 @@ a {
   min-width: 800px;
   margin: 10px auto 0 auto;
 }
+.flex-row {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+}
 .detail-title {
   display: -ms-flexbox;
   display: flex;
@@ -680,4 +697,77 @@ a {
   -ms-flex-pack: start;
       justify-content: flex-start;
   width: 100px;
+}
+.total-price-txt {
+  color: #0b24fb;
+  font-size: 14px;
+}
+.btn-change-discount {
+  margin: 0;
+  padding: 2px;
+  outline: none;
+  border: 1px solid #E6E6E6;
+  background-color: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 5px;
+}
+.comment-area {
+  margin-top: 50px;
+  height: 380px;
+  border: 1px solid #E6E6E6;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  box-sizing: border-box;
+}
+.comment-tabs {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  border-bottom: 1px solid #E6E6E6;
+}
+.comment-tab {
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+}
+.comment-tab:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid #333;
+}
+.comment-input {
+  margin: 5px 15px;
+  height: 100px;
+  background-color: #f0f8fa;
+  padding: 0 10px;
+  position: relative;
+}
+.comment-input .actions {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+}
+.comment-input .send {
+  background-color: #34a6ce;
+  border: none;
+  height: 20px;
+  width: 80px;
+  border-radius: 4px;
+  color: #FFF;
+  font-size: 12px;
 }

@@ -208,7 +208,15 @@ export class DetailHeader extends React.PureComponent {
             <RadioButton value={1} label="不含税" iconStyle={{marginRight: 5}} labelStyle={{color: '#999'}} style={{marginLeft: -30}}/>
           </RadioButtonGroup>
         </div>
-        <div></div>
+        <div className="flex-row" style={{justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #E6E6E6'}}>
+          <p className="total-price-txt">总价：{`${detail.total_price}`.replace(/\d{1,3}(?=(\d{3})+$)/g,function(s){ return s+',' })}</p>
+          <div className="flex-row">
+            <button className="btn-change-discount" onClick={() => alert('change discount')}>￥</button>
+            <p>-5%</p>
+          </div>
+          <label><input type="checkbox" name="goods-item"/> OK</label>
+        </div>
+        {/* TODO (noah) 明细列表 */}
       </div>
     );
   };

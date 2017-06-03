@@ -19,7 +19,7 @@ export default class Detail extends React.Component {
     return (
       <div>
         <DetailHeader id={id} onClose={this.onClose} detail={detail}/>
-        <Comments id={id}/>
+        <Comments id={id} detail={detail}/>
       </div>
     );
   }

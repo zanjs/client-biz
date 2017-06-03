@@ -1,5 +1,11 @@
 @import "varible";
 
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
 
 .detail-title {
   display: flex;
@@ -139,4 +145,77 @@
   align-items: center;
   justify-content: flex-start;
   width: 100px;
+}
+
+.total-price-txt {
+  color: #0b24fb;
+  font-size: 14px;
+}
+
+.btn-change-discount {
+  margin: 0;
+  padding: 2px;
+  outline: none;
+  border: 1px solid #E6E6E6;
+  background-color: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+
+.comment-area {
+  margin-top: 50px;
+  height: 380px;
+  border: 1px solid #E6E6E6;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.comment-tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  border-bottom: 1px solid #E6E6E6;
+}
+
+.comment-tab {
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, .1);
+    border-bottom: 2px solid #333;
+  }
+}
+
+.comment-input {
+  margin: 5px 15px;
+  height: 100px;
+  background-color: #f0f8fa;
+  padding: 0 10px;
+  position: relative;
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .send {
+    background-color: #34a6ce;
+    border: none;
+    height: 20px;
+    width: 80px;
+    border-radius: 4px;
+    color: #FFF;
+    font-size: 12px;
+  }
 }

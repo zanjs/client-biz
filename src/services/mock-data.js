@@ -218,7 +218,7 @@ export const ORDER_DETAIL = {
   price_type: '单价',
   payment: '30天',
   total_price: 34000,
-  reduce: null,
+  discount: null,
   goods_list: [
     {line_no: 10, goods_no: 20012, name: '不粘胶', size: '20m', count: 200, unit: '卷', currency: '￥', total_price: 16000, due_date: 1489334400000},
     {line_no: 20, goods_no: 21005, name: '中号白色无纺布', size: '60mm', count: 300, unit: '匹', currency: '￥', total_price: 18000, due_date: 1489334400000}
