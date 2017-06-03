@@ -8,8 +8,8 @@ export default class Detail extends React.Component {
     detail: {},
   };
   async componentWillMount() {
-    const detail = await getDetail('MESSAGE');
-    // const detail = await getDetail('ORDER');
+    // const detail = await getDetail('MESSAGE');
+    const detail = await getDetail('ORDER');
     this.setState({ detail });
   }
   onClose = () => this.props.history.goBack();

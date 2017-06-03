@@ -1,4 +1,4 @@
-import {TagType, MailType, ProcurementMessagType, ProcurementType, DetailContentType} from "./data-type";
+import {TagType, MailType, ProcurementMessagType, ProcurementType, DetailContentType, CurrencyType} from "./data-type";
 
 export const MOCK_MAILS = [
   {
@@ -198,10 +198,10 @@ export const MESSAGE_DETAIL = {
 
 export const ORDER_DETAIL = {
   order_no: '30000012',
-  title: '采购-订单',
+  label: '采购-订单',
   type: DetailContentType.PROCUREMENT_ORDER,
   timestamp: 1488247680000,
-  supply: {
+  supplier: {
     company: 'Babycare Co, Ltd',
     display_name: '王五',
     position: '客户经理',
@@ -213,10 +213,10 @@ export const ORDER_DETAIL = {
   follower: [
     {display_name: '肖云初', position: '采购总监'},
   ],
-  currency: 'CNY',
+  currency: CurrencyType.CNY,
   tax: true,
   price_type: '单价',
-  pay_agreement: '30天',
+  payment: '30天',
   total_price: 34000,
   reduce: null,
   goods_list: [

@@ -51,7 +51,7 @@ export const PriceType = {
   DEFAULT: '金额',
 };
 
-export const PayAgreementType = {
+export const PaymentType = {
   PRE_PAY: '预付',
   CASH: '现款现结',
   TEN_DAY: '10天',
