@@ -1,4 +1,4 @@
-import {TagType, MailType, ProcurementMessagType} from "./data-type";
+import {TagType, MailType, ProcurementMessagType, ProcurementType} from "./data-type";
 
 export const MOCK_MAILS = [
   {
@@ -29,7 +29,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT],
     read: false,
     id: 'PROCUREMENT01',
-    type: ProcurementMessagType.CONTACTME
+    type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.CANCELED,
   },
   {
     title: '采购订单30000011被确认',
@@ -38,7 +39,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT, TagType.URGENT],
     read: false,
     id: 'PROCUREMENT02',
-    type: ProcurementMessagType.INCHARGE
+    type: ProcurementMessagType.INCHARGE,
+    main_type: ProcurementType.COMPLETED,
   },
   {
     title: '结算单50000009被修改',
@@ -46,7 +48,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     from: '永辉超市集团',
     read: true,
     id: 'PROCUREMENT03',
-    type: ProcurementMessagType.PARTICIPANT
+    type: ProcurementMessagType.PARTICIPANT,
+    main_type: ProcurementType.CONFIRMED,
   },
   {
     title: '预计需求00000015被反馈',
@@ -54,6 +57,7 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     read: true,
     id: 'PROCUREMENT04',
     type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.TO_BALANCE,
   },
   {
     title: '询报价单13000018获报价',
@@ -62,7 +66,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT],
     read: false,
     id: 'PROCUREMENT01',
-    type: ProcurementMessagType.CONTACTME
+    type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.TO_CONFIRM,
   },
   {
     title: '采购订单30000011被确认',
@@ -71,7 +76,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT, TagType.URGENT],
     read: false,
     id: 'PROCUREMENT02',
-    type: ProcurementMessagType.INCHARGE
+    type: ProcurementMessagType.INCHARGE,
+    main_type: ProcurementType.TO_PAY,
   },
   {
     title: '结算单50000009被修改',
@@ -79,7 +85,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     from: '永辉超市集团',
     read: true,
     id: 'PROCUREMENT03',
-    type: ProcurementMessagType.PARTICIPANT
+    type: ProcurementMessagType.PARTICIPANT,
+    main_type: ProcurementType.TO_RECEIVE,
   },
   {
     title: '预计需求00000015被反馈',
@@ -87,6 +94,7 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     read: true,
     id: 'PROCUREMENT04',
     type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.CANCELED,
   },
   {
     title: '询报价单13000018获报价',
@@ -95,7 +103,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT],
     read: false,
     id: 'PROCUREMENT01',
-    type: ProcurementMessagType.CONTACTME
+    type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.COMPLETED,
   },
   {
     title: '采购订单30000011被确认',
@@ -104,7 +113,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT, TagType.URGENT],
     read: false,
     id: 'PROCUREMENT02',
-    type: ProcurementMessagType.INCHARGE
+    type: ProcurementMessagType.INCHARGE,
+    main_type: ProcurementType.CONFIRMED,
   },
   {
     title: '结算单50000009被修改',
@@ -112,7 +122,8 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     from: '永辉超市集团',
     read: true,
     id: 'PROCUREMENT03',
-    type: ProcurementMessagType.PARTICIPANT
+    type: ProcurementMessagType.PARTICIPANT,
+    main_type: ProcurementType.CONFIRMED,
   },
   {
     title: '预计需求00000015被反馈',
@@ -120,6 +131,7 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     read: true,
     id: 'PROCUREMENT04',
     type: ProcurementMessagType.CONTACTME,
+    main_type: ProcurementType.TO_BALANCE,
   },
 ];
 

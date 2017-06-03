@@ -1,3 +1,4 @@
+@import "~react-big-calendar/lib/css/react-big-calendar.css";
 body,
 html {
   width: 100%;
@@ -111,6 +112,8 @@ p {
   text-decoration: none;
   color: inherit;
   outline: none;
+}
+a {
   padding: 0;
   margin: 0;
 }
@@ -174,6 +177,7 @@ p {
 .work-panel {
   -ms-flex: 1;
       flex: 1;
+  overflow: hidden;
 }
 .panel-nav {
   display: -ms-flexbox;
@@ -193,6 +197,7 @@ p {
   -ms-flex-align: center;
       align-items: center;
   width: 110px;
+  min-width: 110px;
   height: 50px;
   -ms-flex-pack: justify;
       justify-content: space-between;
@@ -244,13 +249,17 @@ p {
   position: relative;
   box-sizing: border-box;
   padding: 10px 10px 0 10px;
-  -ms-flex-pack: distribute;
-      justify-content: space-around;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
   -ms-flex-align: start;
       align-items: flex-start;
   height: 100%;
+  min-width: 780px;
 }
 .board-layout {
+  -ms-flex: 1;
+      flex: 1;
+  min-width: 280px;
   background-color: #E4E4E4;
   padding: 5px 10px 20px 10px;
   box-sizing: border-box;
@@ -272,14 +281,16 @@ p {
   -ms-flex-pack: justify;
       justify-content: space-between;
   margin-bottom: 10px;
-  width: 260px;
+  width: 100%;
+  min-width: 260px;
 }
 .message-box .title {
   color: #797979;
   font-size: 14px;
 }
 .message-item {
-  width: 260px;
+  width: 100%;
+  min-width: 260px;
   height: auto;
   background-color: #FFF;
   border-radius: 2px;
@@ -335,9 +346,9 @@ p {
 .message-detail {
   -ms-flex: 1;
       flex: 1;
-  padding: 0 10px 0 5px;
   box-sizing: border-box;
   overflow: hidden;
+  padding-right: 10px;
 }
 .message-bottom {
   display: -ms-flexbox;
@@ -396,4 +407,124 @@ p {
 }
 .slate select {
   color: #000;
+}
+.procurement-board {
+  margin: 5px 20px;
+  height: 90%;
+  overflow-y: scroll;
+  background-color: #E4E4E4;
+  box-sizing: border-box;
+  padding: 5px;
+}
+.procurement-header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  margin-bottom: 10px;
+}
+.procurement-header .title {
+  color: #797979;
+  font-size: 14px;
+  margin-right: 20px;
+}
+.header-left {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  min-width: 290px;
+}
+.header-right {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+}
+.procurement-item {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: start;
+      align-items: flex-start;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+}
+.btn-actions {
+  position: relative;
+  cursor: pointer;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-align: center;
+      align-items: center;
+  width: 80px;
+  height: 20px;
+  font-size: 12px;
+  color: #797979;
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px solid #797979;
+}
+.trangle {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid #797979;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+.follow-actions {
+  position: absolute;
+  right: -10px;
+  top: 20px;
+  width: 100px;
+  height: 0;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.follow-actions .btn-action {
+  width: 100%;
+  height: 20px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  color: #797979;
+}
+.follow-actions .btn-action:hover {
+  background-color: #4296fa;
+  color: #FFF;
+}
+.btn-actions:hover .trangle {
+  border-left: 4px solid transparent;
+  border-bottom: 4px solid #797979;
+  border-right: 4px solid transparent;
+  border-top: 0;
+}
+.btn-actions:hover .follow-actions {
+  height: auto;
+  opacity: 1;
+  overflow: visible;
+  padding: 5px 0;
+  border: 1px solid rgba(153, 153, 153, 0.6);
+  box-shadow: 2px 4px 5px rgba(153, 153, 153, 0.5);
+}
+.calendar-container {
+  width: 90%;
+  height: 90%;
+  min-width: 800px;
+  margin: 10px auto 0 auto;
 }

@@ -15,6 +15,16 @@ export const ProcurementMessagType = {
   PENDING: 3,
 };
 
+export const ProcurementType = {
+  TO_CONFIRM: 0,
+  CONFIRMED: 1,
+  TO_RECEIVE: 2,
+  TO_BALANCE: 3,
+  TO_PAY: 4,
+  COMPLETED: 5,
+  CANCELED: 6,
+};
+
 export const SaleMessagType = {
   INCHARGE: 0,
   PARTICIPANT: 1,

@@ -14,3 +14,15 @@ export const BoxHeader = ({title, selections, onSelect, selectionCount}) => (
     </select>
   </div>
 );
+
+export const SelectItem = ({selections, onSelect, selectionCount}) => (
+  <select onChange={onSelect} className="styled-select slate">
+    {
+      selections.map(((selection, index) => <option
+        value={index}
+        key={index}>
+        {selection}&nbsp;&nbsp;{selectionCount && (selectionCount(index) || 0)}
+      </option>))
+    }
+  </select>
+);

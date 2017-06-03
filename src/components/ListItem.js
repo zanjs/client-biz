@@ -17,22 +17,23 @@ export class MessageItem extends React.PureComponent {
   render() {
     const {message} = this.props;
     return (
-      <Link to={`/message/${message.id}`} style={{display: 'block', marginBottom: 5}}>
-        <div className="message-item">
-          <input type="checkbox"/>
-          <div className="message-detail">
-            <p className="message-title">{message.title}</p>
-            <p className="message-content">{message.content}</p>
-            <div className="message-bottom">
-              <div>
-                {message.tags && message.tags.map((tag, index) => <p
-                  key={index} className="tag" style={this.getTagStyle(tag)}>{tag}</p>)}
-              </div>
-              <p className="source">来自：{message.from}</p>
+      <div className="message-item" style={{marginBottom: 5}}>
+        <input type="checkbox"/>
+        <Link className="message-detail" to={`/message/${message.id}`} style={{display: 'block', marginLeft: 5}}>
+          <p className="message-title">{message.title}</p>
+          <p className="message-content">{message.content}</p>
+          <div className="message-bottom">
+            <div>
+              {message.tags && message.tags.map((tag, index) => <p
+                key={index} className="tag" style={this.getTagStyle(tag)}>{tag}</p>)}
             </div>
+            <p className="source">来自：{message.from}</p>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
     );
   }
 }
+{/*<Link to={`/message/${message.id}`} style={{display: 'block', marginBottom: 5}}>*/}
+
+{/*</Link>*/}

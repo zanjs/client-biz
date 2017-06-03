@@ -2,6 +2,8 @@ import React from 'react';
 import FontIcon from 'material-ui/FontIcon';
 import MainBoard from './main/MainBoard';
 import ProcurementBoard from './procurement/ProcurementBoard';
+import SaleBoard from './sale/SaleBoard';
+import Calendar from './calendar/Calendar';
 
 export default class MainDashboard extends React.PureComponent {
   state={
@@ -27,7 +29,7 @@ export default class MainDashboard extends React.PureComponent {
               </button>
             ))}
         </div>
-        <div style={{width: 110, height: 50}}/>
+        <div className="defaultRight" style={{width: 110, height: 50}}/>
       </div>
     );
   };
@@ -36,8 +38,8 @@ export default class MainDashboard extends React.PureComponent {
     switch (this.state.activeTab) {
       case 0: return <MainBoard/>;
       case 1: return <ProcurementBoard/>;
-      case 2: return <p>销售内容</p>;
-      case 3: return <p>日历内容</p>;
+      case 2: return <SaleBoard/>;
+      case 3: return <Calendar />;
       default: return;
     }
   };
