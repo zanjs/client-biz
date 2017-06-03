@@ -2,11 +2,10 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Link
 } from 'react-router-dom';
 import Login from '../views/Login';
 import Dashboard from '../views/Dashboard';
-import MessageDetail from '../views/MessageDetail';
+import Detail from '../views/Detail';
 import {
   MainDashboard,
   Analysis,
@@ -49,8 +48,8 @@ const routes = [
     ],
   },
   {
-    path: '/message/:id',
-    component: MessageDetail,
+    path: '/detail/:id',
+    component: Detail,
   }
 ];
 

@@ -8,17 +8,12 @@ import {RouteWithSubRoutes} from "../router/index";
 
 export default class Dashboard extends React.Component {
   componentWillMount() {
-    console.log(this.props);
     if (this.props.match.path === '/dashboard') {
-
+      this.props.history.push('/dashboard/main');
     }
   }
   render() {
-    // console.log(this.props);
-    const {routes, match} = this.props;
-    // if (match.path === '/dashboard') {
-    //   return <Redirect to/>
-    // }
+    const {routes} = this.props;
     return (
       <div className="dashboard">
         <DashboardNav />

@@ -1,5 +1,5 @@
 import React from 'react';
-import {getSaleMessage} from "../../../services/message";
+import {getSaleMessages} from "../../../services/message";
 import {MessageItem} from "../../../components/ListItem";
 import {SelectItem} from "../../../components/BoxHeader"
 import {SaleMessagType} from "../../../services/data-type";
@@ -11,7 +11,7 @@ export default class SaleBoard extends React.PureComponent {
     filterValue: 0,
   };
   async componentWillMount() {
-    const listDS = await getSaleMessage();
+    const listDS = await getSaleMessages();
     this.setState({ listDS });
   }
 

@@ -2,6 +2,7 @@ import React from 'react';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
 import {getEvent} from "../../../services/calendarEvent";
+
 BigCalendar.momentLocalizer(moment);
 
 export default class BizCalendar extends React.PureComponent {

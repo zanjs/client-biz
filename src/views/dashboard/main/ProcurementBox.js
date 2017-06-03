@@ -1,6 +1,6 @@
 import React from 'react';
 import {BoxHeader} from "../../../components/BoxHeader";
-import {getProcurementMessag} from "../../../services/message";
+import {getProcurementMessages} from "../../../services/message";
 import {MessageItem} from "../../../components/ListItem";
 import {ProcurementMessagType} from "../../../services/data-type";
 
@@ -12,7 +12,7 @@ export class ProcurementBox extends React.PureComponent {
   selections = ['全部未读', '我负责的', '我参与的', '@我的', '待处理', '已读'];
   async componentWillMount() {
     try {
-      const messages = await getProcurementMessag();
+      const messages = await getProcurementMessages();
       this.setState({ messages });
     } catch (e) {}
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import {getProcurementMessag} from "../../../services/message";
+import {getProcurementMessages} from "../../../services/message";
 import {MessageItem} from "../../../components/ListItem";
 import {SelectItem} from "../../../components/BoxHeader"
 import {ProcurementMessagType, ProcurementType} from "../../../services/data-type";
@@ -12,12 +12,11 @@ export default class ProcurementBoard extends React.PureComponent {
     filterValueB: 0,
   };
   async componentWillMount() {
-    const listDS = await getProcurementMessag();
+    const listDS = await getProcurementMessages();
     this.setState({ listDS });
   }
   selectionsA = ['全部', '待确认', '已确认', '未收货', '未结算', '未付款', '已付款', '已完成', '已取消'];
   selectionsB = ['全部未读', '我负责的', '我参与的', '@我的', '待处理', '已读'];
-  actionSelections = ['后续操作', '收货', '退货', '生成结算单', '完成', '取消'];
   selectionCountB = (index) => {
     const {listDS} = this.state;
     switch (index) {
@@ -118,7 +117,7 @@ export default class ProcurementBoard extends React.PureComponent {
 
   onSend = () => alert('send');
   onSave = () => alert('save');
-  onInsert = () => alert('insert');
+  onAttach = () => alert('attach');
   onCopy = () => alert('copy');
   onShare = () => alert('share');
 
@@ -134,7 +133,7 @@ export default class ProcurementBoard extends React.PureComponent {
           <div className="header-right">
             <this.ActionButton icon='send' action={this.onSend}/>
             <this.ActionButton icon='save' action={this.onSave}/>
-            <this.ActionButton icon='attachment' action={this.onInsert}/>
+            <this.ActionButton icon='attachment' action={this.onAttach}/>
             <this.ActionButton icon='content_copy' action={this.onCopy}/>
             <this.FollowActions/>
             <this.ActionButton icon='share' action={this.onShare}/>

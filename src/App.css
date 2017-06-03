@@ -529,3 +529,109 @@ a {
   min-width: 800px;
   margin: 10px auto 0 auto;
 }
+.detail-title {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  border-bottom: 1px solid #EBEBEB;
+  padding: 5px 10px;
+}
+.detail-title > div {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+}
+.detail-title.message {
+  width: 480px;
+  min-width: 480px;
+  box-sizing: border-box;
+}
+.detail-label {
+  font-size: 16px;
+  color: #797979;
+  margin-right: 10px;
+}
+.message-info-item {
+  width: 480px;
+  min-width: 480px;
+  box-sizing: border-box;
+  padding: 5px 10px;
+}
+.message-info-item .title-container {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: start;
+      align-items: flex-start;
+  width: 100%;
+}
+.message-info-item .line {
+  height: 1px;
+  background-color: #E6E6E6;
+  margin: 5px 0;
+}
+.message-info-item .message-content {
+  color: #999;
+  font-size: 12px;
+}
+.detail-title-txt {
+  -ms-flex: 1;
+      flex: 1;
+  color: #333;
+  font-size: 14px;
+}
+.detail-time-txt {
+  color: #999;
+  font-size: 14px;
+  margin-left: 10px;
+}
+.sender-info-item {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: start;
+      align-items: flex-start;
+  color: #999;
+  font-size: 14px;
+  margin: 5px 0;
+}
+.sender-info-item .company-txt {
+  -ms-flex: 1;
+      flex: 1;
+}
+.message-relatives {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: start;
+      align-items: flex-start;
+  color: #189acf;
+  font-size: 12px;
+}
+.message-relatives > div {
+  -ms-flex: 1;
+      flex: 1;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: start;
+      align-items: flex-start;
+}
+.message-relatives button {
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  outline: none;
+}

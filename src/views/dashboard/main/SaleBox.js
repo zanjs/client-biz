@@ -1,6 +1,6 @@
 import React from 'react';
 import {BoxHeader} from "../../../components/BoxHeader";
-import {getSaleMessage} from "../../../services/message";
+import {getSaleMessages} from "../../../services/message";
 import {MessageItem} from "../../../components/ListItem";
 import {SaleMessagType} from "../../../services/data-type";
 
@@ -12,7 +12,7 @@ export class SaleBox extends React.PureComponent {
   selections = ['全部未读', '我负责的', '我参与的', '待处理', '已读'];
   async componentWillMount() {
     try {
-      const messages = await getSaleMessage();
+      const messages = await getSaleMessages();
       this.setState({ messages });
     } catch (e) {}
   }
