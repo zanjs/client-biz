@@ -1,6 +1,7 @@
 import React from 'react';
 import FontIcon from 'material-ui/FontIcon';
 import MainBoard from './main/MainBoard';
+import ProcurementBoard from './procurement/ProcurementBoard';
 
 export default class MainDashboard extends React.PureComponent {
   state={
@@ -34,7 +35,7 @@ export default class MainDashboard extends React.PureComponent {
   PanelContent = () => {
     switch (this.state.activeTab) {
       case 0: return <MainBoard/>;
-      case 1: return <p>采购内容</p>;
+      case 1: return <ProcurementBoard/>;
       case 2: return <p>销售内容</p>;
       case 3: return <p>日历内容</p>;
       default: return;

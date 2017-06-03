@@ -1,4 +1,4 @@
-import {TagType, MailType} from "./data-type";
+import {TagType, MailType, ProcurementMessagType} from "./data-type";
 
 export const MOCK_MAILS = [
   {
@@ -24,11 +24,12 @@ export const MOCK_MAILS = [
 export const MOCK_PROCUREMENT_MESSAGE = [
   {
     title: '询报价单13000018获报价',
-    content: '付款条件被改为60天\n' + '10行[纸尿裤]交货日期被改为4月5日',
+    content: '付款条件被改为60天10行[纸尿裤]交货日期被改为4月5日',
     from: '永辉超市集团',
     tags: [TagType.IMPORTANT],
     read: false,
     id: 'PROCUREMENT01',
+    type: ProcurementMessagType.CONTACTME
   },
   {
     title: '采购订单30000011被确认',
@@ -37,6 +38,7 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     tags: [TagType.IMPORTANT, TagType.URGENT],
     read: false,
     id: 'PROCUREMENT02',
+    type: ProcurementMessagType.INCHARGE
   },
   {
     title: '结算单50000009被修改',
@@ -44,12 +46,80 @@ export const MOCK_PROCUREMENT_MESSAGE = [
     from: '永辉超市集团',
     read: true,
     id: 'PROCUREMENT03',
+    type: ProcurementMessagType.PARTICIPANT
   },
   {
     title: '预计需求00000015被反馈',
     from: '永辉超市集团',
     read: true,
     id: 'PROCUREMENT04',
+    type: ProcurementMessagType.CONTACTME,
+  },
+  {
+    title: '询报价单13000018获报价',
+    content: '付款条件被改为60天10行[纸尿裤]交货日期被改为4月5日',
+    from: '永辉超市集团',
+    tags: [TagType.IMPORTANT],
+    read: false,
+    id: 'PROCUREMENT01',
+    type: ProcurementMessagType.CONTACTME
+  },
+  {
+    title: '采购订单30000011被确认',
+    content: '贵司BizLink订单号30000001所供商品客诉率很高，存在明显质量问题，我司...贵司BizLink订单号30000001所供商品客诉率很高，存在明显质量问题，我司...',
+    from: '上海爱婴室...',
+    tags: [TagType.IMPORTANT, TagType.URGENT],
+    read: false,
+    id: 'PROCUREMENT02',
+    type: ProcurementMessagType.INCHARGE
+  },
+  {
+    title: '结算单50000009被修改',
+    content: '10行2017年2月结算款被改为1,639,870',
+    from: '永辉超市集团',
+    read: true,
+    id: 'PROCUREMENT03',
+    type: ProcurementMessagType.PARTICIPANT
+  },
+  {
+    title: '预计需求00000015被反馈',
+    from: '永辉超市集团',
+    read: true,
+    id: 'PROCUREMENT04',
+    type: ProcurementMessagType.CONTACTME,
+  },
+  {
+    title: '询报价单13000018获报价',
+    content: '付款条件被改为60天10行[纸尿裤]交货日期被改为4月5日',
+    from: '永辉超市集团',
+    tags: [TagType.IMPORTANT],
+    read: false,
+    id: 'PROCUREMENT01',
+    type: ProcurementMessagType.CONTACTME
+  },
+  {
+    title: '采购订单30000011被确认',
+    content: '贵司BizLink订单号30000001所供商品客诉率很高，存在明显质量问题，我司...贵司BizLink订单号30000001所供商品客诉率很高，存在明显质量问题，我司...',
+    from: '上海爱婴室...',
+    tags: [TagType.IMPORTANT, TagType.URGENT],
+    read: false,
+    id: 'PROCUREMENT02',
+    type: ProcurementMessagType.INCHARGE
+  },
+  {
+    title: '结算单50000009被修改',
+    content: '10行2017年2月结算款被改为1,639,870',
+    from: '永辉超市集团',
+    read: true,
+    id: 'PROCUREMENT03',
+    type: ProcurementMessagType.PARTICIPANT
+  },
+  {
+    title: '预计需求00000015被反馈',
+    from: '永辉超市集团',
+    read: true,
+    id: 'PROCUREMENT04',
+    type: ProcurementMessagType.CONTACTME,
   },
 ];
 

@@ -17,7 +17,7 @@ export class MessageItem extends React.PureComponent {
   render() {
     const {message} = this.props;
     return (
-      <Link to={`/message/${message.id}`}>
+      <Link to={`/message/${message.id}`} style={{display: 'block', marginBottom: 5}}>
         <div className="message-item">
           <input type="checkbox"/>
           <div className="message-detail">

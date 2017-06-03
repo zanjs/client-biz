@@ -245,18 +245,25 @@ p {
   position: relative;
   box-sizing: border-box;
   padding: 10px 10px 0 10px;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -ms-flex-align: start;
+      align-items: flex-start;
+  height: 100%;
 }
 .board-layout {
   background-color: #E4E4E4;
   padding: 5px 10px 20px 10px;
   box-sizing: border-box;
   margin-right: 10px;
+  max-height: 90%;
+  overflow-y: auto;
 }
-.mail-box {
+.message-box {
   box-sizing: border-box;
   position: relative;
 }
-.mail-box .header {
+.message-box .header {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: row;
@@ -268,7 +275,7 @@ p {
   margin-bottom: 10px;
   width: 260px;
 }
-.mail-box .title {
+.message-box .title {
   color: #797979;
   font-size: 14px;
 }
@@ -285,9 +292,6 @@ p {
   padding: 10px 5px;
   position: relative;
   cursor: pointer;
-}
-.message-item:not(:last-child) {
-  margin-bottom: 5px;
 }
 .message-item .message-content {
   font-size: 12px;

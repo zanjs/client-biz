@@ -40,7 +40,7 @@ export class MailBox extends React.PureComponent {
   onSelect = e => this.setState({mailFilterValue: parseInt(e.target.value, 10)});
   render() {
     return (
-      <div className="board-layout mail-box">
+      <div className="board-layout message-box">
         <BoxHeader title="收件箱" selections={this.selections} onSelect={this.onSelect} selectionCount={this.selectionCount}/>
         <div className="message-list">
           {this.mailDS.map((mail, index) => <MessageItem message={mail} key={index}/>)}
