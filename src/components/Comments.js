@@ -34,7 +34,7 @@ export class Comments extends React.PureComponent {
   onAttach = () => alert('attach');
   onInsertImage = () => alert('insert image');
   onAt = () => alert('@');
-  onSend = () => alert('send');
+  onSend = () => alert(this.state.content);
 
   CommentList = () => {
     const {detail} = this.props;
@@ -114,7 +114,7 @@ export class Comments extends React.PureComponent {
                 {'@'}
               </IconButton>
             </div>
-            <button className="send" disabled={!content} onSend={this.onSend}>发表评论</button>
+            <button className="send" disabled={!content} onClick={this.onSend}>发表评论</button>
           </div>
         </div>
       </div>

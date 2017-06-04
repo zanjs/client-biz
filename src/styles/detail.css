@@ -290,3 +290,7 @@
 .activity-item .sender-info > p:not(:last-child) {
   margin-right: 5px;
 }
+.goods-table {
+  width: 100%;
+  margin: 5px 0;
+}

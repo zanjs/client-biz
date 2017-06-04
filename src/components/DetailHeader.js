@@ -5,6 +5,14 @@ import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
 import {CurrencyType, PaymentType, PriceType} from "../services/data-type";
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
 
 export class DetailHeader extends React.PureComponent {
 
@@ -19,6 +27,11 @@ export class DetailHeader extends React.PureComponent {
       width: 30,
       height: 30,
       padding: 4,
+    },
+    noPadding: {
+      padding: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
     },
   };
 
@@ -214,10 +227,57 @@ export class DetailHeader extends React.PureComponent {
             <button className="btn-change-discount" onClick={() => alert('change discount')}>￥</button>
             <p>-5%</p>
           </div>
-          <label><input type="checkbox" name="goods-item"/> OK</label>
+          <div/>
+          {/*<label><input type="checkbox" name="goods-item"/> OK</label>*/}
         </div>
-        {/* TODO (noah) 明细列表 */}
+        <this.GoodsTable />
+        <button onClick={() => alert('insert table')}>
+          <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
+        </button>
       </div>
+    );
+  };
+
+  GoodsTable = () => {
+    const {detail} = this.props;
+    const {styles} = DetailHeader;
+    return (
+      <Table className="goods-table" multiSelectable>
+        <TableHeader enableSelectAll>
+          <TableRow style={{padding: 0, paddingLeft: 0, paddingRight: 0}}>
+            <TableHeaderColumn style={styles.noPadding}>行号</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>物料号</TableHeaderColumn>
+            {detail.type === DetailContentType.SALE_ORDER &&
+              <TableHeaderColumn style={styles.noPadding}>客户物料号</TableHeaderColumn>
+            }
+            <TableHeaderColumn style={styles.noPadding}>物料名称</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>规格备注</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>数量</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>单位</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>单价</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>金额</TableHeaderColumn>
+            <TableHeaderColumn style={styles.noPadding}>交期/收货</TableHeaderColumn>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {detail.goods_list && detail.goods_list.map((item, index) => (
+            <TableRow key={index}>
+              <TableRowColumn style={styles.noPadding}>{item.line_no}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.goods_no}</TableRowColumn>
+              {detail.type === DetailContentType.SALE_ORDER &&
+                <TableHeaderColumn style={styles.noPadding}>{item.client_goods_no}</TableHeaderColumn>
+              }
+              <TableRowColumn style={styles.noPadding}>{item.name}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.size}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.count}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.unit}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.unit_price}{item.discount}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.total_price}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     );
   };
 
