@@ -242,7 +242,7 @@ export const ORDER_DETAIL = {
       },
       content: '可否准时交货？',
       timestamp: 1488953760000,
-    }
+    },
   ],
   activity_list: [
     {

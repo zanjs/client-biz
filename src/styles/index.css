@@ -624,7 +624,7 @@ a {
       align-items: flex-start;
   color: #999;
   font-size: 14px;
-  margin: 5px 0;
+  margin: 5px 0 10px 0;
 }
 .sender-info-item .company-txt {
   -ms-flex: 1;
@@ -721,6 +721,7 @@ a {
   -ms-flex-direction: column;
       flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
 }
 .comment-tabs {
   display: -ms-flexbox;
@@ -770,4 +771,58 @@ a {
   border-radius: 4px;
   color: #FFF;
   font-size: 12px;
+}
+.comment-list {
+  padding: 10px 5px;
+  border-bottom: 1px solid #E6E6E6;
+  overflow-y: scroll;
+}
+.comment-item:not(:last-child) {
+  margin-bottom: 10px;
+}
+.comment-info {
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  font-size: 14px;
+  color: #999;
+}
+.comment-company {
+  margin-right: 10px;
+  max-width: 260px;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.comment-content {
+  font-size: 14px;
+  color: #4A4A4A;
+}
+.comment-item.activities {
+  -ms-flex-align: start;
+      align-items: flex-start;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+}
+.activities > p {
+  font-size: 14px;
+  color: #999;
+  width: 180px;
+  min-width: 180px;
+}
+.activities-list {
+  font-size: 14px;
+  color: #4A4A4A;
+}
+.activity-item > div {
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  -ms-flex-align: start;
+      align-items: flex-start;
+}
+.activity-item .sender-info {
+  color: #999;
+}
+.activity-item .sender-info > p:not(:last-child) {
+  margin-right: 5px;
 }

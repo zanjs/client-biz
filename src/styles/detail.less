@@ -82,7 +82,7 @@
   align-items: flex-start;
   color: #999;
   font-size: 14px;
-  margin: 5px 0;
+  margin: 5px 0 10px 0;
 
   .company-txt {
     flex: 1;
@@ -171,6 +171,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .comment-tabs {
@@ -217,5 +218,64 @@
     border-radius: 4px;
     color: #FFF;
     font-size: 12px;
+  }
+}
+
+.comment-list {
+  padding: 10px 5px;
+  border-bottom: 1px solid #E6E6E6;
+  overflow-y: scroll;
+}
+
+.comment-item {
+  &:not(:last-child) {
+    margin-bottom: 10px;
+  }
+}
+
+.comment-info {
+  justify-content: flex-start;
+  font-size: 14px;
+  color: #999;
+}
+
+.comment-company {
+  margin-right: 10px;
+  max-width: 260px;
+  .text-ellipsis;
+}
+
+.comment-content {
+  font-size: 14px;
+  color: #4A4A4A;
+}
+
+.comment-item.activities {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.activities > p {
+  font-size: 14px;
+  color: #999;
+  width: 180px;
+  min-width: 180px;
+}
+
+.activities-list {
+  font-size: 14px;
+  color: #4A4A4A;
+}
+
+.activity-item {
+  > div {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .sender-info {
+    color: #999;
+    >p:not(:last-child) {
+      margin-right: 5px;
+    }
   }
 }
