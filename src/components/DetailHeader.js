@@ -32,6 +32,13 @@ export class DetailHeader extends React.PureComponent {
       padding: 0,
       paddingLeft: 0,
       paddingRight: 0,
+      wordBreak: 'normal',
+      whiteSpace: 'normal',
+      overflow: 'visible',
+      textOverflow: 'clip',
+    },
+    styleLineNo: {
+      width: 30,
     },
   };
 
@@ -244,16 +251,16 @@ export class DetailHeader extends React.PureComponent {
     return (
       <Table className="goods-table" multiSelectable>
         <TableHeader enableSelectAll>
-          <TableRow style={{padding: 0, paddingLeft: 0, paddingRight: 0}}>
-            <TableHeaderColumn style={styles.noPadding}>行号</TableHeaderColumn>
+          <TableRow>
+            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>行号</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>物料号</TableHeaderColumn>
             {detail.type === DetailContentType.SALE_ORDER &&
               <TableHeaderColumn style={styles.noPadding}>客户物料号</TableHeaderColumn>
             }
             <TableHeaderColumn style={styles.noPadding}>物料名称</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>规格备注</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>数量</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>单位</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>数量</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>单位</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>单价</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>金额</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>交期/收货</TableHeaderColumn>
@@ -262,15 +269,15 @@ export class DetailHeader extends React.PureComponent {
         <TableBody>
           {detail.goods_list && detail.goods_list.map((item, index) => (
             <TableRow key={index}>
-              <TableRowColumn style={styles.noPadding}>{item.line_no}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.line_no}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.goods_no}</TableRowColumn>
               {detail.type === DetailContentType.SALE_ORDER &&
                 <TableHeaderColumn style={styles.noPadding}>{item.client_goods_no}</TableHeaderColumn>
               }
               <TableRowColumn style={styles.noPadding}>{item.name}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.size}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.count}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.unit}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.count}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.unit}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.unit_price}{item.discount}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.total_price}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>

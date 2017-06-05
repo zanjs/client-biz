@@ -294,3 +294,7 @@
   width: 100%;
   margin: 5px 0;
 }
+.goods-table th,
+.goods-table td {
+  padding: 0 5px !important;
+}
