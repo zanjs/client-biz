@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import {login} from '../actions/account';
 
 
-export default class Login extends React.Component {
+class LoginContainer extends React.Component {
   state={
     username: '',
     password: '',
@@ -57,6 +59,7 @@ export default class Login extends React.Component {
 
   render() {
     const { username, password, error } = this.state;
+    console.log(this.props);
     return (
       <div className="layout layout-login">
        <div className="title">
@@ -89,4 +92,13 @@ export default class Login extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    login: (user, token) => { dispatch(login(user, token)); }
+  }
+};
+
+const Login = connect(null, mapDispatchToProps)(LoginContainer);
+export default Login;
 
