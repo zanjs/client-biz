@@ -3,17 +3,19 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
+import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import {RouteWithSubRoutes} from "../router/index";
 
-export default class Dashboard extends React.Component {
+class DashboardContainer extends React.Component {
   componentWillMount() {
     if (this.props.match.path === '/dashboard') {
       this.props.history.push('/dashboard/main');
     }
   }
   render() {
-    const {routes} = this.props;
+    const {routes, currentUser} = this.props;
+    console.log(currentUser);
     return (
       <div className="dashboard">
         <DashboardNav />
@@ -51,3 +53,12 @@ const LinkButton = ({icon, text, to}) => (
     <p>{text}</p>
   </Link>
 );
+
+const mapStateToProps = (state) => {
+  return {
+    currentUser: state.account.currentUser,
+  }
+};
+
+const Dashboard = connect(mapStateToProps)(DashboardContainer);
+export default  Dashboard;

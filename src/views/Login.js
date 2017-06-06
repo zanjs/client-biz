@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import {login} from '../actions/account';
+import {loginAction} from '../actions/account';
+import {loginService} from "../services/account";
 
 
 class LoginContainer extends React.Component {
@@ -54,12 +55,18 @@ class LoginContainer extends React.Component {
 
   login = async () => {
     const {username, password} = this.state;
-    this.props.history.replace('/dashboard', {username}); // next page: this.props.location.state.username;
+    const {loginAction} = this.props;
+    try {
+      const resp = await loginService.login(username, password);
+      if (resp.success) {
+        loginAction(resp.user, resp.token);
+        this.props.history.replace('/dashboard');
+      }
+    } catch (e) {}
   };
 
   render() {
     const { username, password, error } = this.state;
-    console.log(this.props);
     return (
       <div className="layout layout-login">
        <div className="title">
@@ -95,7 +102,7 @@ class LoginContainer extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    login: (user, token) => { dispatch(login(user, token)); }
+    loginAction: (user, token) => { dispatch(loginAction(user, token)); }
   }
 };
 
