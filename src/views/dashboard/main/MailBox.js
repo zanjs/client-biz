@@ -44,7 +44,7 @@ export class MailBox extends React.PureComponent {
         <BoxHeader title="收件箱" selections={this.selections} onSelect={this.onSelect} selectionCount={this.selectionCount}/>
         <div className="message-list">
           {this.mailDS.map((mail, index) => <MessageItem message={mail} key={index}/>)}
-          {!this.mailDS.length && <p>暂无消息</p>}
+          {!this.mailDS.length && <p className="none-data">暂无消息</p>}
         </div>
       </div>
     );

@@ -4,7 +4,6 @@ import FontIcon from 'material-ui/FontIcon';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
-import {CurrencyType, PaymentType, PriceType} from "../services/data-type";
 import {
   Table,
   TableBody,

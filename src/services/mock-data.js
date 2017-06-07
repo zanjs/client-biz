@@ -3,7 +3,7 @@ import {TagType, MailType, ProcurementMessagType, ProcurementType, DetailContent
 export const MOCK_MAILS = [
   {
     title: '供应商大会邀请函供应商大会邀请函供应商大会邀请函供应商大会邀请函',
-    content: '付款条件被改为60天\n' + '10行[纸尿裤]交货日期被改为4月5日',
+    content: '付款条件被改为60天 10行[纸尿裤]交货日期被改为4月5日',
     from: '永辉超市集团永辉超市集团永辉超市集团永辉超市集团永辉超市集团',
     tags: [TagType.IMPORTANT],
     read: false,
@@ -151,7 +151,7 @@ export const MOCK_SALE_MESSAGE = [
   },
   {
     title: '询报价单13000018获报价',
-    content: '付款条件被改为60天\n' + '10行[纸尿裤]交货日期被改为4月5日',
+    content: '付款条件被改为60天 10行[纸尿裤]交货日期被改为4月5日',
     from: '永辉超市集团',
     tags: [TagType.IMPORTANT],
     read: true,

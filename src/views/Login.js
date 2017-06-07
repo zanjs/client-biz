@@ -60,6 +60,9 @@ class LoginContainer extends React.Component {
       const resp = await loginService.login(username, password);
       if (resp.success) {
         loginAction(resp.user, resp.token);
+        const data = {user: resp.user, token: resp.token};
+        console.log(data, JSON.stringify(data));
+        localStorage.setItem('bizUser', JSON.stringify(data));
         this.props.history.replace('/dashboard');
       }
     } catch (e) {}

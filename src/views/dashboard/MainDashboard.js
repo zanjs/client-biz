@@ -17,7 +17,7 @@ export default class MainDashboard extends React.PureComponent {
     return (
       <div className="panel-nav">
         <a className="title">
-          <FontIcon className="material-icons" color="#FFF">dashboard</FontIcon>
+          <FontIcon className="material-icons" color="#333">dashboard</FontIcon>
           <span>我的工作台</span>
         </a>
         <div className="tab-container">

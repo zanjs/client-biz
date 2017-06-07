@@ -1,6 +1,8 @@
+const userData = JSON.parse(localStorage.getItem('bizUser')) || {};
+
 const defaultState = {
-  currentUser: {},
-  token: null,
+  currentUser: userData.user || {},
+  token: userData.token,
 };
 
 export const account = (state = defaultState, action) => {

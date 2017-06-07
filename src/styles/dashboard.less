@@ -27,9 +27,15 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding-top: 20px;
   padding-bottom: 20px;
-  background-color: #4bbcb7;
+  background-color: #292826;
+
+  .logo {
+    color: #FFF;
+    text-align: center;
+    padding: 20px 0;
+    cursor: pointer;
+  }
 
   a {
     outline: none;
@@ -45,25 +51,34 @@ a {
     padding: 15px 0;
     text-align: center;
     text-decoration: none;
-    color: #a1fffb;
+    color: #868481;
     cursor: pointer;
     outline: none;
     font-size: 14px;
+    transition: color .3s ease-in-out;
+    box-sizing: border-box;
 
     &:hover {
-      background-color: rgba(0, 0, 0, .1);
+      background-color: rgba(255, 255, 255, .2);
+      color: #fff;
+      border-left: 2px solid red;
     }
   }
 
   .btn-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     font-size: 0;
     width: 60px;
     height: 60px;
-    text-align: center;
-    position: relative;
+    color: #868481;
+    transition: color .3s ease-in-out;
     &:hover {
-      background-color: rgba(0, 0, 0, .1);
+      background-color: rgba(255, 255, 255, .2);
+      color: #fff;
     }
     .display-name {
       display: inline-block;
@@ -73,9 +88,7 @@ a {
       font-size: 14px;
       line-height: 44px;
       border-radius: 22px;
-      background-color: rgb(132, 117, 207);
-      position: relative;
-      top: 8px;
+      background-color: #64b1ca;
     }
   }
 }
@@ -83,14 +96,15 @@ a {
 .work-panel {
   flex: 1;
   overflow: hidden;
+  background-color: #F8F6F2;
 }
 
 .panel-nav {
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #3F51B5;
-  color: #FFF;
+  background-color: #FFF;
+  color: #333;
 
   .title {
     display: flex;
@@ -123,15 +137,16 @@ a {
     outline: none;
     cursor: pointer;
     background-color: transparent;
-    color: inherit;
+    color: #777;
     font-size: inherit;
+    margin-right: 10px;
     &:hover {
-      background-color: rgba(0, 0, 0, .1);
-      border-bottom: 3px solid #FFF;
+      color: #333;
     }
-  }
-  .active {
-    border-bottom: 3px solid #FFF;
+    &.active {
+      color: #da4f4a;
+      border-bottom: 3px solid #da4f4a;
+    }
   }
 }
 
@@ -147,18 +162,24 @@ a {
   align-items: flex-start;
   height: 100%;
   min-width: 780px;
-  //max-width: 1000px;
+  background-color: #F8F6F2;
 }
 
 .board-layout {
-  flex: 1;
+  width: 280px;
   min-width: 280px;
-  background-color: #E4E4E4;
+  background-color: #eeece8;
   padding: 5px 10px 20px 10px;
   box-sizing: border-box;
-  margin-right: 10px;
+  margin-right: 20px;
   max-height: 90%;
   overflow-y: auto;
+
+  .none-data {
+    font-size: 14px;
+    color: #797979;
+    margin-top: 20px;
+  }
 }
 
 .message-box {
@@ -194,7 +215,8 @@ a {
 
   .message-content {
     font-size: 12px;
-    color: #4A4A4A;
+    color: #acaba7;
+    margin-top: 5px;
     .mutiline-ellipsis(16px, 2, 12px); //mixin
   }
 
@@ -253,6 +275,8 @@ a {
   overflow: hidden;
   width: 100px;
   color: #797979;
+  outline: none;
+  border: none;
 }
 
 .styled-select select {
@@ -265,13 +289,13 @@ a {
 }
 
 .styled-select.slate select {
-  border: 1px solid #ccc;
+  border: 1px solid #fff;
   font-size: 14px;
   height: 20px;
   width: 100px;
 }
 
-.slate { background-color: #ddd; }
+.slate { background-color: #fff; }
 .slate select { color: #000; }
 
 // procurement board
@@ -279,8 +303,9 @@ a {
 .procurement-board {
   margin: 5px 20px;
   height: 90%;
+  min-width: 800px;
   overflow-y: scroll;
-  background-color: #E4E4E4;
+  background-color: #eeece8;
   box-sizing: border-box;
   padding: 5px;
 }
