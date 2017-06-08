@@ -21,6 +21,8 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import {List, ListItem, makeSelectable} from 'material-ui/List';
+import {getContacts} from "../services/message";
 
 export class DetailHeader extends React.PureComponent {
 
@@ -36,9 +38,18 @@ export class DetailHeader extends React.PureComponent {
       payment: defaultPayment,
       openFollowActions: false,
       openEditDialog: false,
+      contacts: [],
+      openContactList: false,
     };
     this.focusGoodData = null;
     this.editRowNumber = null;
+    this.contactsFilter = [];
+    this.contactsSelectType = null;
+  }
+
+  async componentWillMount() {
+    const contacts = await getContacts();
+    this.setState({ contacts });
   }
 
   static styles = {
@@ -104,10 +115,15 @@ export class DetailHeader extends React.PureComponent {
     }
     this.uploading = false;
   };
-  onChangeChargePerson = () => alert('onChangeChargePerson');
+  onChangeChargePerson = () => {
+    this.contactsFilter = [this.props.detail.in_charge];
+    this.contactsSelectType = 'IN_CHARGE';
+    this.handleContactSelect();
+  };
   onAddFollowers = () => {
-    this.props.detail.follower.push({display_name: '肖益龙', position: '总经理'});
-    this.forceUpdate();
+    this.contactsFilter = [...this.props.detail.follower];
+    this.contactsSelectType = 'FOLLOW';
+    this.handleContactSelect();
   };
 
   onSend = () => alert('send');
@@ -493,6 +509,58 @@ export class DetailHeader extends React.PureComponent {
     this.setState({openEditDialog: false});
   };
 
+  handleCloseSelect = () => {
+    this.contactsFilter = [];
+    this.contactsSelectType = null;
+    this.setState({openContactList: false});
+  };
+
+  handleContactSelect = () => {
+    this.setState({openContactList: true});
+  };
+
+  onSelectContact = (user) => {
+    switch (this.contactsSelectType) {
+      default: break;
+      case 'IN_CHARGE': this.props.detail.in_charge = user; break;
+      case 'FOLLOW': this.props.detail.follower.push(user); break;
+    }
+    this.handleCloseSelect();
+  };
+
+  SelectUserDialog = () => {
+    const {contacts, openContactList} = this.state;
+    const contactDS = contacts.filter(c => (this.contactsFilter.findIndex(filter => filter.display_name === c.display_name) === -1));
+    const actions = [
+      <FlatButton
+        label="取消"
+        primary={false}
+        keyboardFocused={true}
+        onTouchTap={this.handleCloseSelect}
+      />,
+    ];
+    return (
+      <Dialog
+        title={'请选择联系人'}
+        actions={actions}
+        modal={false}
+        autoScrollBodyContent
+        open={openContactList}
+        onRequestClose={this.handleCloseSelect}>
+        <List>
+          {contactDS.map((user, index) => <ListItem
+            primaryText={user.display_name}
+            secondaryText={user.position}
+            secondaryTextLines={1}
+            onClick={() => {this.onSelectContact({display_name: user.display_name, position: user.position});}}
+            key={index}
+          />)}
+          {!contactDS.length && <p>暂无联系人</p>}
+        </List>
+      </Dialog>
+    )
+  };
+
   render() {
     const {detail} = this.props;
     const isOrder = detail.type === DetailContentType.PROCUREMENT_ORDER || detail.type === DetailContentType.SALE_ORDER;
@@ -501,6 +569,7 @@ export class DetailHeader extends React.PureComponent {
         <this.TitleItem />
         {isOrder ? <this.OrderInfo /> : <this.MessageInfo />}
         <this.EditGoodsDialog />
+        <this.SelectUserDialog />
       </div>
     );
   }

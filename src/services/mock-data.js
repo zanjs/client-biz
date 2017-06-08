@@ -389,3 +389,13 @@ export const ORDER_DETAIL = {
     },
   ],
 };
+
+export const CONTACT_LIST = [
+  {display_name: '肖益龙', position: '总经理'},
+  {display_name: '陆黎婷', position: '大客户经理'},
+  {display_name: '俞雪英', position: '市场部总监'},
+  {display_name: '黄秀梅', position: '采购经理'},
+  {display_name: '王五', position: '客户经理'},
+  {display_name: '肖云初', position: '采购总监'},
+  {display_name: '张三', position: '采购部总监'}
+];

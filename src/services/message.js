@@ -1,4 +1,4 @@
-import {MOCK_MAILS, MOCK_PROCUREMENT_MESSAGE, MOCK_SALE_MESSAGE, MESSAGE_DETAIL, ORDER_DETAIL} from "./mock-data"
+import {MOCK_MAILS, MOCK_PROCUREMENT_MESSAGE, MOCK_SALE_MESSAGE, MESSAGE_DETAIL, ORDER_DETAIL, CONTACT_LIST} from "./mock-data"
 
 export const getMails = async () => {
   return MOCK_MAILS;
@@ -29,4 +29,8 @@ export const create = async (content, id, type) => {
     content,
     timestamp: Date.now(),
   };
+};
+
+export const getContacts = async () => {
+  return CONTACT_LIST;
 };
