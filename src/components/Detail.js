@@ -12,14 +12,13 @@ export class Detail extends React.PureComponent {
     const detail = await getDetail('ORDER');
     this.setState({ detail });
   }
-  onClose = () => this.props.history.goBack();
   render() {
     const {id} = this.props;
     if (!id) return <div/>;
     const {detail} = this.state;
     return (
       <div>
-        <DetailHeader id={id} onClose={this.onClose} detail={detail}/>
+        <DetailHeader id={id} onClose={this.props.close} detail={detail}/>
         <Comments id={id} detail={detail}/>
       </div>
     );

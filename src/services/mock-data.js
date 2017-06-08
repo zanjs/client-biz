@@ -194,6 +194,86 @@ export const MESSAGE_DETAIL = {
     {display_name: '陆黎婷', position: '大客户经理'},
     {display_name: '俞雪英', position: '市场部总监'},
   ],
+  comments_list: [
+    {
+      company: 'Babycare',
+      sender: {
+        display_name: '王五',
+        position: '客户经理',
+      },
+      reply: '黄秀梅',
+      content: '可以准时交货',
+      timestamp: 1488954360000,
+    },
+    {
+      company: '起初母婴用品',
+      sender: {
+        display_name: '黄秀梅',
+        position: '采购经理',
+      },
+      content: '可否准时交货？',
+      timestamp: 1488953760000,
+    },
+  ],
+  activity_list: [
+    {
+      timestamp: 1488954360000,
+      activities: [
+        {
+          company: 'Babycare',
+          sender: {
+            display_name: '王五',
+            position: '客户经理',
+          },
+          activity: '发表留言',
+          content: '贵司欠款已超信用额度，本单需现结，敬请理解！另：不粘胶产能告急，需调整交期，敬请谅解！',
+        },
+        {
+          company: 'Babycare',
+          sender: {
+            display_name: '王五',
+            position: '客户经理',
+          },
+          activity: '修改了抬头信息',
+          content: '付款条件：30天  改为  现款现结',
+        },
+        {
+          company: 'Babycare',
+          sender: {
+            display_name: '王五',
+            position: '客户经理',
+          },
+          activity: '修改了行项目信息',
+          content: '10行 交期/收货：2017/3/13  改为  2017/3/20',
+        }
+      ],
+    },
+    {
+      timestamp: 1488247920000,
+      activities: [
+        {
+          sender: {
+            display_name: '肖云初',
+            position: '采购总监',
+          },
+          activity: '确认采购订单',
+          content: '发送采购订单至：BabyCare Co., Ltd',
+        },
+      ],
+    },
+    {
+      timestamp: 1488247680000,
+      activities: [
+        {
+          sender: {
+            display_name: '黄秀梅',
+            position: '采购经理',
+          },
+          activity: '创建采购订单',
+        },
+      ],
+    },
+  ],
 };
 
 export const ORDER_DETAIL = {

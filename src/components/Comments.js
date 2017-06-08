@@ -6,7 +6,7 @@ import {formatTime} from "../utils/time";
 
 export class Comments extends React.PureComponent {
   state={
-    tabValue: 1,
+    tabValue: 0,
     content: '',
   };
   static styles = {
@@ -14,18 +14,20 @@ export class Comments extends React.PureComponent {
       width: 24,
       height: 24,
       fontSize: 22,
-      color: '#4A4A4A',
+      color: '#8A959E',
     },
     small: {
       width: 30,
       height: 30,
       padding: 4,
+      marginRight: 10,
     },
   };
-  ActionButton = ({icon, action}) => (
+  ActionButton = ({icon, action, tooltip}) => (
     <IconButton
       iconClassName="material-icons"
       onClick={action}
+      tooltip={tooltip}
       iconStyle={Comments.styles.smallIcon}
       style={Comments.styles.small}>
       {icon}
@@ -41,7 +43,7 @@ export class Comments extends React.PureComponent {
     const {tabValue} = this.state;
     if (!detail.comments_list || !detail.activity_list) return (<div style={{flex: 1}}/>);
     return tabValue === 0 ? (
-      <div style={{flex: 1}} className="comment-list">
+      <div className="comment-list">
         {detail.comments_list && detail.comments_list.map((comment, index) => (
           <div key={index} className="comment-item">
             <div className="flex-row comment-info">
@@ -81,23 +83,22 @@ export class Comments extends React.PureComponent {
     const {detail} = this.props;
     const isOrder = detail.type === DetailContentType.PROCUREMENT_ORDER || detail.type === DetailContentType.SALE_ORDER;
     return (
-      <div className="comment-area" style={{width: isOrder ? 600 : 480}}>
+      <div className="comment-area">
         <div className="comment-tabs">
-          <button className="comment-tab"
-                  onClick={() => this.setState({tabValue: 0})}
-                  style={{borderBottom: tabValue === 0 ? '2px solid #333' : null}}>评论</button>
-          <button className="comment-tab"
-                  onClick={() => this.setState({tabValue: 1})}
-                  style={{borderBottom: tabValue === 1 ? '2px solid #333' : null}}>动态</button>
+          <button className={`comment-tab${tabValue === 0 ? ' active' : ''}`}
+                  onClick={() => this.setState({tabValue: 0})}>评论</button>
+          <button className={`comment-tab${tabValue === 1 ? ' active' : ''}`}
+                  onClick={() => this.setState({tabValue: 1})}>动态</button>
         </div>
         <this.CommentList />
         <div className="comment-input">
           <TextField
             hintText="说点什么，按Ctrl+Enter提交"
-            hintStyle={{bottom: 35}}
+            hintStyle={{bottom: 60, fontSize: 14}}
+            inputStyle={{fontSize: 14, color: '#333'}}
             multiLine={true}
-            rows={2}
-            rowsMax={2}
+            rows={3}
+            rowsMax={4}
             fullWidth
             className="input-area"
             onChange={(e, v) => this.setState({content: v})}

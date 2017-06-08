@@ -434,7 +434,7 @@ a {
   width: 100px;
   color: #797979;
   outline: none;
-  border: none;
+  border: 1px solid #E6E6E6;
 }
 .styled-select select {
   background: transparent;
@@ -523,7 +523,7 @@ a {
   color: #797979;
   padding: 0 5px;
   border-radius: 4px;
-  border: 1px solid #797979;
+  border: 1px solid #E6E6E6;
 }
 .trangle {
   display: inline-block;
@@ -539,7 +539,7 @@ a {
   top: 20px;
   width: 100px;
   height: 0;
-  background-color: #f0f0f0;
+  background-color: #F8F6F2;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -738,7 +738,8 @@ a {
       align-items: center;
   -ms-flex-pack: start;
       justify-content: flex-start;
-  width: 100px;
+  width: 120px;
+  margin-bottom: 10px;
 }
 .total-price-txt {
   color: #0b24fb;
@@ -755,9 +756,8 @@ a {
   margin-right: 5px;
 }
 .comment-area {
-  margin-top: 50px;
-  height: 380px;
-  border: 1px solid #E6E6E6;
+  margin-top: 20px;
+  width: 100%;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -775,6 +775,7 @@ a {
   -ms-flex-pack: start;
       justify-content: flex-start;
   border-bottom: 1px solid #E6E6E6;
+  padding-left: 20px;
 }
 .comment-tab {
   display: inline-block;
@@ -782,17 +783,23 @@ a {
   background-color: transparent;
   height: 30px;
   line-height: 30px;
-  padding: 0 10px;
+  padding: 0 20px;
+  font-size: 14px;
+  color: #8a959e;
+  margin-right: 10px;
 }
 .comment-tab:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid rgba(216, 76, 49, 0.4);
+  color: #333;
+}
+.comment-tab.active {
+  border-bottom: 2px solid #D84C31;
+  color: #333;
 }
 .comment-input {
-  margin: 5px 15px;
-  height: 100px;
-  background-color: #f0f8fa;
-  padding: 0 10px;
+  margin: 20px 15px;
+  background-color: #f8f6f2;
+  padding: 0 10px 10px 10px;
   position: relative;
 }
 .comment-input .actions {
@@ -806,18 +813,21 @@ a {
       justify-content: space-between;
 }
 .comment-input .send {
-  background-color: #34a6ce;
+  background-color: #54d09f;
   border: none;
-  height: 20px;
+  height: 30px;
   width: 80px;
   border-radius: 4px;
   color: #FFF;
   font-size: 12px;
 }
+.comment-input .send:hover {
+  background-color: #4cae4c;
+}
 .comment-list {
-  padding: 10px 5px;
-  border-bottom: 1px solid #E6E6E6;
-  overflow-y: scroll;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  width: 100%;
 }
 .comment-item:not(:last-child) {
   margin-bottom: 10px;
@@ -849,8 +859,8 @@ a {
 .activities > p {
   font-size: 14px;
   color: #999;
-  width: 180px;
-  min-width: 180px;
+  width: 160px;
+  min-width: 160px;
 }
 .activities-list {
   font-size: 14px;
@@ -870,9 +880,15 @@ a {
 }
 .goods-table {
   width: 100%;
+  border-bottom: 1px solid #E6E6E6;
   margin: 5px 0;
 }
 .goods-table th,
 .goods-table td {
   padding: 0 5px !important;
+}
+.btn-add-goods {
+  border: none;
+  outline: none;
+  background-color: transparent;
 }

@@ -59,11 +59,11 @@ export default class MainDashboard extends React.PureComponent {
       default: return;
       case DetailContentType.ANNOUNCE:
       case DetailContentType.APPEAL:
-        drawerWidth = 480;
+        drawerWidth = 500;
         break;
       case DetailContentType.PROCUREMENT_ORDER:
       case DetailContentType.SALE_ORDER:
-        drawerWidth = 600;
+        drawerWidth = 620;
         break;
     }
     this.setState({openDrawer: true, drawerWidth, detailId});
