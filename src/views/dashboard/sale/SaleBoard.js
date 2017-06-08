@@ -4,12 +4,18 @@ import {MessageItem} from "../../../components/ListItem";
 import {SelectItem} from "../../../components/BoxHeader"
 import {SaleMessagType} from "../../../services/data-type";
 import IconButton from 'material-ui/IconButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import MenuItem from 'material-ui/MenuItem';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
 
 export default class SaleBoard extends React.PureComponent {
   state = {
     listDS: [],
     filterValue: 0,
+    openFollowActions: false,
   };
+
   async componentWillMount() {
     const listDS = await getSaleMessages();
     this.setState({ listDS });
@@ -45,6 +51,7 @@ export default class SaleBoard extends React.PureComponent {
       width: 24,
       height: 24,
       fontSize: 20,
+      color: '#797979',
     },
     small: {
       width: 30,
@@ -53,10 +60,11 @@ export default class SaleBoard extends React.PureComponent {
     },
   };
 
-  ActionButton = ({icon, action}) => (
+  ActionButton = ({icon, action, tooltip}) => (
     <IconButton
       iconClassName="material-icons"
       onClick={action}
+      tooltip={tooltip}
       iconStyle={SaleBoard.styles.smallIcon}
       style={SaleBoard.styles.small}>
       {icon}
@@ -64,22 +72,68 @@ export default class SaleBoard extends React.PureComponent {
   );
 
   FollowActions = () => (
-    <div className="btn-actions">
-      <span>后续操作</span>
-      <i className="trangle"/>
-      <div className="follow-actions">
-        <button className="btn-action">发货</button>
-        <button className="btn-action">退货处理</button>
-        <button className="btn-action">生成结算单</button>
-        <button className="btn-action">完成</button>
-        <button className="btn-action">取消</button>
-      </div>
+    <div style={{marginLeft: 5}}>
+      <RaisedButton
+        onTouchTap={this.handleFollowActions}
+        style={{height: 26, fontSize: 12}}
+        label="后续操作"/>
+      <Popover
+        open={this.state.openFollowActions}
+        anchorEl={this.state.anchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={this.handleFollowActionsClose}>
+        <Menu>
+          <MenuItem primaryText="发货" />
+          <MenuItem primaryText="退货处理" />
+          <MenuItem primaryText="生成结算单" />
+          <MenuItem primaryText="完成" />
+          <MenuItem primaryText="取消" />
+        </Menu>
+      </Popover>
     </div>
   );
+  handleFollowActions = (event) => {
+    // This prevents ghost click.
+    event.preventDefault();
+
+    this.setState({
+      openFollowActions: true,
+      anchorEl: event.currentTarget,
+    });
+  };
+
+  handleFollowActionsClose = () => {
+    this.setState({
+      openFollowActions: false,
+    });
+  };
 
   onSend = () => alert('send');
   onSave = () => alert('save');
-  onInsert = () => alert('insert');
+  onAttach = async () => {
+    if (!window.FileReader) {
+      return;
+    }
+    if (this.uploading) return;
+    const files = await new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = e => resolve(e.target.files);
+      input.click();
+    });
+    const file = files[0];
+    this.uploading = true;
+    const data = new FormData();
+    data.append('uploadfile', file);
+    data.append('business', '1');
+    try {
+      // const resp = await uploadFile(data);
+    } catch (e) {
+      console.log(e);
+    }
+    this.uploading = false;
+  };
   onCopy = () => alert('copy');
   onShare = () => alert('share');
 
@@ -94,7 +148,7 @@ export default class SaleBoard extends React.PureComponent {
           <div className="header-right">
             <this.ActionButton icon='send' action={this.onSend}/>
             <this.ActionButton icon='save' action={this.onSave}/>
-            <this.ActionButton icon='attachment' action={this.onInsert}/>
+            <this.ActionButton icon='attachment' action={this.onAttach}/>
             <this.ActionButton icon='content_copy' action={this.onCopy}/>
             <this.FollowActions/>
             <this.ActionButton icon='share' action={this.onShare}/>

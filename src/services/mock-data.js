@@ -279,7 +279,8 @@ export const MESSAGE_DETAIL = {
 export const ORDER_DETAIL = {
   order_no: '30000012',
   label: '采购-订单',
-  type: DetailContentType.PROCUREMENT_ORDER,
+  // type: DetailContentType.PROCUREMENT_ORDER,
+  type: DetailContentType.SALE_ORDER,
   timestamp: 1488247680000,
   supplier: {
     company: 'Babycare Co, Ltd',
@@ -299,9 +300,13 @@ export const ORDER_DETAIL = {
   payment: '30天',
   total_price: 34000,
   discount: null,
+  // goods_list: [
+  //   {line_no: 10, goods_no: 20012, name: '不粘胶', size: '20m', count: 200, unit: '卷', unit_price: 80, discount: '￥', total_price: 16000, due_date: 1489334400000},
+  //   {line_no: 20, goods_no: 21005, name: '中号白色无纺布', size: '60mm', count: 300, unit: '匹', unit_price: 60, discount: '￥', total_price: 18000, due_date: 1489334400000}
+  // ],
   goods_list: [
-    {line_no: 10, goods_no: 20012, name: '不粘胶', size: '20m', count: 200, unit: '卷', unit_price: 80, discount: '￥', total_price: 16000, due_date: 1489334400000},
-    {line_no: 20, goods_no: 21005, name: '中号白色无纺布', size: '60mm', count: 300, unit: '匹', unit_price: 60, discount: '￥', total_price: 18000, due_date: 1489334400000}
+    {line_no: 10, goods_no: 20012, client_goods_no: 86743156, name: '不粘胶', size: '20m', count: 200, unit: '卷', unit_price: 80, discount: '￥', total_price: 16000, due_date: 1489334400000},
+    {line_no: 20, goods_no: 21005, client_goods_no: 86743156, name: '中号白色无纺布', size: '60mm', count: 300, unit: '匹', unit_price: 60, discount: '￥', total_price: 18000, due_date: 1489334400000}
   ],
   comments_list: [
     {

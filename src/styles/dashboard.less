@@ -76,6 +76,9 @@ a {
     height: 60px;
     color: #868481;
     transition: color .3s ease-in-out;
+    border: none;
+    outline: none;
+    background-color: transparent;
     &:hover {
       background-color: rgba(255, 255, 255, .2);
       color: #fff;
@@ -91,13 +94,30 @@ a {
       background-color: #64b1ca;
     }
   }
+  .btn-setting {
+    position: relative;
+    overflow: visible;
+  }
+  .popover-menu {
+    position: absolute;
+    top: 12px;
+    right: -150px;
+    background-color: #FFF;
+    z-index: 1;
+    display: none;
+  }
+  .btn-setting:hover .popover-menu {
+    display: block;
+  }
+  .btn-setting .btn-link:hover {
+    background-color: transparent;
+  }
 }
 
 .work-panel {
   flex: 1;
   overflow: hidden;
   background-color: #F8F6F2;
-
 }
 
 .panel-nav {

@@ -6,6 +6,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import SelectField from 'material-ui/SelectField';
 import FontIcon from 'material-ui/FontIcon';
+import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
@@ -31,6 +32,7 @@ export class DetailHeader extends React.PureComponent {
       currency: defaultCurrency,
       payment: defaultPayment,
       openFollows: false,
+      goodsAddedData: [],
     };
   }
 
@@ -75,7 +77,29 @@ export class DetailHeader extends React.PureComponent {
   onReply = () => alert('reply');
   onReplyAll = () => alert('replyAll');
   onForward = () => alert('forward');
-  onAttach = () => alert('attach');
+  onAttach = async () => {
+    if (!window.FileReader) {
+      return;
+    }
+    if (this.uploading) return;
+    const files = await new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = e => resolve(e.target.files);
+      input.click();
+    });
+    const file = files[0];
+    this.uploading = true;
+    const data = new FormData();
+    data.append('uploadfile', file);
+    data.append('business', '1');
+    try {
+      // const resp = await uploadFile(data);
+    } catch (e) {
+      console.log(e);
+    }
+    this.uploading = false;
+  };
   onChangeChargePerson = () => alert('onChangeChargePerson');
   onAddFollowers = () => {
     this.props.detail.follower.push({display_name: '肖益龙', position: '总经理'});
@@ -109,8 +133,7 @@ export class DetailHeader extends React.PureComponent {
       <RaisedButton
         onTouchTap={this.handleFollowActions}
         style={{height: 26, fontSize: 12}}
-        label="后续操作"
-      />
+        label="后续操作"/>
       <Popover
         open={this.state.openFollows}
         anchorEl={this.state.anchorEl}
@@ -230,19 +253,16 @@ export class DetailHeader extends React.PureComponent {
   );
 
   onCurrencyChange = (event, index, value) => {
-    console.log(value);
     this.props.detail.currency = value;
     this.setState({currency: value});
   };
 
   onPaymentChange = (event, index, value) => {
-    console.log(value);
     this.props.detail.payment = this.PAYMENT_SELECTIONS[value];
     this.setState({payment: value});
   };
 
   onPriceTypeChange = (event, index, value) => {
-    console.log(value);
     this.props.detail.price_type = this.PRICE_TYPE_SELECTION[value];
     this.setState({priceType: value});
   };
@@ -261,7 +281,7 @@ export class DetailHeader extends React.PureComponent {
           <p style={{maxWidth: 260}}>{isProcurement ? '供应商：' : '客户：'}{detail.supplier.company}</p>
           <p style={{maxWidth: 160}}>{detail.supplier.display_name} / {detail.supplier.position}</p>
           <p>{formatTime(detail.timestamp, "YYYY-MM-D h:mm")}</p>
-          <this.ActionButton icon='note_add' action={this.onAddNote}/>
+          <this.ActionButton icon='note_add' tooltip='添加备注' action={this.onAddNote}/>
         </div>
         <div className="member-relatives" style={{marginTop: 10}}>
           <p>负责人：</p>
@@ -321,48 +341,72 @@ export class DetailHeader extends React.PureComponent {
           <div/>
         </div>
         <this.GoodsTable />
-        <button onClick={() => alert('insert table')} className="btn-add-goods">
+        <button onClick={this.editGoodsList} className="btn-add-goods" style={{marginLeft: 10}}>
           <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
         </button>
       </div>
     );
   };
 
+  editGoodsList = () => {
+    const {goodsAddedData} = this.state;
+    const newList = [...goodsAddedData, {}];
+    this.setState({goodsAddedData: newList});
+  };
+
   GoodsTable = () => {
     const {detail} = this.props;
     const {styles} = DetailHeader;
     return (
-      <Table className="goods-table" multiSelectable>
+      <Table className="goods-table" multiSelectable onRowSelection={() => {}}>
         <TableHeader enableSelectAll>
           <TableRow>
-            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>行号</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>物料号</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 26}}>行号</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 40}}>物料号</TableHeaderColumn>
             {detail.type === DetailContentType.SALE_ORDER &&
-              <TableHeaderColumn style={styles.noPadding}>客户物料号</TableHeaderColumn>
+              <TableHeaderColumn style={{...styles.noPadding, width: 70}}>客户物料号</TableHeaderColumn>
             }
             <TableHeaderColumn style={styles.noPadding}>物料名称</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>规格备注</TableHeaderColumn>
             <TableHeaderColumn style={{...styles.noPadding, width: 30}}>数量</TableHeaderColumn>
             <TableHeaderColumn style={{...styles.noPadding, width: 30}}>单位</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>单价</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 40}}>单价</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>金额</TableHeaderColumn>
             <TableHeaderColumn style={styles.noPadding}>交期/收货</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody showRowHover>
           {detail.goods_list && detail.goods_list.map((item, index) => (
-            <TableRow key={index}>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.line_no}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.goods_no}</TableRowColumn>
-              {detail.type === DetailContentType.SALE_ORDER &&
-                <TableHeaderColumn style={styles.noPadding}>{item.client_goods_no}</TableHeaderColumn>
+            <TableRow key={index} selectable={true}>
+              <TableRowColumn style={{...styles.noPadding, width: 20}}>{item.line_no}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.goods_no}</TableRowColumn>
+              {
+                detail.type === DetailContentType.SALE_ORDER && <TableRowColumn
+                style={{...styles.noPadding, width: 70}}>{item.client_goods_no}</TableRowColumn>
               }
               <TableRowColumn style={styles.noPadding}>{item.name}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.size}</TableRowColumn>
               <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.count}</TableRowColumn>
               <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.unit}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.unit_price}{item.discount}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.unit_price}{item.discount}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.total_price}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>
+            </TableRow>
+          ))}
+          {this.state.goodsAddedData.map((item, index) => (
+            <TableRow key={index} selectable={false}>
+              <TableRowColumn style={{...styles.noPadding, width: 20}}><TextField  style={{width: 20, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}><TextField  style={{width: 40, fontSize: 13}}/></TableRowColumn>
+              {
+                detail.type === DetailContentType.SALE_ORDER && <TableRowColumn
+                  style={{...styles.noPadding, width: 70}}><TextField style={{width: 70, fontSize: 13}}/></TableRowColumn>
+              }
+              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}><TextField  style={{width: 40, fontSize: 13}}/></TableRowColumn>
+              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>
             </TableRow>
           ))}

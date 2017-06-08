@@ -18,3 +18,15 @@ export const getDetail = async (id) => {
     case 'MESSAGE': return MESSAGE_DETAIL;
   }
 };
+
+export const create = async (content, id, type) => {
+  return {
+    company: 'myself',
+    sender: {
+      display_name: '我',
+      position: '客户经理',
+    },
+    content,
+    timestamp: Date.now(),
+  };
+};

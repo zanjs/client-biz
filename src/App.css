@@ -184,6 +184,9 @@ a {
   height: 60px;
   color: #868481;
   transition: color 0.3s ease-in-out;
+  border: none;
+  outline: none;
+  background-color: transparent;
 }
 .board-nav .btn-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
@@ -198,6 +201,24 @@ a {
   line-height: 44px;
   border-radius: 22px;
   background-color: #64b1ca;
+}
+.board-nav .btn-setting {
+  position: relative;
+  overflow: visible;
+}
+.board-nav .popover-menu {
+  position: absolute;
+  top: 12px;
+  right: -150px;
+  background-color: #FFF;
+  z-index: 1;
+  display: none;
+}
+.board-nav .btn-setting:hover .popover-menu {
+  display: block;
+}
+.board-nav .btn-setting .btn-link:hover {
+  background-color: transparent;
 }
 .work-panel {
   -ms-flex: 1;

@@ -3,6 +3,7 @@ import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
+import {create} from "../services/message";
 
 export class Comments extends React.PureComponent {
   state={
@@ -33,10 +34,45 @@ export class Comments extends React.PureComponent {
       {icon}
     </IconButton>
   );
-  onAttach = () => alert('attach');
+  onAttach = async () => {
+    if (!window.FileReader) {
+      return;
+    }
+    if (this.uploading) return;
+    const files = await new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = e => resolve(e.target.files);
+      input.click();
+    });
+    const file = files[0];
+    this.uploading = true;
+    const data = new FormData();
+    data.append('uploadfile', file);
+    data.append('business', '1');
+    try {
+      // const resp = await uploadFile(data);
+    } catch (e) {
+      console.log(e);
+    }
+    this.uploading = false;
+  };
   onInsertImage = () => alert('insert image');
   onAt = () => alert('@');
-  onSend = () => alert(this.state.content);
+  onSend = async () => {
+    if (this.submiting) return;
+    const {content, tabValue} = this.state;
+    if (!content || !content.trim()) return;
+    this.submiting = true;
+    const {detail} = this.props;
+    const messageType = tabValue;
+    try {
+      const resp = await create(content, detail.id, messageType);
+      detail.comments_list.push(resp);
+    } catch (e) { console.log(e); }
+    this.submiting = false;
+    this.setState({ content: ''});
+  };
 
   CommentList = () => {
     const {detail} = this.props;
@@ -80,8 +116,6 @@ export class Comments extends React.PureComponent {
 
   render() {
     const {tabValue, content} = this.state;
-    const {detail} = this.props;
-    const isOrder = detail.type === DetailContentType.PROCUREMENT_ORDER || detail.type === DetailContentType.SALE_ORDER;
     return (
       <div className="comment-area">
         <div className="comment-tabs">

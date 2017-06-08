@@ -3,8 +3,8 @@ import {
   Link,
 } from 'react-router-dom';
 import {connect} from 'react-redux';
-import FontIcon from 'material-ui/FontIcon';
 import {RouteWithSubRoutes} from "../router/index";
+import RaisedButton from 'material-ui/RaisedButton';
 
 class DashboardContainer extends React.Component {
   componentWillMount() {
@@ -25,26 +25,36 @@ class DashboardContainer extends React.Component {
   }
 }
 
-const DashboardNav = ({user}) => (
-  <nav className="board-nav">
-    <div>
-      <p className="logo">Biz</p>
-      <LinkButton icon='dashboard' text='我的' to="/dashboard/main"/>
-      <LinkButton icon='search' text='搜索' to="/dashboard/search"/>
-      <LinkButton icon='person' text='伙伴' to="/dashboard/partner"/>
-      <LinkButton icon='archive' text='产品' to="/dashboard/product"/>
-      <LinkButton icon='trending_up' text='分析' to="/dashboard/analysis"/>
-    </div>
-    <div>
-      <a className="btn-link">
-        <i className="material-icons" style={{fontSize: 30}}>add_circle_outline</i>
-      </a>
-      <a className="btn-link">
-        <span className="display-name">{(user && user.display_name) || '我'}</span>
-      </a>
-    </div>
-  </nav>
-);
+class DashboardNav extends React.PureComponent {
+  render() {
+    const {user} = this.props;
+    return (
+      <nav className="board-nav">
+        <div>
+          <p className="logo">Biz</p>
+          <LinkButton icon='dashboard' text='我的' to="/dashboard/main"/>
+          <LinkButton icon='search' text='搜索' to="/dashboard/search"/>
+          <LinkButton icon='person' text='伙伴' to="/dashboard/partner"/>
+          <LinkButton icon='archive' text='产品' to="/dashboard/product"/>
+          <LinkButton icon='trending_up' text='分析' to="/dashboard/analysis"/>
+        </div>
+        <div>
+          <button className="btn-link">
+            <i className="material-icons" style={{fontSize: 30}}>add_circle_outline</i>
+          </button>
+          <div className="btn-setting">
+            <div className="btn-link">
+              <span className="display-name">{(user && user.display_name) || '我'}</span>
+            </div>
+            <div className="popover-menu">
+              <RaisedButton label="退出" style={{width: 150}} />
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+}
 
 const LinkButton = ({icon, text, to}) => (
   <Link className="icon-button" to={to}>
