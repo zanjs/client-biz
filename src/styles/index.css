@@ -912,3 +912,6 @@ a {
   outline: none;
   background-color: transparent;
 }
+.edit-form .edit-field {
+  margin-right: 20px;
+}

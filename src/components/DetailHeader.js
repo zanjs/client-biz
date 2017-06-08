@@ -7,6 +7,9 @@ import Menu from 'material-ui/Menu';
 import SelectField from 'material-ui/SelectField';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
+import Dialog from 'material-ui/Dialog';
+import DatePicker from 'material-ui/DatePicker';
+import FlatButton from 'material-ui/FlatButton';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
@@ -31,9 +34,11 @@ export class DetailHeader extends React.PureComponent {
       priceType: defaultPriceType,
       currency: defaultCurrency,
       payment: defaultPayment,
-      openFollows: false,
-      goodsAddedData: [],
+      openFollowActions: false,
+      openEditDialog: false,
     };
+    this.focusGoodData = null;
+    this.editRowNumber = null;
   }
 
   static styles = {
@@ -92,7 +97,6 @@ export class DetailHeader extends React.PureComponent {
     this.uploading = true;
     const data = new FormData();
     data.append('uploadfile', file);
-    data.append('business', '1');
     try {
       // const resp = await uploadFile(data);
     } catch (e) {
@@ -117,14 +121,14 @@ export class DetailHeader extends React.PureComponent {
     event.preventDefault();
 
     this.setState({
-      openFollows: true,
+      openFollowActions: true,
       anchorEl: event.currentTarget,
     });
   };
 
   handleFollowActionsClose = () => {
     this.setState({
-      openFollows: false,
+      openFollowActions: false,
     });
   };
 
@@ -135,7 +139,7 @@ export class DetailHeader extends React.PureComponent {
         style={{height: 26, fontSize: 12}}
         label="后续操作"/>
       <Popover
-        open={this.state.openFollows}
+        open={this.state.openFollowActions}
         anchorEl={this.state.anchorEl}
         anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
         targetOrigin={{horizontal: 'left', vertical: 'top'}}
@@ -341,24 +345,32 @@ export class DetailHeader extends React.PureComponent {
           <div/>
         </div>
         <this.GoodsTable />
-        <button onClick={this.editGoodsList} className="btn-add-goods" style={{marginLeft: 10}}>
+        <button onClick={this.handleAddGoods} className="btn-add-goods" style={{marginLeft: 10}}>
           <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
         </button>
       </div>
     );
   };
 
-  editGoodsList = () => {
-    const {goodsAddedData} = this.state;
-    const newList = [...goodsAddedData, {}];
-    this.setState({goodsAddedData: newList});
+  handleAddGoods = () => {
+    this.isCreateGood = true;
+    this.handleDialogOpen();
+  };
+
+
+  onCellClick = (row,column) => {
+    if (column > -1) {
+      this.focusGoodData = this.props.detail.goods_list[row];
+      this.editRowNumber = row;
+      this.handleDialogOpen();
+    }
   };
 
   GoodsTable = () => {
     const {detail} = this.props;
     const {styles} = DetailHeader;
     return (
-      <Table className="goods-table" multiSelectable onRowSelection={() => {}}>
+      <Table className="goods-table" multiSelectable onCellClick={this.onCellClick}>
         <TableHeader enableSelectAll>
           <TableRow>
             <TableHeaderColumn style={{...styles.noPadding, width: 26}}>行号</TableHeaderColumn>
@@ -378,41 +390,107 @@ export class DetailHeader extends React.PureComponent {
         <TableBody showRowHover>
           {detail.goods_list && detail.goods_list.map((item, index) => (
             <TableRow key={index} selectable={true}>
-              <TableRowColumn style={{...styles.noPadding, width: 20}}>{item.line_no}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.goods_no}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 20}}>{item.line_no || 0}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.goods_no || 0}</TableRowColumn>
               {
                 detail.type === DetailContentType.SALE_ORDER && <TableRowColumn
-                style={{...styles.noPadding, width: 70}}>{item.client_goods_no}</TableRowColumn>
+                style={{...styles.noPadding, width: 70}}>{item.client_goods_no || 0}</TableRowColumn>
               }
-              <TableRowColumn style={styles.noPadding}>{item.name}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.size}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.count}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.unit}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.unit_price}{item.discount}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.name || '暂无'}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.size || '暂无'}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.count || 0}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.unit || '暂无'}</TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.unit_price || 0}{item.discount}</TableRowColumn>
               <TableRowColumn style={styles.noPadding}>{item.total_price}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>
-            </TableRow>
-          ))}
-          {this.state.goodsAddedData.map((item, index) => (
-            <TableRow key={index} selectable={false}>
-              <TableRowColumn style={{...styles.noPadding, width: 20}}><TextField  style={{width: 20, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}><TextField  style={{width: 40, fontSize: 13}}/></TableRowColumn>
-              {
-                detail.type === DetailContentType.SALE_ORDER && <TableRowColumn
-                  style={{...styles.noPadding, width: 70}}><TextField style={{width: 70, fontSize: 13}}/></TableRowColumn>
-              }
-              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}><TextField  style={{width: 40, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={styles.noPadding}><TextField style={{width: 30, fontSize: 13}}/></TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{formatTime(item.due_date, 'YYYY/M/D')}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>{item.due_date ? formatTime(item.due_date, 'YYYY/M/D') : '暂无'}</TableRowColumn>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
+  };
+
+  EditGoodsDialog = () => {
+    const {detail} = this.props;
+    const title = this.focusGoodData ? '编辑' : '创建';
+    if (this.isCreateGood) this.focusGoodData = {};
+    const actions = [
+      <FlatButton
+        label="确认"
+        primary={true}
+        keyboardFocused={false}
+        onTouchTap={this.submitEdit}
+      />,
+      <FlatButton
+        label="取消"
+        primary={false}
+        keyboardFocused={true}
+        onTouchTap={this.handleDialogClose}
+      />,
+    ];
+    return (
+      <Dialog
+        title={title}
+        actions={actions}
+        modal={false}
+        autoScrollBodyContent
+        open={this.state.openEditDialog}
+        onRequestClose={this.handleDialogClose}>
+        <div className="edit-form">
+          <TextField floatingLabelText="行号" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.line_no}
+                     onChange={(e, value) => this.focusGoodData.line_no = parseInt(value, 10)}/>
+          <TextField floatingLabelText="物料号" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.goods_no}
+                     onChange={(e, value) => this.focusGoodData.goods_no = parseInt(value, 10)}/>
+          {detail.type === DetailContentType.SALE_ORDER && <TextField floatingLabelText="客户物料号"
+                                                                      className="edit-field"
+                                                                      defaultValue={this.focusGoodData && this.focusGoodData.client_goods_no}
+                                                                      onChange={(e, value) => this.focusGoodData.client_goods_no = parseInt(value, 10)}/>}
+          <TextField floatingLabelText="物料名称" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.name}
+                     onChange={(e, value) => this.focusGoodData.name = value}/>
+          <TextField floatingLabelText="规格备注" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.size}
+                     onChange={(e, value) => this.focusGoodData.size = value}/>
+          <TextField floatingLabelText="数量" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.count}
+                     onChange={(e, value) => this.focusGoodData.count = parseInt(value, 10)}/>
+          <TextField floatingLabelText="单位" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.unit}
+                     onChange={(e, value) => this.focusGoodData.unit = value}/>
+          <TextField floatingLabelText="单价" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.unit_price}
+                     onChange={(e, value) => this.focusGoodData.unit_price = parseInt(value, 10)}/>
+          <TextField floatingLabelText="金额" className="edit-field"
+                     defaultValue={this.focusGoodData && this.focusGoodData.total_price}
+                     onChange={(e, value) => this.focusGoodData.total_price = parseInt(value, 10)}/>
+          <DatePicker floatingLabelText="交期/收货" className="edit-field"
+                      defaultDate={this.focusGoodData && this.focusGoodData.due_date && new Date(this.focusGoodData.due_date)}
+                      onChange={(e, value) => this.focusGoodData.due_date = new Date(value).getTime()}/>
+        </div>
+      </Dialog>
+    )
+  };
+
+  submitEdit = () => {
+    if (this.isCreateGood) {
+      this.props.detail.goods_list.push(this.focusGoodData);
+    } else {
+      this.props.detail.goods_list[this.editRowNumber] = {...this.props.detail.goods_list[this.editRowNumber], ...this.focusGoodData}
+    }
+    this.handleDialogClose();
+  };
+
+  handleDialogOpen = () => {
+    this.setState({openEditDialog: true});
+  };
+
+  handleDialogClose = () => {
+    this.focusGoodData = null;
+    this.editRowNumber = null;
+    this.isCreateGood = false;
+    this.setState({openEditDialog: false});
   };
 
   render() {
@@ -422,6 +500,7 @@ export class DetailHeader extends React.PureComponent {
       <div className="detail-header">
         <this.TitleItem />
         {isOrder ? <this.OrderInfo /> : <this.MessageInfo />}
+        <this.EditGoodsDialog />
       </div>
     );
   }

@@ -49,7 +49,6 @@ export class Comments extends React.PureComponent {
     this.uploading = true;
     const data = new FormData();
     data.append('uploadfile', file);
-    data.append('business', '1');
     try {
       // const resp = await uploadFile(data);
     } catch (e) {
