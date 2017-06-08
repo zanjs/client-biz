@@ -7,9 +7,13 @@ export default class MainBoard extends React.PureComponent {
   render() {
     return (
       <div className="main-board">
-        <MailBox/>
-        <ProcurementBox/>
-        <SaleBox/>
+        {/*<button className="drawer-overlay" onClick={this.props.closeDetailDrawer}/>*/}
+        <MailBox openDetailDrawer={this.props.openDetailDrawer}
+                 closeDetailDrawer={this.props.closeDetailDrawer}/>
+        <ProcurementBox openDetailDrawer={this.props.openDetailDrawer}
+                        closeDetailDrawer={this.props.closeDetailDrawer}/>
+        <SaleBox openDetailDrawer={this.props.openDetailDrawer}
+                 closeDetailDrawer={this.props.closeDetailDrawer}/>
       </div>
     );
   }

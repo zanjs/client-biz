@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import Login from '../views/Login';
 import Dashboard from '../views/Dashboard';
-import Detail from '../views/Detail';
+// import Detail from '../views/Detail';
 import {
   MainDashboard,
   Analysis,
@@ -44,10 +44,10 @@ const routes = [
       }
     ],
   },
-  {
-    path: '/detail/:id',
-    component: Detail,
-  }
+  // {
+  //   path: '/detail/:id',
+  //   component: Detail,
+  // }
 ];
 
 const RouteWithSubRoutes = (route) => (

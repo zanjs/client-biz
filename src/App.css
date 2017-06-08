@@ -273,7 +273,6 @@ a {
   display: flex;
   -ms-flex-direction: row;
       flex-direction: row;
-  position: relative;
   box-sizing: border-box;
   padding: 10px 10px 0 10px;
   -ms-flex-pack: start;
@@ -283,6 +282,20 @@ a {
   height: 100%;
   min-width: 780px;
   background-color: #F8F6F2;
+  position: relative;
+}
+.drawer-overlay {
+  display: block;
+  border: none;
+  outline: none;
+  cursor: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: transparent;
 }
 .board-layout {
   width: 280px;

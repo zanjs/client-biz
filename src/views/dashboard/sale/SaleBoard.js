@@ -104,7 +104,7 @@ export default class SaleBoard extends React.PureComponent {
           {
             this.DS.map((data, index) => (
               <div key={index} className="procurement-item">
-                <div style={{width: 260}}><MessageItem message={data}/></div>
+                <div style={{width: 260}}><MessageItem message={data} openDetail={this.props.openDetailDrawer}/></div>
                 <div className="message-detail" style={{marginLeft: 5, textAlign: 'center'}}>
                   <p style={{fontSize: 14}}>单据详情</p>
                 </div>

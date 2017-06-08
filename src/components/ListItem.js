@@ -19,7 +19,7 @@ export class MessageItem extends React.PureComponent {
     return (
       <div className="message-item" style={{marginBottom: 5}}>
         <input type="checkbox"/>
-        <Link className="message-detail" to={`/detail/${message.id}`} style={{display: 'block', marginLeft: 5}}>
+        <div className="message-detail" onClick={() => this.props.openDetail(message.type, message.id)} style={{display: 'block', marginLeft: 5}}>
           <p className="message-title">{message.title}</p>
           <p className="message-content">{message.content}</p>
           <div className="message-bottom">
@@ -29,7 +29,7 @@ export class MessageItem extends React.PureComponent {
             </div>
             <p className="source">来自：{message.from}</p>
           </div>
-        </Link>
+        </div>
       </div>
     );
   }
