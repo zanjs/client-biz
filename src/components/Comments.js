@@ -134,6 +134,7 @@ export class Comments extends React.PureComponent {
             rowsMax={4}
             fullWidth
             className="input-area"
+            value={content}
             onChange={(e, v) => this.setState({content: v})}
           />
           <div className="actions">
