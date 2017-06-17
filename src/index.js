@@ -1,18 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
-import injectTapEventPlugin from 'react-tap-event-plugin'; // fix react onTouchTap events(button & drawer component...)
 
+import injectTapEventPlugin from 'react-tap-event-plugin'; // fix react onTouchTap events(button & drawer component...)
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppComponent from './App';
-import AppStore from './reducers/index';
+import store from './reducers/index';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import './App.css';
 
 injectTapEventPlugin();
-
-const store = createStore(AppStore);
 
 const App = () => (
   <MuiThemeProvider>

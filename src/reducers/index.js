@@ -1,8 +1,8 @@
-import {combineReducers} from 'redux';
+import {combineReducers, createStore} from 'redux';
 import {account} from "./account";
 
 const AppStore = combineReducers({
   account,
 });
-
-export default AppStore;
+const store = createStore(AppStore);
+export default store;

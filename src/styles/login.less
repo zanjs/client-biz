@@ -1,4 +1,5 @@
-.layout-login {
+.layout-login,
+.register-view {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,13 +8,12 @@
   box-sizing: border-box;
 
   a {
-    color: inherit;
     text-decoration: none;
   }
 
   .card {
     width: 500px;
-    height: 360px;
+    min-height: 360px;
     background-color: #FFF;
     border-radius: 4px;
     margin: 0 20px;
@@ -21,7 +21,6 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-
   }
 
   .title {
@@ -35,6 +34,7 @@
     margin-left: 10px;
     font-size: 28px;
     letter-spacing: 5px;
+    color: #000;
   }
 
   h4 {
@@ -57,10 +57,81 @@
   }
 
   .login-input {
+    width: 30%;
     margin-bottom: 20px;
+  }
+
+  .actions {
+    margin-top: 25px;
+    border-top: 1px solid #E6E6E6;
+    width: 256px;
+    text-align: right;
+    padding-top: 10px;
   }
 }
 
 .btn-login {
   width: 256px;
+}
+
+.link-register {
+  text-align: right;
+  font-size: 13px;
+  color: #6f6e6b;
+  &:hover {
+    color: #da4f4a;
+  }
+}
+
+.register-view {
+  width: 100%;
+  background-color: #F8F6F2;
+  padding-top: 30px;
+
+  .card-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 1px 1px -1px rgba(0, 0, 0, .2);
+
+    h4 {
+      box-shadow: none;
+    }
+  }
+  .card {
+    width: 580px;
+    margin-bottom: 30px;
+  }
+  .link-back {
+    color: #6f6e6b;
+    font-size: 14px;
+    &:hover {
+      color: #da4f4a;
+    }
+  }
+  .form-register {
+    padding: 0 10px 10px 10px;
+  }
+  .login-input:nth-child(odd) {
+    margin-right: 40px;
+  }
+  .title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .title-txt {
+    margin-left: 10px;
+    font-size: 28px;
+    letter-spacing: 5px;
+  }
+  .actions-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

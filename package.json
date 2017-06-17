@@ -6,6 +6,7 @@
     "axios": "^0.16.2",
     "material-ui": "^0.18.1",
     "moment": "^2.18.1",
+    "node-less-chokidar": "^0.1.0",
     "react": "^15.5.4",
     "react-big-calendar": "^0.14.0",
     "react-dom": "^15.5.4",
@@ -16,10 +17,13 @@
     "redux": "^3.6.0"
   },
   "devDependencies": {
+    "node-sass-chokidar": "0.0.3",
     "react-scripts": "1.0.7"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "build-css": "node-less-chokidar src/ -o src/",
+    "watch-css": "npm run build-css && node-less-chokidar src/ -o src/ --watch --recursive",
+    "start": "react-scripts start PORT=3001",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

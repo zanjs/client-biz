@@ -5,8 +5,9 @@ import {
 import {connect} from 'react-redux';
 import {RouteWithSubRoutes} from "../router/index";
 import RaisedButton from 'material-ui/RaisedButton';
+import {logout} from '../actions/account';
 
-class DashboardContainer extends React.Component {
+export default class Dashboard extends React.Component {
   componentWillMount() {
     if (this.props.match.path === '/dashboard') {
       this.props.history.push('/dashboard/main');
@@ -25,9 +26,14 @@ class DashboardContainer extends React.Component {
   }
 }
 
-class DashboardNav extends React.PureComponent {
+class Nav extends React.PureComponent {
+  logout = () => {
+    this.props.logout();
+    localStorage.removeItem('bizUser');
+    window.location.replace('/');
+  };
   render() {
-    const {user} = this.props;
+    const {currentUser} = this.props;
     return (
       <nav className="board-nav">
         <div>
@@ -44,10 +50,10 @@ class DashboardNav extends React.PureComponent {
           </button>
           <div className="btn-setting">
             <div className="btn-link">
-              <span className="display-name">{(user && user.display_name) || '我'}</span>
+              <span className="display-name">{(currentUser && currentUser.display_name) || '我'}</span>
             </div>
             <div className="popover-menu">
-              <RaisedButton label="退出" style={{width: 150}} />
+              <RaisedButton label="退出" style={{width: 150}} onClick={this.logout}/>
             </div>
           </div>
         </div>
@@ -69,5 +75,10 @@ const mapStateToProps = (state) => {
   }
 };
 
-const Dashboard = connect(mapStateToProps)(DashboardContainer);
-export default  Dashboard;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    logout: () => dispatch(logout())
+  }
+};
+
+const DashboardNav = connect(mapStateToProps, mapDispatchToProps)(Nav);

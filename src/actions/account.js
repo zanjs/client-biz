@@ -5,3 +5,5 @@ export const loginAction = (user, token) => {
     token,
   }
 };
+
+export const logout = () => ({ type: 'LOGOUT' });

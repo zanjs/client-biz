@@ -6,6 +6,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {loginAction} from '../actions/account';
 import {loginService} from "../services/account";
+import Toast from "../components/Toast";
 
 
 class LoginContainer extends React.Component {
@@ -15,7 +16,8 @@ class LoginContainer extends React.Component {
     error: {
       username: '',
       password: '',
-    }
+    },
+    toastMessage: '',
   };
   get validated() {
     const {username, password} = this.state;
@@ -53,7 +55,8 @@ class LoginContainer extends React.Component {
     this.setState({ error });
   };
 
-  login = async () => {
+  login = async (e) => {
+    e.preventDefault();
     const {username, password} = this.state;
     const {loginAction} = this.props;
     try {
@@ -61,11 +64,12 @@ class LoginContainer extends React.Component {
       if (resp.success) {
         loginAction(resp.user, resp.token);
         const data = {user: resp.user, token: resp.token};
-        console.log(data, JSON.stringify(data));
         localStorage.setItem('bizUser', JSON.stringify(data));
         this.props.history.replace('/dashboard');
       }
-    } catch (e) {}
+    } catch (e) {
+      this.refs.toast.show('登录失败', 1000);
+    }
   };
 
   render() {
@@ -78,7 +82,7 @@ class LoginContainer extends React.Component {
        </div>
        <div className="card">
          <h4>登录</h4>
-         <div className="form-login">
+         <from className="form-login">
            <TextField
              hintText="请输入用户名"
              value={username}
@@ -96,8 +100,12 @@ class LoginContainer extends React.Component {
              errorText={error.password}
              className="login-input"/>
            <RaisedButton label="确认" className="btn-login" primary={this.validated} disabled={!this.validated} onClick={this.login}/>
-         </div>
+           <div className="actions">
+             <Link to="/register" className="link-register">注册新商户</Link>
+           </div>
+         </from>
        </div>
+       <Toast ref="toast"/>
       </div>
     );
   }

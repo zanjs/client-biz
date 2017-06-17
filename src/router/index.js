@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import Login from '../views/Login';
+import Register from '../views/Reg';
 import Dashboard from '../views/Dashboard';
 import {
   MainDashboard,
@@ -15,6 +16,11 @@ const routes = [
     path: '/',
     component: Login,
     exact: true,
+  },
+  {
+    path: '/register',
+    component: Register,
+    name: 'register',
   },
   {
     path: '/dashboard',
