@@ -13,7 +13,7 @@ import Toast from "../../components/Toast";
 class RegisterContainer extends React.Component {
   constructor(props) {
     super(props);
-    if (!this.props.location.state && this.props.location.state.username) window.location.replace('/');
+    if (!(this.props.location.state && this.props.location.state.username)) window.location.replace('/');
   }
   state = {
     mer_name: '',
