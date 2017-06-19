@@ -4,15 +4,19 @@ import { connect } from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import { loginAction } from '../actions/account';
-import { loginService } from "../services/account";
+import { loginAction } from '../../actions/account';
+import { accountService } from "../../services/account";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Toast from "../../components/Toast";
 
 class RegisterContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    if (!this.props.location.state && this.props.location.state.username) window.location.replace('/');
+  }
   state = {
     mer_name: '',
-    password: '',
     type: 0,
     indust_id: '',
     org_code: '',
@@ -34,25 +38,23 @@ class RegisterContainer extends React.Component {
       om_bank_name: '',
       bank_account: '',
       swift_code: '',
-      password: '',
       la_bank_account: '',
       tel_list: '',
       address: '',
     }
   };
   get validated() {
-    const { mer_name, type, indust_id, org_code, representative, establish_date, password } = this.state;
+    const { mer_name, type, indust_id, org_code, representative, establish_date } = this.state;
     let allLengthChecked = false;
     switch (type) {
       case 0:
-        allLengthChecked = this.hasLength(mer_name, indust_id, org_code, representative, establish_date, password);
+        allLengthChecked = this.hasLength(mer_name, indust_id, org_code, representative, establish_date);
         break;
       case 1:
-        allLengthChecked = this.hasLength(mer_name, indust_id, password);
+        allLengthChecked = this.hasLength(mer_name, indust_id);
         break;
       default: break;
     }
-    if (password.length < 6) allLengthChecked = false;
     return allLengthChecked;
   }
 
@@ -95,49 +97,45 @@ class RegisterContainer extends React.Component {
     this.setState({ error });
   };
 
-  checkPassword = () => {
-    const { password } = this.state;
-    const error = { ...this.state.error, password: '' };
-    if (!(password.trim() || password)) {
-      error.password = '密码不能为空';
-    } else if (password.trim().length < 6) {
-      error.password = '密码不能少于6位';
-    } else {
-      if (this.state.error.password.length) this.setState({ error });
-      return;
+  submit = async () => {
+    const { username, password } = this.props.location.state;
+    const { login } = this.props;
+    const {mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account,
+      swift_code, la_bank_account, tel_list, address} = this.state;
+    try {
+      const resp = await accountService.createMerchant(mer_name, type, indust_id, org_code, representative,
+        establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
+      if (resp.code == 0) {
+        const loginResp = await accountService.login(username, password);
+        const token = loginResp.data.access_token;
+        const userData = await accountService.getProfile(loginResp.data.access_token);
+        const account = {username, password};
+        login(userData.data, token, account);
+        const data = {user: userData.data, token, account};
+        localStorage.setItem('bizUser', JSON.stringify(data));
+        this.props.history.replace('/dashboard/main');
+      }
+    } catch (e) {
+      console.log(e, 'create merchant');
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试', 1000);
     }
-    this.setState({ error });
-  };
-
-  register = async () => {
-    // const { username, password } = this.state;
-    // const { loginAction } = this.props;
-    // try {
-    //   const resp = await loginService.login(username, password);
-    //   if (resp.success) {
-    //     loginAction(resp.user, resp.token);
-    //     const data = { user: resp.user, token: resp.token };
-    //     console.log(data, JSON.stringify(data));
-    //     localStorage.setItem('bizUser', JSON.stringify(data));
-    //     this.props.history.replace('/dashboard');
-    //   }
-    // } catch (e) { }
   };
 
   render() {
-    const { mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account, swift_code, password, la_bank_account, tel_list, address, error } = this.state;
+    const { mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account,
+      swift_code, la_bank_account, tel_list, address, error } = this.state;
     return (
-        <div className="register-view">
+        <div className="add-merchant">
           <div className="title">
             <FontIcon className="material-icons">home</FontIcon>
             <p className="title-txt" disabled>BizLink</p>
           </div>
           <div className="card">
             <div className="card-title">
-              <h4>注册</h4>
+              <h4>创建商户</h4>
               <Link to="/" className="link-back">返回</Link>
             </div>
-            <form className="form-register">
+            <form className="form-register" onSubmit={this.submit}>
               <TextField
                 hintText="商户名称"
                 value={mer_name}
@@ -155,14 +153,6 @@ class RegisterContainer extends React.Component {
                 <MenuItem value={1} primaryText="个人" />
                 <MenuItem value={0} primaryText="企业" />
               </SelectField>
-              <TextField
-                hintText="登录密码"
-                value={password}
-                type="password"
-                onBlur={this.checkPassword}
-                onChange={e => this.setState({ password: e.target.value })}
-                errorText={error.password}
-                className="login-input"/>
               <TextField
                 hintText="行业类型"
                 value={indust_id}
@@ -240,10 +230,11 @@ class RegisterContainer extends React.Component {
 
               <div className="actions-container">
                 <RaisedButton style={{ marginTop: '20px' }} label="确认" className="btn-login"
-                              primary={this.validated} disabled={!this.validated} onClick={this.register} />
+                              primary={this.validated} disabled={!this.validated} onClick={this.submit} />
               </div>
 
             </form>
+            <Toast ref="toast"/>
           </div>
       </div>
     );
@@ -252,7 +243,7 @@ class RegisterContainer extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginAction: (user, token) => { dispatch(loginAction(user, token)); }
+    login: (user, token) => { dispatch(loginAction(user, token)); }
   }
 };
 

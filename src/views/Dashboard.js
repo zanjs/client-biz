@@ -1,23 +1,37 @@
 import React from 'react';
-import {
-  Link,
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
-import {RouteWithSubRoutes} from "../router/index";
+import { RouteWithSubRoutes } from "../router/index";
 import RaisedButton from 'material-ui/RaisedButton';
-import {logout} from '../actions/account';
+import { logout, updateUser } from '../actions/account';
+import {accountService} from "../services/account";
 
-export default class Dashboard extends React.Component {
-  componentWillMount() {
+class DashboardContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    if (!props.token) window.location.replace('/');
+  }
+  async componentWillMount() {
     if (this.props.match.path === '/dashboard') {
       this.props.history.push('/dashboard/main');
     }
+    // if (this.props.token) {
+    //   const resp = await accountService.getProfile(this.props.token);
+    // }
+  }
+  async componentDidMount() {
+    try {
+      const resp = await accountService.getProfile(this.props.token);
+      if (resp.code == 0) this.props.updateUser(resp.data);
+    } catch (e) {
+      console.log(e, 'update user in dashboard');
+    }
   }
   render() {
-    const {routes} = this.props;
+    const {routes, currentUser, logout} = this.props;
     return (
       <div className="dashboard">
-        <DashboardNav />
+        <DashboardNav currentUser={currentUser} logout={logout}/>
         {routes && routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route}/>
         ))}
@@ -26,7 +40,23 @@ export default class Dashboard extends React.Component {
   }
 }
 
-class Nav extends React.PureComponent {
+const mapStateToProps = (state) => {
+  return {
+    currentUser: state.account.currentUser,
+    token: state.account.token,
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    logout: () => dispatch(logout()),
+    updateUser: user => dispatch(updateUser(user)),
+  }
+};
+
+const Dashboard = connect(mapStateToProps, mapDispatchToProps)(DashboardContainer);
+
+class DashboardNav extends React.PureComponent {
   logout = () => {
     this.props.logout();
     localStorage.removeItem('bizUser');
@@ -69,16 +99,4 @@ const LinkButton = ({icon, text, to}) => (
   </Link>
 );
 
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.account.currentUser,
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    logout: () => dispatch(logout())
-  }
-};
-
-const DashboardNav = connect(mapStateToProps, mapDispatchToProps)(Nav);
+export default Dashboard;

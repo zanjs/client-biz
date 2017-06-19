@@ -1,18 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect, } from 'react-router-dom';
 import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import {loginAction} from '../actions/account';
-import {loginService} from "../services/account";
-import Toast from "../components/Toast";
+import {loginAction} from '../../actions/account';
+import {accountService} from "../../services/account";
+import Toast from "../../components/Toast";
 
 
 class LoginContainer extends React.Component {
   state={
-    username: '',
-    password: '',
+    username: this.props.account.username || '',
+    password: this.props.account.password || '',
     error: {
       username: '',
       password: '',
@@ -60,20 +60,32 @@ class LoginContainer extends React.Component {
     const {username, password} = this.state;
     const {loginAction} = this.props;
     try {
-      const resp = await loginService.login(username, password);
-      if (resp.success) {
-        loginAction(resp.user, resp.token);
-        const data = {user: resp.user, token: resp.token};
+      const resp = await accountService.login(username, password);
+      console.log(resp, 'login');
+      if (resp.code == 0) {
+        const token = resp.data.access_token;
+        const userData = await accountService.getProfile(resp.data.access_token);
+        const account = {username, password};
+        loginAction(userData.data, token, account);
+        const data = {user: userData.data, token, account};
         localStorage.setItem('bizUser', JSON.stringify(data));
-        this.props.history.replace('/dashboard');
+        this.props.history.replace('/dashboard/main');
+      } else {
+        this.refs.toast.show('登录失败, 请稍后重试', 1000);
       }
     } catch (e) {
-      this.refs.toast.show('登录失败', 1000);
+      console.log(e, 'login');
+      this.refs.toast.show('登录失败, 请稍后重试', 1000);
     }
   };
 
   render() {
     const { username, password, error } = this.state;
+    console.log(this.props.isLoggedIn);
+    if (this.props.isLoggedIn) {
+      return (<Redirect to={'/dashboard/main'}/>);
+    }
+
     return (
       <div className="layout layout-login">
        <div className="title">
@@ -82,7 +94,7 @@ class LoginContainer extends React.Component {
        </div>
        <div className="card">
          <h4>登录</h4>
-         <from className="form-login">
+         <from onSubmit={this.login} className="form-login">
            <TextField
              hintText="请输入用户名"
              value={username}
@@ -111,12 +123,19 @@ class LoginContainer extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapStateToProps = state => {
+  return {
+    account: state.account.account,
+    isLoggedIn: state.account.token,
+  }
+};
+
+const mapDispatchToProps = dispatch => {
   return {
     loginAction: (user, token) => { dispatch(loginAction(user, token)); }
   }
 };
 
-const Login = connect(null, mapDispatchToProps)(LoginContainer);
+const Login = connect(mapStateToProps, mapDispatchToProps)(LoginContainer);
 export default Login;
 

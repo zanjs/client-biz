@@ -1,7 +1,8 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import Login from '../views/Login';
-import Register from '../views/Reg';
+import Login from '../views/account/Login';
+import Register from '../views/account/Reg';
+import AddMerchant from '../views/account/AddMerchant';
 import Dashboard from '../views/Dashboard';
 import {
   MainDashboard,
@@ -21,6 +22,11 @@ const routes = [
     path: '/register',
     component: Register,
     name: 'register',
+  },
+  {
+    path: '/add_merchant',
+    component: AddMerchant,
+    name: 'add_merchant',
   },
   {
     path: '/dashboard',
