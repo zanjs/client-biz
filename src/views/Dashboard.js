@@ -3,11 +3,14 @@ import { Link, withRouter } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { RouteWithSubRoutes } from "../router/index";
 import RaisedButton from 'material-ui/RaisedButton';
+import Dialog from 'material-ui/Dialog';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import { logout, updateUser } from '../actions/account';
 import {accountService} from "../services/account";
+import AddMerchant from "./items/AddMerchant";
+import Toast from "../components/Toast";
 
 class DashboardContainer extends React.Component {
   constructor(props) {
@@ -21,12 +24,17 @@ class DashboardContainer extends React.Component {
     try {
       const resp = await accountService.getProfile(this.props.token);
       if (resp.code == 0) this.props.updateUser(resp.data);
+      else this.reLogin();
     } catch (e) {
       console.log(e, 'update user in dashboard');
-      this.props.logout();
-      window.location.replace('/');
+      this.reLogin();
     }
   }
+  reLogin = () => {
+    this.refs.toast.show('登录已过期，请重新登录');
+    this.props.logout();
+    window.location.replace('/');
+  };
   render() {
     const {routes, currentUser, logout} = this.props;
     return (
@@ -35,6 +43,7 @@ class DashboardContainer extends React.Component {
         {routes && routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route}/>
         ))}
+        <Toast ref="toast"/>
       </div>
     );
   }
@@ -60,26 +69,30 @@ export default Dashboard;
 class DashboardNavItem extends React.Component {
   state = {
     openQuickCreateMenu: false,
+    openDialog: !this.props.currentUser || !this.props.currentUser.mer_id || this.props.currentUser.mer_id === 0,
+    openCreateMerchantDialog: false,
+    dialogTitle: '请选择',
   };
   logout = () => {
     this.props.logout();
     window.location.replace('/');
   };
+  handleRequestCloseDialog = () => this.setState({ openDialog: false, dialogTitle: '请选择', openCreateMerchantDialog: false });
+  handleOpenCreateMerchantDialog = () => this.setState({ openDialog: true, openCreateMerchantDialog: true, dialogTitle: '创建商户' });
   handleQuickCreate = event => {
     event.preventDefault();
     this.setState({ openQuickCreateMenu: true, quickCreateAnchorEl: event.currentTarget });
   };
   handleQuickCreateRequestClose = () => this.setState({ openQuickCreateMenu: false });
-  createMerchant = () => this.props.history.push('/add_merchant');
   inviteUser = () => alert('邀请用户');
 
   render() {
+    const {openQuickCreateMenu, quickCreateAnchorEl, openCreateMerchantDialog, dialogTitle} = this.state;
     const {currentUser} = this.props;
     const quickCreateAction = currentUser && currentUser.mer_id ? [
-      {name: "创建商户", action: this.createMerchant},
       {name: "邀请用户", action: this.inviteUser},
     ] : [
-      {name: "创建商户", action: this.createMerchant},
+      {name: "创建商户", action: this.handleOpenCreateMerchantDialog},
     ];
     return (
       <nav className="board-nav">
@@ -96,8 +109,8 @@ class DashboardNavItem extends React.Component {
             <i className="material-icons" style={{fontSize: 30}}>add_circle_outline</i>
           </button>
           <Popover
-            open={this.state.openQuickCreateMenu}
-            anchorEl={this.state.quickCreateAnchorEl}
+            open={openQuickCreateMenu}
+            anchorEl={quickCreateAnchorEl}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
             targetOrigin={{horizontal: 'left', vertical: 'top'}}
             onRequestClose={this.handleQuickCreateRequestClose}
@@ -112,13 +125,29 @@ class DashboardNavItem extends React.Component {
           </Popover>
           <div className="btn-setting">
             <div className="btn-link">
-              <span className="display-name">{(currentUser && currentUser.display_name) || '我'}</span>
+              <span className="display-name">{(currentUser && currentUser.name.slice(0, 2))}</span>
             </div>
             <div className="popover-menu">
               <RaisedButton label="退出" style={{width: 150}} onClick={this.logout}/>
             </div>
           </div>
         </div>
+        <Dialog
+          title={dialogTitle}
+          titleStyle={{fontSize: 18}}
+          modal={false}
+          autoScrollBodyContent
+          open={this.state.openDialog}
+          onRequestClose={this.handleRequestCloseDialog}>
+          {
+            openCreateMerchantDialog ? <AddMerchant close={this.handleRequestCloseDialog}/> : (
+              <div className="dialogActions">
+                <RaisedButton label="加入商户" primary={true} style={{margin: 12, flex: 1}} />
+                <RaisedButton label="创建商户" secondary={true} style={{margin: 12, flex: 1}} onTouchTap={this.handleOpenCreateMerchantDialog}/>
+              </div>
+            )
+          }
+        </Dialog>
       </nav>
     );
   }

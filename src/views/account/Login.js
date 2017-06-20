@@ -65,11 +65,15 @@ class LoginContainer extends React.Component {
       if (resp.code == 0) {
         const token = resp.data.access_token;
         const userData = await accountService.getProfile(resp.data.access_token);
-        const account = {account: username, password};
-        loginAction(userData.data, token, account);
-        const data = {user: userData.data, token, account};
-        localStorage.setItem('bizUser', JSON.stringify(data));
-        this.props.history.replace('/dashboard/main');
+        if (userData.code == 0) {
+          const account = {account: username, password};
+          loginAction(userData.data, token, account);
+          const data = {user: userData.data, token, account};
+          localStorage.setItem('bizUser', JSON.stringify(data));
+          this.props.history.replace('/dashboard/main');
+        } else {
+          this.refs.toast.show('登录失败, 请稍后重试');
+        }
       } else {
         this.refs.toast.show('登录失败, 请稍后重试');
       }

@@ -5,8 +5,8 @@ const login = async (uname, pwd) => {
   return resp.data;
 };
 
-const getProfile = async (access_token) => {
-  const resp = await axios.post('/user_gateway/get_userinfo', { access_token });
+const getProfile = async access_token => {
+  const resp = await axios.post('/user_gateway/get_userinfo', { access_token }, { headers: { access_token }});
   return resp.data;
 };
 

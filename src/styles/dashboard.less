@@ -79,6 +79,7 @@ a {
     border: none;
     outline: none;
     background-color: transparent;
+    overflow: hidden;
     &:hover {
       background-color: rgba(255, 255, 255, .2);
       color: #fff;
@@ -92,6 +93,7 @@ a {
       line-height: 44px;
       border-radius: 22px;
       background-color: #64b1ca;
+      overflow: hidden;
     }
   }
   .btn-setting {
@@ -113,6 +115,13 @@ a {
   .btn-setting .btn-link:hover {
     background-color: transparent;
   }
+}
+
+.dialogActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .work-panel {
@@ -452,4 +461,27 @@ a {
   height: 90%;
   min-width: 800px;
   margin: 10px auto 0 auto;
+}
+
+.add-merchant {
+  margin-top: -10px;
+
+  form {
+    padding: 0 10px 10px 10px;
+    //text-align: center;
+  }
+
+  .login-input {
+    display: inline-block;
+  }
+
+  .login-input:nth-child(odd) {
+    margin-right: 40px;
+  }
+  .actions-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

@@ -30,8 +30,7 @@ button {
   outline: 0;
 }
 .layout-login,
-.register-view,
-.add-merchant {
+.register-view {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -44,13 +43,11 @@ button {
   box-sizing: border-box;
 }
 .layout-login a,
-.register-view a,
-.add-merchant a {
+.register-view a {
   text-decoration: none;
 }
 .layout-login .card,
-.register-view .card,
-.add-merchant .card {
+.register-view .card {
   width: 500px;
   min-height: 360px;
   background-color: #FFF;
@@ -64,8 +61,7 @@ button {
       flex-direction: column;
 }
 .layout-login .title,
-.register-view .title,
-.add-merchant .title {
+.register-view .title {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: row;
@@ -75,16 +71,14 @@ button {
   margin-bottom: 20px;
 }
 .layout-login .title-txt,
-.register-view .title-txt,
-.add-merchant .title-txt {
+.register-view .title-txt {
   margin-left: 10px;
   font-size: 28px;
   letter-spacing: 5px;
   color: #000;
 }
 .layout-login h4,
-.register-view h4,
-.add-merchant h4 {
+.register-view h4 {
   color: #4A4A4A;
   letter-spacing: 5px;
   font-size: 18px;
@@ -95,8 +89,7 @@ button {
   padding: 0;
 }
 .layout-login .form-login,
-.register-view .form-login,
-.add-merchant .form-login {
+.register-view .form-login {
   -ms-flex: 1;
       flex: 1;
   display: -ms-flexbox;
@@ -109,14 +102,12 @@ button {
       justify-content: center;
 }
 .layout-login .login-input,
-.register-view .login-input,
-.add-merchant .login-input {
+.register-view .login-input {
   width: 30%;
   margin-bottom: 20px;
 }
 .layout-login .actions,
-.register-view .actions,
-.add-merchant .actions {
+.register-view .actions {
   margin-top: 25px;
   border-top: 1px solid #E6E6E6;
   width: 256px;
@@ -133,65 +124,6 @@ button {
 }
 .link-register:hover {
   color: #da4f4a;
-}
-.add-merchant {
-  width: 100%;
-  background-color: #F8F6F2;
-  padding-top: 30px;
-}
-.add-merchant .card-title {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  box-shadow: 0px 1px 1px -1px rgba(0, 0, 0, 0.2);
-}
-.add-merchant .card-title h4 {
-  box-shadow: none;
-}
-.add-merchant .card {
-  width: 580px;
-  margin-bottom: 30px;
-}
-.add-merchant .link-back {
-  color: #6f6e6b;
-  font-size: 14px;
-}
-.add-merchant .link-back:hover {
-  color: #da4f4a;
-}
-.add-merchant .form-register {
-  padding: 0 10px 10px 10px;
-}
-.add-merchant .login-input:nth-child(odd) {
-  margin-right: 40px;
-}
-.add-merchant .title {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-  -ms-flex-align: center;
-      align-items: center;
-  margin-bottom: 20px;
-}
-.add-merchant .title-txt {
-  margin-left: 10px;
-  font-size: 28px;
-  letter-spacing: 5px;
-}
-.add-merchant .actions-container {
-  width: 100%;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: center;
-      justify-content: center;
 }
 /* styles for multiLine (default 2) line '...' */
 .dashboard {
@@ -275,6 +207,7 @@ a {
   border: none;
   outline: none;
   background-color: transparent;
+  overflow: hidden;
 }
 .board-nav .btn-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
@@ -289,6 +222,7 @@ a {
   line-height: 44px;
   border-radius: 22px;
   background-color: #64b1ca;
+  overflow: hidden;
 }
 .board-nav .btn-setting {
   position: relative;
@@ -310,6 +244,16 @@ a {
 }
 .board-nav .btn-setting .btn-link:hover {
   background-color: transparent;
+}
+.dialogActions {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
 }
 .work-panel {
   -ms-flex: 1;
@@ -688,6 +632,27 @@ a {
   height: 90%;
   min-width: 800px;
   margin: 10px auto 0 auto;
+}
+.add-merchant {
+  margin-top: -10px;
+}
+.add-merchant form {
+  padding: 0 10px 10px 10px;
+}
+.add-merchant .login-input {
+  display: inline-block;
+}
+.add-merchant .login-input:nth-child(odd) {
+  margin-right: 40px;
+}
+.add-merchant .actions-container {
+  width: 100%;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
 }
 .flex-row {
   display: -ms-flexbox;
