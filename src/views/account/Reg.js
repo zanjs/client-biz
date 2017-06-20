@@ -1,28 +1,31 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {accountService} from "../../services/account";
 import Toast from "../../components/Toast";
+import { loginAction } from '../../actions/account';
 
 
-export default class Register extends React.Component {
+class RegisterContainer extends React.Component {
   state={
     username: '',
     password: '',
+    account: '',
     error: {
+      account: '',
       username: '',
       password: '',
     },
-    toastMessage: '',
   };
   get validated() {
-    const {username, password} = this.state;
-    const nameValidated = username.trim().length > 1;
+    const {account, username, password} = this.state;
+    const nameValidated = username.trim().length > 0;
+    const accountValidated = account.trim().length > 0;
     const passwordValidated = password.trim().length > 5 && password.trim().length <= 20;
-    if (nameValidated && passwordValidated) return true;
-    return false;
+    return (accountValidated && nameValidated && passwordValidated);
   }
 
   checkName = () => {
@@ -30,10 +33,24 @@ export default class Register extends React.Component {
     const error = {...this.state.error, username: ''};
     if (!(username.trim() || username)) {
       error.username = '用户名不能为空';
-    } else if(username.trim().length < 2) {
-      error.username = '用户名不能少于2个字';
+    } else if(username.trim().length < 1) {
+      error.username = '用户名不能少于1个字';
     } else {
       if (this.state.error.username.length) this.setState({ error });
+      return;
+    }
+    this.setState({ error });
+  };
+
+  checkAccount = () => {
+    const {account} = this.state;
+    const error = {...this.state.error, account: ''};
+    if (!(account.trim() || account)) {
+      error.account = '账号不能为空';
+    } else if(account.trim().length < 1) {
+      error.account = '账号不能少于1个字';
+    } else {
+      if (this.state.error.account.length) this.setState({ error });
       return;
     }
     this.setState({ error });
@@ -55,23 +72,30 @@ export default class Register extends React.Component {
 
   register = async (e) => {
     e.preventDefault();
-    const {username, password} = this.state;
+    if (this.submiting) return;
+    this.submiting = true;
+    const {account, username, password} = this.state;
     try {
-      this.props.history.replace('/add_merchant', {username, password});
-      // const resp = await accountService.register(username, password);
-      // console.log(resp, 'register');
-      // if (resp.code == 0) {
-      //   this.props.history.replace('/add_merchant', {username, password});
-      // }
-      // else this.refs.toast.show('注册失败, 请稍后重试', 1000);
+      const resp = await accountService.register(account, username, password);
+      if (resp.code == 0) {
+        const loginResp = await accountService.login(account, password);
+        const token = loginResp.data.access_token;
+        const userData = await accountService.getProfile(loginResp.data.access_token);
+        this.props.login(userData.data, token, {account, password});
+        const data = {user: userData.data, token, account: {account, password}};
+        localStorage.setItem('bizUser', JSON.stringify(data));
+        this.props.history.replace('/dashboard/main');
+      }
+      else this.refs.toast.show('注册失败, 请稍后重试');
     } catch (e) {
       console.log(e, 'register');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试', 1000);
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
     }
+    this.submiting = false;
   };
 
   render() {
-    const { username, password, error } = this.state;
+    const { account, username, password, error } = this.state;
     return (
       <div className="layout register-view">
         <div className="title">
@@ -81,6 +105,15 @@ export default class Register extends React.Component {
         <div className="card">
           <h4>注册</h4>
           <from onSubmit={this.register} className="form-login">
+            <TextField
+              hintText="请输入注册账号"
+              value={account}
+              type="text"
+              onBlur={this.checkAccount}
+              onChange={e => this.setState({ account: e.target.value })}
+              errorText={error.account}
+              style={{marginTop: 20}}
+              className="login-input"/>
             <TextField
               hintText="请输入用户名"
               value={username}
@@ -108,3 +141,12 @@ export default class Register extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    login: (user, token) => { dispatch(loginAction(user, token)); }
+  }
+};
+
+const Register = connect(null, mapDispatchToProps)(RegisterContainer);
+export default Register;

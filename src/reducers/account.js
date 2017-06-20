@@ -16,12 +16,16 @@ export const account = (state = defaultState, action) => {
         token: action.token,
       };
     case 'LOGOUT':
+      const data = {user: null, token: null, account: state.account};
+      localStorage.setItem('bizUser', JSON.stringify(data));
       return {
         currentUser: null,
         token: null,
+        account: state.account,
       };
     case 'UPDATE_USER':
       return {
+        ...state,
         currentUser: {...current, ...action.user}
       };
     default: return state;

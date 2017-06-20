@@ -4,16 +4,16 @@ import { connect } from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import { loginAction } from '../../actions/account';
 import { accountService } from "../../services/account";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Toast from "../../components/Toast";
+import { updateUser } from '../../actions/account';
 
-class RegisterContainer extends React.Component {
+class AddMerchantContainer extends React.Component {
   constructor(props) {
     super(props);
-    if (!(this.props.location.state && this.props.location.state.username)) window.location.replace('/');
+    if (!props.token) window.location.replace('/');
   }
   state = {
     mer_name: '',
@@ -98,26 +98,18 @@ class RegisterContainer extends React.Component {
   };
 
   submit = async () => {
-    const { username, password } = this.props.location.state;
-    const { login } = this.props;
     const {mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account,
       swift_code, la_bank_account, tel_list, address} = this.state;
     try {
       const resp = await accountService.createMerchant(mer_name, type, indust_id, org_code, representative,
         establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
       if (resp.code == 0) {
-        const loginResp = await accountService.login(username, password);
-        const token = loginResp.data.access_token;
-        const userData = await accountService.getProfile(loginResp.data.access_token);
-        const account = {username, password};
-        login(userData.data, token, account);
-        const data = {user: userData.data, token, account};
-        localStorage.setItem('bizUser', JSON.stringify(data));
+        // TODO
         this.props.history.replace('/dashboard/main');
       }
     } catch (e) {
       console.log(e, 'create merchant');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试', 1000);
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
     }
   };
 
@@ -241,12 +233,17 @@ class RegisterContainer extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapStateToProps = (state) => {
   return {
-    login: (user, token) => { dispatch(loginAction(user, token)); }
+    token: state.account.token,
   }
 };
 
-const Register = connect(null, mapDispatchToProps)(RegisterContainer);
-export default Register;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateUser: user => dispatch(updateUser(user)),
+  }
+};
 
+const AddMerchant = connect(mapStateToProps, mapDispatchToProps)(AddMerchantContainer);
+export default AddMerchant;

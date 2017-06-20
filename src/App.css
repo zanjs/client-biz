@@ -304,7 +304,10 @@ a {
   display: none;
 }
 .board-nav .btn-setting:hover .popover-menu {
-  display: block;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
 }
 .board-nav .btn-setting .btn-link:hover {
   background-color: transparent;

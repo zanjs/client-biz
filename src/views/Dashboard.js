@@ -1,8 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { RouteWithSubRoutes } from "../router/index";
 import RaisedButton from 'material-ui/RaisedButton';
+import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
 import { logout, updateUser } from '../actions/account';
 import {accountService} from "../services/account";
 
@@ -15,16 +18,13 @@ class DashboardContainer extends React.Component {
     if (this.props.match.path === '/dashboard') {
       this.props.history.push('/dashboard/main');
     }
-    // if (this.props.token) {
-    //   const resp = await accountService.getProfile(this.props.token);
-    // }
-  }
-  async componentDidMount() {
     try {
       const resp = await accountService.getProfile(this.props.token);
       if (resp.code == 0) this.props.updateUser(resp.data);
     } catch (e) {
       console.log(e, 'update user in dashboard');
+      this.props.logout();
+      window.location.replace('/');
     }
   }
   render() {
@@ -55,15 +55,32 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const Dashboard = connect(mapStateToProps, mapDispatchToProps)(DashboardContainer);
+export default Dashboard;
 
-class DashboardNav extends React.PureComponent {
+class DashboardNavItem extends React.Component {
+  state = {
+    openQuickCreateMenu: false,
+  };
   logout = () => {
     this.props.logout();
-    localStorage.removeItem('bizUser');
     window.location.replace('/');
   };
+  handleQuickCreate = event => {
+    event.preventDefault();
+    this.setState({ openQuickCreateMenu: true, quickCreateAnchorEl: event.currentTarget });
+  };
+  handleQuickCreateRequestClose = () => this.setState({ openQuickCreateMenu: false });
+  createMerchant = () => this.props.history.push('/add_merchant');
+  inviteUser = () => alert('邀请用户');
+
   render() {
     const {currentUser} = this.props;
+    const quickCreateAction = currentUser && currentUser.mer_id ? [
+      {name: "创建商户", action: this.createMerchant},
+      {name: "邀请用户", action: this.inviteUser},
+    ] : [
+      {name: "创建商户", action: this.createMerchant},
+    ];
     return (
       <nav className="board-nav">
         <div>
@@ -75,9 +92,24 @@ class DashboardNav extends React.PureComponent {
           <LinkButton icon='trending_up' text='分析' to="/dashboard/analysis"/>
         </div>
         <div>
-          <button className="btn-link">
+          <button className="btn-link" onClick={this.handleQuickCreate}>
             <i className="material-icons" style={{fontSize: 30}}>add_circle_outline</i>
           </button>
+          <Popover
+            open={this.state.openQuickCreateMenu}
+            anchorEl={this.state.quickCreateAnchorEl}
+            anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+            onRequestClose={this.handleQuickCreateRequestClose}
+            animation={PopoverAnimationVertical}>
+            <Menu>
+              {
+                quickCreateAction.map((item, index) => <MenuItem primaryText={item.name}
+                                                               onClick={item.action}
+                                                               key={index}/>)
+              }
+            </Menu>
+          </Popover>
           <div className="btn-setting">
             <div className="btn-link">
               <span className="display-name">{(currentUser && currentUser.display_name) || '我'}</span>
@@ -91,6 +123,7 @@ class DashboardNav extends React.PureComponent {
     );
   }
 }
+const DashboardNav = withRouter(DashboardNavItem);
 
 const LinkButton = ({icon, text, to}) => (
   <Link className="icon-button" to={to}>
@@ -98,5 +131,3 @@ const LinkButton = ({icon, text, to}) => (
     <p>{text}</p>
   </Link>
 );
-
-export default Dashboard;

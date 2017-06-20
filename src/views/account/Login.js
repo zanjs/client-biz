@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Redirect, } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
@@ -11,7 +11,7 @@ import Toast from "../../components/Toast";
 
 class LoginContainer extends React.Component {
   state={
-    username: this.props.account.username || '',
+    username: this.props.account.account || '',
     password: this.props.account.password || '',
     error: {
       username: '',
@@ -23,8 +23,7 @@ class LoginContainer extends React.Component {
     const {username, password} = this.state;
     const nameValidated = username.trim().length > 1;
     const passwordValidated = password.trim().length > 5 && password.trim().length <= 20;
-    if (nameValidated && passwordValidated) return true;
-    return false;
+    return (nameValidated && passwordValidated);
   }
 
   checkName = () => {
@@ -57,31 +56,32 @@ class LoginContainer extends React.Component {
 
   login = async (e) => {
     e.preventDefault();
+    if (this.submiting) return;
+    this.submiting = true;
     const {username, password} = this.state;
     const {loginAction} = this.props;
     try {
       const resp = await accountService.login(username, password);
-      console.log(resp, 'login');
       if (resp.code == 0) {
         const token = resp.data.access_token;
         const userData = await accountService.getProfile(resp.data.access_token);
-        const account = {username, password};
+        const account = {account: username, password};
         loginAction(userData.data, token, account);
         const data = {user: userData.data, token, account};
         localStorage.setItem('bizUser', JSON.stringify(data));
         this.props.history.replace('/dashboard/main');
       } else {
-        this.refs.toast.show('登录失败, 请稍后重试', 1000);
+        this.refs.toast.show('登录失败, 请稍后重试');
       }
     } catch (e) {
       console.log(e, 'login');
-      this.refs.toast.show('登录失败, 请稍后重试', 1000);
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
     }
+    this.submiting = false;
   };
 
   render() {
     const { username, password, error } = this.state;
-    console.log(this.props.isLoggedIn);
     if (this.props.isLoggedIn) {
       return (<Redirect to={'/dashboard/main'}/>);
     }
@@ -113,7 +113,7 @@ class LoginContainer extends React.Component {
              className="login-input"/>
            <RaisedButton label="确认" className="btn-login" primary={this.validated} disabled={!this.validated} onClick={this.login}/>
            <div className="actions">
-             <Link to="/register" className="link-register">注册新商户</Link>
+             <Link to="/register" className="link-register">注册新用户</Link>
            </div>
          </from>
        </div>

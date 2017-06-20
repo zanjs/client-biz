@@ -1,23 +1,18 @@
 import axios from './';
-// import axios from "axios";
-// import {base_url} from "./index";
 
 const login = async (uname, pwd) => {
-  console.log(uname, pwd);
-  const resp = await axios.post(`/login_gateway/auth`, { uname, pwd });
-  console.log(resp, 'login service');
-  return resp;
-  // return {success: true, user: {id: 'mockId'}, token: 'mockToken'};
+  const resp = await axios.post(`/user_gateway/auth`, { uname, pwd });
+  return resp.data;
 };
 
 const getProfile = async (access_token) => {
-  const resp = await axios.post('/login_gateway/get_userinfo', { access_token });
-  return resp;
+  const resp = await axios.post('/user_gateway/get_userinfo', { access_token });
+  return resp.data;
 };
 
-const register = async (account, pwd) => {
-  const resp = await axios.post('/user_gateway/register', {account, pwd});
-  return resp;
+const register = async (account, name, pwd) => {
+  const resp = await axios.post('/user_gateway/register', {account, name, pwd});
+  return resp.data;
 };
 
 const createMerchant = async (mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name,
@@ -36,12 +31,12 @@ const createMerchant = async (mer_name, type, indust_id, org_code, representativ
     tel_list,
     address,
   });
-  return resp;
+  return resp.data;
 };
 
 const refreshToken = async (refresh_token) => {
   const resp = await axios.post('/user_gateway/refresh', {refresh_token});
-  return resp;
+  return resp.data;
 };
 
 export const accountService = {
