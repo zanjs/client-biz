@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import CircularProgress from 'material-ui/CircularProgress';
 import {loginAction} from '../../actions/account';
 import {accountService} from "../../services/account";
 import Toast from "../../components/Toast";
@@ -18,6 +19,7 @@ class LoginContainer extends React.Component {
       password: '',
     },
     toastMessage: '',
+    submitting: false,
   };
   get validated() {
     const {username, password} = this.state;
@@ -56,8 +58,8 @@ class LoginContainer extends React.Component {
 
   login = async (e) => {
     e.preventDefault();
-    if (this.submiting) return;
-    this.submiting = true;
+    if (this.state.submitting) return;
+    this.setState({ submitting: true });
     const {username, password} = this.state;
     const {loginAction} = this.props;
     try {
@@ -71,6 +73,7 @@ class LoginContainer extends React.Component {
           const data = {user: userData.data, token, account};
           localStorage.setItem('bizUser', JSON.stringify(data));
           this.props.history.replace('/dashboard/main');
+          return;
         } else {
           this.refs.toast.show('登录失败, 请稍后重试');
         }
@@ -81,11 +84,11 @@ class LoginContainer extends React.Component {
       console.log(e, 'login');
       this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
     }
-    this.submiting = false;
+    this.setState({ submitting: false });
   };
 
   render() {
-    const { username, password, error } = this.state;
+    const { username, password, error, submitting } = this.state;
     if (this.props.isLoggedIn) {
       return (<Redirect to={'/dashboard/main'}/>);
     }
@@ -115,7 +118,9 @@ class LoginContainer extends React.Component {
              onChange={e => this.setState({ password: e.target.value })}
              errorText={error.password}
              className="login-input"/>
-           <RaisedButton label="确认" className="btn-login" primary={this.validated} disabled={!this.validated} onClick={this.login}/>
+           <RaisedButton label={submitting ? null : "确认"} className="btn-login" primary={this.validated}
+                         disabled={!this.validated} onClick={this.login}
+                         icon={submitting ? <CircularProgress size={28}/> : null}/>
            <div className="actions">
              <Link to="/register" className="link-register">注册新用户</Link>
            </div>

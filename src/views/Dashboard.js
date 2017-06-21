@@ -7,6 +7,8 @@ import Dialog from 'material-ui/Dialog';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
+import CircularProgress from 'material-ui/CircularProgress';
 import { logout, updateUser } from '../actions/account';
 import {accountService} from "../services/account";
 import AddMerchant from "./items/AddMerchant";
@@ -66,28 +68,91 @@ const mapDispatchToProps = (dispatch) => {
 const Dashboard = connect(mapStateToProps, mapDispatchToProps)(DashboardContainer);
 export default Dashboard;
 
+const DIALOG_STATE = {
+  SELECT: 0,
+  CREATE_MERCHANT: 1,
+  JOIN_MERCHANT: 2,
+};
+
 class DashboardNavItem extends React.Component {
   state = {
     openQuickCreateMenu: false,
     openDialog: !this.props.currentUser || !this.props.currentUser.mer_id || this.props.currentUser.mer_id === 0,
-    openCreateMerchantDialog: false,
+    dialogState: DIALOG_STATE.SELECT,
     dialogTitle: '请选择',
+    merchantIdForApply: '',
+    submitting: false,
   };
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.currentUser && (nextProps.currentUser.mer_id !== this.props.currentUser.mer_id)) {
+      const openDialog = !this.props.currentUser.mer_id || this.props.currentUser.mer_id === 0;
+      this.setState({ openDialog})
+    }
+  }
+
   logout = () => {
     this.props.logout();
     window.location.replace('/');
   };
-  handleRequestCloseDialog = () => this.setState({ openDialog: false, dialogTitle: '请选择', openCreateMerchantDialog: false });
-  handleOpenCreateMerchantDialog = () => this.setState({ openDialog: true, openCreateMerchantDialog: true, dialogTitle: '创建商户' });
+  handleRequestCloseDialog = () => this.setState({ openDialog: false, dialogTitle: '请选择', dialogState: DIALOG_STATE.SELECT });
+  handleOpenCreateMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.CREATE_MERCHANT, openQuickCreateMenu: false, dialogTitle: '创建商户' });
+  handleOpenJoinMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.JOIN_MERCHANT, openQuickCreateMenu: false, dialogTitle: '加入商户' });
   handleQuickCreate = event => {
     event.preventDefault();
     this.setState({ openQuickCreateMenu: true, quickCreateAnchorEl: event.currentTarget });
   };
   handleQuickCreateRequestClose = () => this.setState({ openQuickCreateMenu: false });
   inviteUser = () => alert('邀请用户');
+  submitJoinMerchant = async (e) => {
+    e.preventDefault();
+    const {submitting, merchantIdForApply} = this.state;
+    if (submitting) return;
+    this.setState({ submitting: true });
+    try {
+      const resp = await accountService.applyMerchant(`${merchantIdForApply}`);
+      if (resp.code == 0) {
+        this.refs.toast.show('已提交申请，请等待或联系商户通过');
+        this.handleRequestCloseDialog();
+      } else {
+        this.refs.toast.show('提交失败，请检查商户ID后重试');
+      }
+    } catch (e) {
+      console.log(e, 'apply merchant');
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+    }
+    this.setState({ submitting: false });
+  };
+
+  DialogContent = () => {
+    const {dialogState, merchantIdForApply, submitting} = this.state;
+    switch (dialogState) {
+      default: return (
+        <div className="dialogActions">
+          <RaisedButton label="加入商户" primary={true} style={{margin: 12, flex: 1}} onTouchTap={this.handleOpenJoinMerchantDialog}/>
+          <RaisedButton label="创建商户" secondary={true} style={{margin: 12, flex: 1}} onTouchTap={this.handleOpenCreateMerchantDialog}/>
+        </div>
+      );
+      case DIALOG_STATE.CREATE_MERCHANT:
+        return <AddMerchant close={this.handleRequestCloseDialog}/>;
+      case DIALOG_STATE.JOIN_MERCHANT:
+        return (
+          <form onSubmit={this.submitJoinMerchant} style={{paddingTop: 10}}>
+            <TextField
+              hintText="请输入申请加入的商户ID"
+              value={merchantIdForApply}
+              type="text"
+              onChange={e => this.setState({ merchantIdForApply: e.target.value })}/>
+            <RaisedButton label={submitting ? null : "申请"} primary={true} style={{marginLeft: 20}}
+                          onTouchTap={this.submitJoinMerchant}
+                          disabled={!merchantIdForApply}
+                          icon={submitting ? <CircularProgress size={28}/> : null}/>
+          </form>
+        )
+    }
+  };
 
   render() {
-    const {openQuickCreateMenu, quickCreateAnchorEl, openCreateMerchantDialog, dialogTitle} = this.state;
+    const {openQuickCreateMenu, quickCreateAnchorEl, dialogTitle} = this.state;
     const {currentUser} = this.props;
     const quickCreateAction = currentUser && currentUser.mer_id ? [
       {name: "邀请用户", action: this.inviteUser},
@@ -139,15 +204,9 @@ class DashboardNavItem extends React.Component {
           autoScrollBodyContent
           open={this.state.openDialog}
           onRequestClose={this.handleRequestCloseDialog}>
-          {
-            openCreateMerchantDialog ? <AddMerchant close={this.handleRequestCloseDialog}/> : (
-              <div className="dialogActions">
-                <RaisedButton label="加入商户" primary={true} style={{margin: 12, flex: 1}} />
-                <RaisedButton label="创建商户" secondary={true} style={{margin: 12, flex: 1}} onTouchTap={this.handleOpenCreateMerchantDialog}/>
-              </div>
-            )
-          }
+          <this.DialogContent />
         </Dialog>
+        <Toast ref="toast"/>
       </nav>
     );
   }

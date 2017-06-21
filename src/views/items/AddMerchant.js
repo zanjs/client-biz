@@ -8,6 +8,7 @@ import MenuItem from 'material-ui/MenuItem';
 import DatePicker from 'material-ui/DatePicker';
 import Toast from "../../components/Toast";
 import { updateUser } from '../../actions/account';
+import { IndustIdList } from "./indust_id_list";
 
 class AddMerchantContainer extends React.Component {
   state = {
@@ -96,11 +97,10 @@ class AddMerchantContainer extends React.Component {
       const resp = await accountService.createMerchant(mer_name, type, indust_id, org_code, representative,
         establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
       if (resp.code == 0) {
+        this.refs.toast.show('创建成功');
         const profileResp = await accountService.getProfile(this.props.token);
-        console.log(profileResp.data, 'add merchant');
         this.props.updateUser(profileResp.data);
       }
-      this.refs.toast.show('创建成功');
       this.props.close();
     } catch (e) {
       console.log(e, 'create merchant');
@@ -110,12 +110,11 @@ class AddMerchantContainer extends React.Component {
   };
 
   render() {
-    const { mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account,
+    const { mer_name, type, indust_id, org_code, representative, om_bank_name, bank_account,
       swift_code, la_bank_account, tel_list, address, error } = this.state;
-    console.log(establish_date.prototype);
     return (
         <div className="add-merchant">
-          <form onSubmit={this.submit}>
+          <form onSubmit={this.submit} style={{paddingTop: 10}}>
             <TextField
               hintText="商户名称"
               value={mer_name}
@@ -123,31 +122,6 @@ class AddMerchantContainer extends React.Component {
               onBlur={this.checkName}
               onChange={e => this.setState({ mer_name: e.target.value })}
               errorText={error.mer_name}
-              className="login-input" />
-            <SelectField
-              style={{ position: 'relative', top: '17px' }}
-              floatingLabelText="选择类型"
-              value={type}
-              onChange={(event, index, type) => this.setState({ type })}
-            >
-              <MenuItem value={1} primaryText="个人" />
-              <MenuItem value={0} primaryText="企业" />
-            </SelectField>
-            <TextField
-              hintText="行业类型"
-              value={indust_id}
-              type="text"
-              onBlur={this.checkIndustId}
-              onChange={e => this.setState({ indust_id: e.target.value })}
-              errorText={error.indust_id}
-              className="login-input" />
-            <TextField
-              hintText={type == 0 ? "组织机构代码" : '组织机构代码 (选填)'}
-              value={org_code}
-              type="text"
-              onBlur={this.checkOrgCode}
-              onChange={e => this.setState({ org_code: e.target.value })}
-              errorText={error.org_code}
               className="login-input" />
             <TextField
               hintText={type == 0 ? "法人代表" : '法人代表 (选填)'}
@@ -157,6 +131,33 @@ class AddMerchantContainer extends React.Component {
               onChange={e => this.setState({ representative: e.target.value })}
               errorText={error.representative}
               className="login-input" />
+            <SelectField
+              floatingLabelText="选择类型"
+              value={type}
+              className="login-input"
+              onChange={(event, index, type) => this.setState({ type })}
+            >
+              <MenuItem value={1} primaryText="个人" />
+              <MenuItem value={0} primaryText="企业" />
+            </SelectField>
+            <SelectField
+              floatingLabelText="行业类型"
+              value={indust_id}
+              className="login-input"
+              onChange={(event, index, indust_id) => this.setState({ indust_id })}>
+              {
+                IndustIdList.map((item, index) => <MenuItem value={`${item.id}`} primaryText={item.name} key={index}/>)
+              }
+            </SelectField>
+            <TextField
+              hintText={type == 0 ? "组织机构代码" : '组织机构代码 (选填)'}
+              value={org_code}
+              type="text"
+              onBlur={this.checkOrgCode}
+              onChange={e => this.setState({ org_code: e.target.value })}
+              errorText={error.org_code}
+              className="login-input" />
+
             <DatePicker floatingLabelText="公司注册时间" className="login-input"
                         style={{ marginTop: -20 }}
                         errorText={error.establish_date}

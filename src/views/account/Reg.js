@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import CircularProgress from 'material-ui/CircularProgress';
 import {accountService} from "../../services/account";
 import Toast from "../../components/Toast";
 import { loginAction } from '../../actions/account';
@@ -19,6 +20,7 @@ class RegisterContainer extends React.Component {
       username: '',
       password: '',
     },
+    submitting: false,
   };
   get validated() {
     const {account, username, password} = this.state;
@@ -72,8 +74,8 @@ class RegisterContainer extends React.Component {
 
   register = async (e) => {
     e.preventDefault();
-    if (this.submiting) return;
-    this.submiting = true;
+    if (this.state.submitting) return;
+    this.setState({ submitting: true });
     const {account, username, password} = this.state;
     try {
       const resp = await accountService.register(account, username, password);
@@ -85,17 +87,18 @@ class RegisterContainer extends React.Component {
         const data = {user: userData.data, token, account: {account, password}};
         localStorage.setItem('bizUser', JSON.stringify(data));
         this.props.history.replace('/dashboard/main');
+        return;
       }
       else this.refs.toast.show('注册失败, 请稍后重试');
     } catch (e) {
       console.log(e, 'register');
       this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
     }
-    this.submiting = false;
+    this.setState({ submitting: false });
   };
 
   render() {
-    const { account, username, password, error } = this.state;
+    const { account, username, password, error, submitting } = this.state;
     return (
       <div className="layout register-view">
         <div className="title">
@@ -130,7 +133,9 @@ class RegisterContainer extends React.Component {
               onChange={e => this.setState({ password: e.target.value })}
               errorText={error.password}
               className="login-input"/>
-            <RaisedButton label="确认" className="btn-login" primary={this.validated} disabled={!this.validated} onClick={this.register}/>
+            <RaisedButton label={submitting ? null : "确认"} className="btn-login" primary={this.validated}
+                          disabled={!this.validated} onClick={this.register}
+                          icon={submitting ? <CircularProgress size={28}/> : null}/>
             <div className="actions">
               <Link to="/" className="link-register">返回</Link>
             </div>

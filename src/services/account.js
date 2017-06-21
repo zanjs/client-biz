@@ -23,7 +23,7 @@ const createMerchant = async (mer_name, type, indust_id, org_code, representativ
     indust_id,
     org_code,
     representative,
-    establish_date,
+    establish_date: establish_date ? `${new Date(establish_date).getTime()}` : '',
     om_bank_name,
     bank_account,
     swift_code,
@@ -31,6 +31,11 @@ const createMerchant = async (mer_name, type, indust_id, org_code, representativ
     tel_list,
     address,
   });
+  return resp.data;
+};
+
+const applyMerchant = async (mer_id) => {
+  const resp = await axios.post('/biz_gateway/apply_join_merchant', {mer_id});
   return resp.data;
 };
 
@@ -45,4 +50,5 @@ export const accountService = {
   getProfile,
   createMerchant,
   refreshToken,
+  applyMerchant,
 };
