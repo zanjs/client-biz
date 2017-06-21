@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { accountService } from "../../services/account";
+import merchantSvc from "../../services/merchant";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import DatePicker from 'material-ui/DatePicker';
@@ -94,7 +95,7 @@ class AddMerchantContainer extends React.Component {
     const {mer_name, type, indust_id, org_code, representative, establish_date, om_bank_name, bank_account,
       swift_code, la_bank_account, tel_list, address} = this.state;
     try {
-      const resp = await accountService.createMerchant(mer_name, type, indust_id, org_code, representative,
+      const resp = await merchantSvc.createMerchant(mer_name, type, indust_id, org_code, representative,
         establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
       if (resp.code == 0) {
         this.refs.toast.show('创建成功');

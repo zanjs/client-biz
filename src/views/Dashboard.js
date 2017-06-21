@@ -11,6 +11,7 @@ import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
 import { logout, updateUser } from '../actions/account';
 import {accountService} from "../services/account";
+import merchantSvc from "../services/merchant";
 import AddMerchant from "./items/AddMerchant";
 import Toast from "../components/Toast";
 
@@ -109,7 +110,7 @@ class DashboardNavItem extends React.Component {
     if (submitting) return;
     this.setState({ submitting: true });
     try {
-      const resp = await accountService.applyMerchant(`${merchantIdForApply}`);
+      const resp = await merchantSvc.applyMerchant(`${merchantIdForApply}`);
       if (resp.code == 0) {
         this.refs.toast.show('已提交申请，请等待或联系商户通过');
         this.handleRequestCloseDialog();
