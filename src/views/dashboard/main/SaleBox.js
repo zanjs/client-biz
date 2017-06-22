@@ -1,43 +1,45 @@
 import React from 'react';
+import {observer} from 'mobx-react';
 import {BoxHeader} from "../../../components/BoxHeader";
-import {getSaleMessages} from "../../../services/message";
 import {MessageItem} from "../../../components/ListItem";
-import {SaleMessagType} from "../../../services/data-type";
+import FlatButton from 'material-ui/FlatButton';
+import Toast from "../../../components/Toast";
+import sellActivitiesStore from "../../stores/sell-activities";
 
-export class SaleBox extends React.PureComponent {
+class SaleBox extends React.PureComponent {
+  store = sellActivitiesStore;
   state = {
     messagesFilterValue: 0,
-    messages: [],
   };
-  selections = ['全部未读', '我负责的', '我参与的', '待处理', '已读'];
-  async componentWillMount() {
-    try {
-      const messages = await getSaleMessages();
-      this.setState({ messages });
-    } catch (e) {}
+  // selections = ['全部未读', '我负责的', '我参与的', '待处理', '已读'];
+  selections = ['全部未读', '我负责的', '我参与的', '已读'];
+  componentWillMount() {
+    this.store.load(this.onToast);
   }
   selectionCount = (index) => {
-    const {messages} = this.state;
+    const {messageList, unReadListDS, isReadListDS, inChargeListDS, participantListDS} = this.store;
     switch (index) {
-      default: return messages.length;
-      case 0: return messages.filter(m => !m.read).length;
-      case 1: return messages.filter(m => (!m.read && m.type === SaleMessagType.INCHARGE)).length;
-      case 2: return messages.filter(m => (!m.read && m.type === SaleMessagType.PARTICIPANT)).length;
-      case 3: return messages.filter(m => (!m.read && m.type === SaleMessagType.PENDING)).length;
-      case 4: return messages.filter(m => m.read).length;
+      default: return messageList.length;
+      case 0: return unReadListDS.length;
+      case 1: return inChargeListDS.length;
+      case 2: return participantListDS.length;
+      // case 3: return messages.filter(m => (!m.read && m.type === SaleMessagType.PENDING)).length;
+      case 3: return isReadListDS.length;
     }
   };
   get messagesDS() {
-    const {messagesFilterValue, messages} = this.state;
+    const {messagesFilterValue} = this.state;
+    const {messageList, unReadListDS, isReadListDS, inChargeListDS, participantListDS} = this.store;
     switch (messagesFilterValue) {
-      default: return messages;
-      case 0: return messages.filter(m => !m.read);
-      case 1: return messages.filter(m => (!m.read && m.type === SaleMessagType.INCHARGE));
-      case 2: return messages.filter(m => (!m.read && m.type === SaleMessagType.PARTICIPANT));
-      case 3: return messages.filter(m => (!m.read && m.type === SaleMessagType.PENDING));
-      case 4: return messages.filter(m => m.read);
+      default: return messageList;
+      case 0: return unReadListDS;
+      case 1: return inChargeListDS;
+      case 2: return participantListDS;
+      // case 3: return messages.filter(m => (!m.read && m.type === SaleMessagType.PENDING));
+      case 3: return isReadListDS;
     }
   };
+  onToast = txt => this.refs.toast && this.refs.toast.show(txt);
 
   onSelect = e => this.setState({messagesFilterValue: parseInt(e.target.value, 10)});
   render() {
@@ -47,8 +49,13 @@ export class SaleBox extends React.PureComponent {
         <div className="message-list">
           {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index} openDetail={this.props.openDetailDrawer}/>)}
           {!this.messagesDS.length && <p className="none-data">暂无内容</p>}
+          {this.store.hasMore && <FlatButton label="加载更多" style={{color: '#999'}}
+                                             onTouchTap={() => this.store.load(this.onToast)}/>}
         </div>
+        <Toast ref="toast"/>
       </div>
     );
   }
 }
+
+export default observer(SaleBox);

@@ -354,10 +354,10 @@ a {
   background-color: transparent;
 }
 .board-layout {
-  width: 280px;
-  min-width: 280px;
+  width: 300px;
+  min-width: 300px;
   background-color: #eeece8;
-  padding: 5px 10px 20px 10px;
+  padding: 5px 10px 10px 10px;
   box-sizing: border-box;
   margin-right: 20px;
   max-height: 90%;
@@ -366,7 +366,8 @@ a {
 .board-layout .none-data {
   font-size: 14px;
   color: #797979;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .message-box {
   box-sizing: border-box;
@@ -388,6 +389,16 @@ a {
 .message-box .title {
   color: #797979;
   font-size: 14px;
+}
+.message-box .message-list {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
 }
 .message-item {
   width: 100%;
