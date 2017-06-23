@@ -134,6 +134,7 @@ a {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   background-color: #FFF;
   color: #333;
 
@@ -474,6 +475,9 @@ a {
   height: 90%;
   min-width: 800px;
   margin: 10px auto 0 auto;
+  background-color: #FFF;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .add-merchant {
@@ -496,5 +500,43 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.search-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-tems: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  overflow-y: hidden;
+}
+
+.search-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 780px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: #F8F6F2;
+
+  .none-data {
+    font-size: 14px;
+    color: #797979;
+    margin-bottom: 20px;
+  }
+
+  .search-list {
+    flex: 1;
+    height: 98%;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 }
