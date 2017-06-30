@@ -19,6 +19,7 @@ class DashboardContainer extends React.Component {
   constructor(props) {
     super(props);
     if (!props.token) window.location.replace('/');
+    console.log(this.props.currentUser);
   }
   async componentWillMount() {
     if (this.props.match.path === '/dashboard') {
@@ -73,6 +74,7 @@ const DIALOG_STATE = {
   SELECT: 0,
   CREATE_MERCHANT: 1,
   JOIN_MERCHANT: 2,
+  INVITE_USER: 3,
 };
 
 class DashboardNavItem extends React.Component {
@@ -82,6 +84,7 @@ class DashboardNavItem extends React.Component {
     dialogState: DIALOG_STATE.SELECT,
     dialogTitle: '请选择',
     merchantIdForApply: '',
+    userAccountForInvite: '',
     submitting: false,
   };
   componentWillReceiveProps(nextProps) {
@@ -98,12 +101,13 @@ class DashboardNavItem extends React.Component {
   handleRequestCloseDialog = () => this.setState({ openDialog: false, dialogTitle: '请选择', dialogState: DIALOG_STATE.SELECT });
   handleOpenCreateMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.CREATE_MERCHANT, openQuickCreateMenu: false, dialogTitle: '创建商户' });
   handleOpenJoinMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.JOIN_MERCHANT, openQuickCreateMenu: false, dialogTitle: '加入商户' });
+  inviteUser = () => this.setState({ openDialog: true, dialogTitle: '邀请用户', dialogState: DIALOG_STATE.INVITE_USER , openQuickCreateMenu: false});
   handleQuickCreate = event => {
     event.preventDefault();
     this.setState({ openQuickCreateMenu: true, quickCreateAnchorEl: event.currentTarget });
   };
   handleQuickCreateRequestClose = () => this.setState({ openQuickCreateMenu: false });
-  inviteUser = () => alert('邀请用户');
+
   submitJoinMerchant = async (e) => {
     e.preventDefault();
     const {submitting, merchantIdForApply} = this.state;
@@ -114,9 +118,7 @@ class DashboardNavItem extends React.Component {
       if (resp.code == 0) {
         this.refs.toast.show('已提交申请，请等待或联系商户通过');
         this.handleRequestCloseDialog();
-      } else {
-        this.refs.toast.show('提交失败，请检查商户ID后重试');
-      }
+      } else this.refs.toast.show(resp.msg || '提交失败，请检查商户ID后重试');
     } catch (e) {
       console.log(e, 'apply merchant');
       this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
@@ -124,8 +126,37 @@ class DashboardNavItem extends React.Component {
     this.setState({ submitting: false });
   };
 
+  submitInviteUser = async (e) => {
+    e.preventDefault();
+    const {submitting, userAccountForInvite} = this.state;
+    console.log(userAccountForInvite);
+    if (submitting) return;
+    this.setState({ submitting: true });
+    try {
+      const resp = await merchantSvc.inviteUser(userAccountForInvite);
+      console.log(resp);
+      if (resp.code == 0) {
+        this.refs.toast.show('已发送邀请，请等待或联系用户确认');
+        this.handleRequestCloseDialog();
+      } else this.refs.toast.show(resp.msg || '提交失败，请检查用户ID后重试');
+    } catch (e) {
+      console.log(e, 'invite user');
+      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+    }
+    this.setState({ submitting: false });
+  };
+
+  DialogForm = ({hintTxt, value, onChange, submitTxt, onTouchTap, disabled, }) => (
+    <form onSubmit={this.onTouchTap} style={{paddingTop: 10}}>
+      <TextField hintText={hintTxt} value={value} type="text" onChange={onChange}/>
+      <RaisedButton label={this.state.submitting ? null : submitTxt} primary={true} style={{marginLeft: 20}}
+                    onTouchTap={onTouchTap} disabled={disabled}
+                    icon={this.state.submitting ? <CircularProgress size={28}/> : null}/>
+    </form>
+  );
+
   DialogContent = () => {
-    const {dialogState, merchantIdForApply, submitting} = this.state;
+    const {dialogState, merchantIdForApply, userAccountForInvite} = this.state;
     switch (dialogState) {
       default: return (
         <div className="dialogActions">
@@ -137,18 +168,16 @@ class DashboardNavItem extends React.Component {
         return <AddMerchant close={this.handleRequestCloseDialog}/>;
       case DIALOG_STATE.JOIN_MERCHANT:
         return (
-          <form onSubmit={this.submitJoinMerchant} style={{paddingTop: 10}}>
-            <TextField
-              hintText="请输入申请加入的商户ID"
-              value={merchantIdForApply}
-              type="text"
-              onChange={e => this.setState({ merchantIdForApply: e.target.value })}/>
-            <RaisedButton label={submitting ? null : "申请"} primary={true} style={{marginLeft: 20}}
-                          onTouchTap={this.submitJoinMerchant}
-                          disabled={!merchantIdForApply}
-                          icon={submitting ? <CircularProgress size={28}/> : null}/>
-          </form>
-        )
+          <this.DialogForm onTouchTap={this.submitJoinMerchant} hintTxt="请输入商户的ID" value={merchantIdForApply}
+                      onChange={e => this.setState({ merchantIdForApply: e.target.value })} submitTxt="申请"
+                      disabled={!merchantIdForApply}/>
+        );
+      case DIALOG_STATE.INVITE_USER:
+        return (
+          <this.DialogForm onTouchTap={this.submitInviteUser} hintTxt="请输入用户的账号" value={userAccountForInvite}
+                      onChange={e => this.setState({ userAccountForInvite: e.target.value })} submitTxt="邀请"
+                      disabled={!userAccountForInvite}/>
+        );
     }
   };
 
@@ -194,6 +223,7 @@ class DashboardNavItem extends React.Component {
               <span className="display-name">{(currentUser && currentUser.name.slice(0, 2))}</span>
             </div>
             <div className="popover-menu">
+              <RaisedButton label="切换商户" style={{width: 150}} onClick={this.logout}/>
               <RaisedButton label="退出" style={{width: 150}} onClick={this.logout}/>
             </div>
           </div>

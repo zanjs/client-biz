@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import {TagType} from "../services/data-type";
 
 export class MessageItem extends React.PureComponent {

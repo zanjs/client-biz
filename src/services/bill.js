@@ -42,6 +42,7 @@ const getBillList = async (bill_type, page_no, page_size) => {
   return resp.data;
 };
 
+// key 9deb17fa79572cdbe980ff9257009edd7fdb8a50
 const getBillNo = async (key) => {
   const resp = await axios.post('/inner_seq_gateway/get_sequence_no', {key});
   return resp.data;

@@ -142,7 +142,7 @@ const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, o
         <Subheader >{headerTxt}</Subheader>
         {loading && <CircularProgress size={28} style={{display: 'block', margin: '0 auto 20px auto'}}/>}
         {!(listData && listData.length) && !loading && <p className="none-data" style={{textAlign: 'center'}}>暂无内容</p>}
-        {(listData && listData.length) && <Divider inset={true} />}
+        {(listData && listData.length > 0) && <Divider inset={true} />}
       </div>
       <div style={{overflowY: 'auto', overflowX: 'hidden',backgroundColor: '#FFF'}}>
         {
@@ -182,6 +182,7 @@ class MessageContainer extends React.Component {
 
   componentWillMount() {
     const { currentUser } = this.props;
+    if (!currentUser) return;
     if (this.isAdmin) this.applyStore.load(currentUser.mer_id);
     if (this.notJoinMerchant) this.inviteStore.load(currentUser.id);
   }

@@ -1,7 +1,6 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {DetailContentType} from "../services/data-type";
 import {formatTime} from "../utils/time";
 import {create} from "../services/message";
 
