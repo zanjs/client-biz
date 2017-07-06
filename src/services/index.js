@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "../reducers";
+import Storage from '../utils/storage';
 
 const client = axios.create({
   baseURL: '/bizlink-core-server',
@@ -8,7 +8,7 @@ const client = axios.create({
 
 
 client.interceptors.request.use(config => {
-  const {account: {token}} = store.getState();
+  const token = Storage.getValue('token');
   if (token) {
     config.headers.access_token = token;
   }

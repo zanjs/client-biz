@@ -1,7 +1,6 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {observer} from 'mobx-react';
-import {observable, computed, action, runInAction, extendObservable} from 'mobx';
+import {observer, inject} from 'mobx-react';
+import {computed, action, runInAction, extendObservable} from 'mobx';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
@@ -18,7 +17,7 @@ class applyMessageStore {
   constructor() {
     extendObservable(this, {
       messages: [],
-      applyDS: computed(() => this.messages.filter(m => !m.accept_time)),
+      applyDS: computed(() => this.messages.filter(m => !m.accept)),
       loading: false,
     });
   }
@@ -28,7 +27,7 @@ class applyMessageStore {
     try {
       const resp = await MerchantSvc.getUserListByApply(id);
       runInAction('after load', () => {
-        if (resp.code == 0 && resp.data) this.messages = [...resp.data];
+        if (resp.code === '0' && resp.data) this.messages = [...resp.data];
       });
       console.log(resp);
     } catch (e) {
@@ -55,7 +54,7 @@ class applyMessageStore {
       const resp = await service(id);
       console.log(resp, type);
       runInAction('after accept', () => {
-        if (resp.code == 0) {
+        if (resp.code === '0') {
           this.messages = [...this.messages.filter(m => m.id !== id)]
         } else {
           onToast && onToast(resp.msg || '抱歉，提交失败，请稍后重试');
@@ -84,7 +83,7 @@ class inviteMessageStore {
       const resp = await MerchantSvc.getMerchantListByInvite(id);
       console.log(resp, 'invite list');
       runInAction('after load', () => {
-        if (resp.code == 0 && resp.data) this.messages = [...resp.data];
+        if (resp.code === '0' && resp.data) this.messages = [...resp.data];
       });
     } catch (e) {
       console.log(e, 'load invite message');
@@ -110,7 +109,7 @@ class inviteMessageStore {
       const resp = await service(id);
       console.log(resp, type);
       runInAction('after accept', () => {
-        if (resp.code == 0) {
+        if (resp.code === '0') {
           this.messages = [...this.messages.filter(m => m.id !== id)]
         } else {
           onToast && onToast(resp.msg || '抱歉，提交失败，请稍后重试');
@@ -156,10 +155,10 @@ const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, o
                     <MenuItem onTouchTap={() => serviceAction(item.id, actionType.REFUSE, onToast)}>拒绝</MenuItem>
                   </IconMenu>
                 )}
-                primaryText={item.username || `用户ID: ${item.user_id}`}
+                primaryText={item.username || `用户: ${item.name}`}
                 secondaryText={
                   <p>
-                    <span style={{color: darkBlack}}>申请加入</span><br />
+                    <span style={{color: darkBlack}}>申请加入商户</span><br />
                     {item.create_time}
                   </p>
                 }
@@ -174,15 +173,18 @@ const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, o
   );
 };
 
-class MessageContainer extends React.Component {
-  isAdmin = this.props.currentUser && (this.props.currentUser.is_admin === 1);
-  notJoinMerchant = !(this.props.currentUser && this.props.currentUser.mer_id);
+@inject('user')
+@observer
+export default class Message extends React.Component {
+  isAdmin = this.props.user.user.current && (this.props.user.user.current.is_admin === 1);
+  notJoinMerchant = !(this.props.user.user.current && this.props.user.user.current.mer_id);
   applyStore = this.isAdmin && new applyMessageStore();
   inviteStore = this.notJoinMerchant && new inviteMessageStore();
 
   componentWillMount() {
-    const { currentUser } = this.props;
-    if (!currentUser) return;
+    console.log(this.props, 'message props');
+    const currentUser = this.props.user.user.current;
+    if (!this.props.user.user.current) return;
     if (this.isAdmin) this.applyStore.load(currentUser.mer_id);
     if (this.notJoinMerchant) this.inviteStore.load(currentUser.id);
   }
@@ -206,14 +208,3 @@ class MessageContainer extends React.Component {
     );
   }
 }
-
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.account.currentUser,
-  }
-};
-
-const Message = connect(mapStateToProps)(observer(MessageContainer));
-
-export default Message;

@@ -4,15 +4,13 @@ import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin'; // fix react onTouchTap events(button & drawer component...)
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppComponent from './App';
-import store from './reducers/index';
-import 'normalize-css';
 import './App.less';
 
 injectTapEventPlugin();
 
 const App = () => (
   <MuiThemeProvider>
-    <AppComponent store={store}/>
+    <AppComponent />
   </MuiThemeProvider>
 );
 

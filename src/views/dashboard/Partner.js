@@ -1,5 +1,5 @@
 import React from 'react';
-import {Tabs, Tab} from 'material-ui/Tabs';
+// import {Tabs, Tab} from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
 
 const TABS = {
@@ -16,8 +16,8 @@ export default class Search extends React.PureComponent {
   handleTabsChange = tabValue => this.setState({ tabValue });
 
   TabBar = () => {
-    const {tabValue} = this.state;
-    const tabStyle = {color: '#777', fontSize: 16};
+    // const {tabValue} = this.state;
+    // const tabStyle = {color: '#777', fontSize: 16};
     return (
       <div className="panel-nav">
         <a className="title" style={{boxSizing: 'border-box', paddingRight: 10}}>

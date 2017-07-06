@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { observer, inject } from 'mobx-react';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import {accountService} from "../../services/account";
 import Toast from "../../components/Toast";
-import { loginAction } from '../../actions/account';
 
-
-class RegisterContainer extends React.Component {
+@inject('user')
+@observer
+export default class Register extends React.Component {
   state={
     username: '',
     password: '',
@@ -79,13 +79,14 @@ class RegisterContainer extends React.Component {
     const {account, username, password} = this.state;
     try {
       const resp = await accountService.register(account, username, password);
-      if (resp.code == 0) {
+      if (resp.code === '0') {
         const loginResp = await accountService.login(account, password);
         const token = loginResp.data.access_token;
         const userData = await accountService.getProfile(loginResp.data.access_token);
-        this.props.login(userData.data, token, {account, password});
-        const data = {user: userData.data, token, account: {account, password}};
-        localStorage.setItem('bizUser', JSON.stringify(data));
+        // this.props.login(userData.data, token, {account, password});
+        // const data = {user: userData.data, token, account: {account, password}};
+        // localStorage.setItem('bizUser', JSON.stringify(data));
+        this.props.user.login(token, userData.data, {account, password});
         this.props.history.replace('/dashboard/main');
         return;
       }
@@ -147,11 +148,11 @@ class RegisterContainer extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    login: (user, token) => { dispatch(loginAction(user, token)); }
-  }
-};
-
-const Register = connect(null, mapDispatchToProps)(RegisterContainer);
-export default Register;
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     login: (user, token) => { dispatch(loginAction(user, token)); }
+//   }
+// };
+//
+// const Register = connect(null, mapDispatchToProps)(RegisterContainer);
+// export default Register;

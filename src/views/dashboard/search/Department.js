@@ -1,7 +1,6 @@
 import React from 'react';
-import {connect} from 'react-redux';
 import {observer} from 'mobx-react';
-import {observable, computed, action, runInAction, extendObservable} from 'mobx';
+import {action, runInAction, extendObservable} from 'mobx';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
@@ -10,7 +9,6 @@ import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
-import MerchantSvc from '../../../services/merchant';
 import BaseSvc from '../../../services/baseData';
 import ContentDrafts from 'material-ui/svg-icons/content/drafts';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -28,7 +26,7 @@ class MerchantMemberStore {
     try {
       const resp = await BaseSvc.getDepartmentList();
       runInAction('after load', () => {
-        if (resp.code == 0 && resp.data) this.departmentList = [...resp.data];
+        if (resp.code === '0' && resp.data) this.departmentList = [...resp.data];
       });
       console.log(resp);
     } catch (e) {
@@ -49,7 +47,7 @@ const iconButtonElement = (
 );
 
 
-const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, onToast}) => {
+export const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, onToast}) => {
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
@@ -88,7 +86,8 @@ const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, o
   );
 };
 
-class MessageContainer extends React.Component {
+@observer
+export default class Message extends React.Component {
   store = new MerchantMemberStore();
   componentWillMount() {
     this.store.load();
@@ -103,14 +102,3 @@ class MessageContainer extends React.Component {
     );
   }
 }
-
-
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.account.currentUser,
-  }
-};
-
-const Message = connect(mapStateToProps)(observer(MessageContainer));
-
-export default Message;

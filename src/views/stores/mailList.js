@@ -1,6 +1,6 @@
-import {observable, computed, action, runInAction, extendObservable} from 'mobx';
+import {computed, action, runInAction, extendObservable} from 'mobx';
 import mailSvc from "../../services/mail";
-// import store from "../../reducers";
+import Storage from '../../utils/storage';
 
 class MailListStore {
   constructor() {
@@ -20,12 +20,13 @@ class MailListStore {
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
-      const resp = await mailSvc.getMailList(0, null, pageNo, this.pageSize);
-      console.log(resp, 'mail');
+      const mer_id = Storage.getValue('user').mer_id;
+      const resp = await mailSvc.getMailList(0, null, pageNo, this.pageSize, mer_id);
+      console.log(resp, 'mail', Storage.getValue('user'));
       runInAction('after load list', () => {
-        if (resp.code == 0 && resp.data.list) {
+        if (resp.code === '0' && resp.data.list) {
           this.mails = this.pageNo > 1 ? [...this.mails, ...resp.data.list] : resp.data.list;
-          this.recordCount = resp.data.pagination && resp.data.pagination.record_count || 0;
+          this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
           this.hasMore = this.mails.length < this.recordCount;
           this.pageNo++;
         }

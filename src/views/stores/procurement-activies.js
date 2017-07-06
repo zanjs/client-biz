@@ -1,6 +1,6 @@
-import {observable, computed, action, runInAction, extendObservable} from 'mobx';
+import {computed, action, runInAction, extendObservable} from 'mobx';
 import homeSvc from "../../services/home";
-import store from "../../reducers";
+import Storage from '../../utils/storage';
 
 class ProcurementActivitiesStore {
    constructor() {
@@ -11,8 +11,8 @@ class ProcurementActivitiesStore {
        hasMore: false,
        unReadListDS: computed(() => this.purchaseList.filter(item => !item.read_flag)),
        isReadListDS: computed(() => this.purchaseList.filter(item => item.read_flag === 1)),
-       inChargeListDS: computed(() => this.purchaseList.filter(item => !item.read_flag && (item.user_id === store.getState().account.currentUser.id))),
-       participantListDS: computed(() => this.purchaseList.filter(item => !item.read_flag && (item.user_id !== store.getState().account.currentUser.id))),
+       inChargeListDS: computed(() => this.purchaseList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').current.id))),
+       participantListDS: computed(() => this.purchaseList.filter(item => !item.read_flag && (item.user_id !== Storage.getValue('user').current.id))),
      });
    }
    pageSize = 20;
@@ -25,9 +25,9 @@ class ProcurementActivitiesStore {
        const resp = await homeSvc.getPurchaseList(pageNo, this.pageSize);
        console.log(resp, 'procurement store');
        runInAction('after load list', () => {
-         if (resp.code == 0 && resp.data.list) {
+         if (resp.code === '0' && resp.data.list) {
            this.purchaseList = this.pageNo > 1 ? [...this.purchaseList, ...resp.data.list] : resp.data.list;
-           this.recordCount = resp.data.pagination && resp.data.pagination.record_count || 0;
+           this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
            this.hasMore = this.purchaseList.length < this.recordCount;
            this.pageNo++;
          }

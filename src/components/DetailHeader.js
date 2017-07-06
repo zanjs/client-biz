@@ -21,7 +21,7 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import {List, ListItem, makeSelectable} from 'material-ui/List';
+import {List, ListItem} from 'material-ui/List';
 import {getContacts} from "../services/message";
 
 export class DetailHeader extends React.PureComponent {

@@ -1,6 +1,6 @@
-import {observable, computed, action, runInAction, extendObservable} from 'mobx';
+import {computed, action, runInAction, extendObservable} from 'mobx';
 import homeSvc from "../../services/home";
-import store from "../../reducers";
+import Storage from '../../utils/storage';
 
 class SellActivitiesStore {
   constructor() {
@@ -11,8 +11,8 @@ class SellActivitiesStore {
       hasMore: false,
       unReadListDS: computed(() => this.messageList.filter(item => !item.read_flag)),
       isReadListDS: computed(() => this.messageList.filter(item => item.read_flag === 1)),
-      inChargeListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id === store.getState().account.currentUser.id))),
-      participantListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id !== store.getState().account.currentUser.id))),
+      inChargeListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').current.id))),
+      participantListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id !== Storage.getValue('user').current.id))),
     });
   }
   pageSize = 20;
@@ -25,9 +25,9 @@ class SellActivitiesStore {
       const resp = await homeSvc.getSellList(pageNo, this.pageSize);
       console.log(resp, 'sell store');
       runInAction('after load list', () => {
-        if (resp.code == 0 && resp.data.list) {
+        if (resp.code === '0' && resp.data.list) {
           this.messageList = this.pageNo > 1 ? [...this.messageList, ...resp.data.list] : resp.data.list;
-          this.recordCount = resp.data.pagination && resp.data.pagination.record_count || 0;
+          this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
           this.hasMore = this.messageList.length < this.recordCount;
           this.pageNo++;
         }

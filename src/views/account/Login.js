@@ -1,19 +1,21 @@
 import React from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import {connect} from 'react-redux';
+import { observer, inject } from 'mobx-react';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import CircularProgress from 'material-ui/CircularProgress';
-import {loginAction} from '../../actions/account';
 import {accountService} from "../../services/account";
+import Storage from '../../utils/storage';
 import Toast from "../../components/Toast";
 
-
-class LoginContainer extends React.Component {
+@inject('user')
+@observer
+export default class Login extends React.Component {
+  account = Storage.getValue('account') || {};
   state={
-    username: this.props.account.account || '',
-    password: this.props.account.password || '',
+    username: this.account.account || '',
+    password: this.account.password || '',
     error: {
       username: '',
       password: '',
@@ -61,17 +63,15 @@ class LoginContainer extends React.Component {
     if (this.state.submitting) return;
     this.setState({ submitting: true });
     const {username, password} = this.state;
-    const {loginAction} = this.props;
     try {
       const resp = await accountService.login(username, password);
-      if (resp.code == 0) {
+      console.log(resp);
+      if (resp.code === '0') {
         const token = resp.data.access_token;
         const userData = await accountService.getProfile(resp.data.access_token);
-        if (userData.code == 0) {
+        if (userData.code === '0') {
           const account = {account: username, password};
-          loginAction(userData.data, token, account);
-          const data = {user: userData.data, token, account};
-          localStorage.setItem('bizUser', JSON.stringify(data));
+          this.props.user.login(token, userData.data, account);
           this.props.history.replace('/dashboard/main');
           return;
         } else {
@@ -89,7 +89,7 @@ class LoginContainer extends React.Component {
 
   render() {
     const { username, password, error, submitting } = this.state;
-    if (this.props.isLoggedIn) {
+    if (this.props.user.isLoggedIn) {
       return (<Redirect to={'/dashboard/main'}/>);
     }
 
@@ -132,19 +132,4 @@ class LoginContainer extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    account: state.account.account,
-    isLoggedIn: state.account.token,
-  }
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    loginAction: (user, token) => { dispatch(loginAction(user, token)); }
-  }
-};
-
-const Login = connect(mapStateToProps, mapDispatchToProps)(LoginContainer);
-export default Login;
 

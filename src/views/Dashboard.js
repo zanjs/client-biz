@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import {connect} from 'react-redux';
+import { observer, inject } from 'mobx-react';
 import { RouteWithSubRoutes } from "../router/index";
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -9,41 +9,31 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
-import { logout, updateUser } from '../actions/account';
-import {accountService} from "../services/account";
 import merchantSvc from "../services/merchant";
 import AddMerchant from "./items/AddMerchant";
 import Toast from "../components/Toast";
 
-class DashboardContainer extends React.Component {
+@inject('user')
+@observer
+export default class Dashboard extends React.Component {
   constructor(props) {
     super(props);
-    if (!props.token) window.location.replace('/');
-    console.log(this.props.currentUser);
+    if (!props.user.isLoggedIn) window.location.replace('/');
   }
   async componentWillMount() {
     if (this.props.match.path === '/dashboard') {
       this.props.history.push('/dashboard/main');
     }
-    try {
-      const resp = await accountService.getProfile(this.props.token);
-      if (resp.code == 0) this.props.updateUser(resp.data);
-      else this.reLogin();
-    } catch (e) {
-      console.log(e, 'update user in dashboard');
-      this.reLogin();
-    }
   }
   reLogin = () => {
-    this.refs.toast.show('登录已过期，请重新登录');
-    this.props.logout();
+    this.props.user.logout();
     window.location.replace('/');
   };
   render() {
-    const {routes, currentUser, logout} = this.props;
+    const {routes, user} = this.props;
     return (
       <div className="dashboard">
-        <DashboardNav currentUser={currentUser} logout={logout}/>
+        <DashboardNav currentUser={user.user.current} logout={this.reLogin}/>
         {routes && routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route}/>
         ))}
@@ -53,23 +43,6 @@ class DashboardContainer extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    currentUser: state.account.currentUser,
-    token: state.account.token,
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    logout: () => dispatch(logout()),
-    updateUser: user => dispatch(updateUser(user)),
-  }
-};
-
-const Dashboard = connect(mapStateToProps, mapDispatchToProps)(DashboardContainer);
-export default Dashboard;
-
 const DIALOG_STATE = {
   SELECT: 0,
   CREATE_MERCHANT: 1,
@@ -77,7 +50,8 @@ const DIALOG_STATE = {
   INVITE_USER: 3,
 };
 
-class DashboardNavItem extends React.Component {
+@withRouter
+class DashboardNav extends React.Component {
   state = {
     openQuickCreateMenu: false,
     openDialog: !this.props.currentUser || !this.props.currentUser.mer_id || this.props.currentUser.mer_id === 0,
@@ -94,10 +68,6 @@ class DashboardNavItem extends React.Component {
     }
   }
 
-  logout = () => {
-    this.props.logout();
-    window.location.replace('/');
-  };
   handleRequestCloseDialog = () => this.setState({ openDialog: false, dialogTitle: '请选择', dialogState: DIALOG_STATE.SELECT });
   handleOpenCreateMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.CREATE_MERCHANT, openQuickCreateMenu: false, dialogTitle: '创建商户' });
   handleOpenJoinMerchantDialog = () => this.setState({ openDialog: true, dialogState: DIALOG_STATE.JOIN_MERCHANT, openQuickCreateMenu: false, dialogTitle: '加入商户' });
@@ -115,7 +85,7 @@ class DashboardNavItem extends React.Component {
     this.setState({ submitting: true });
     try {
       const resp = await merchantSvc.applyMerchant(`${merchantIdForApply}`);
-      if (resp.code == 0) {
+      if (resp.code === '0') {
         this.refs.toast.show('已提交申请，请等待或联系商户通过');
         this.handleRequestCloseDialog();
       } else this.refs.toast.show(resp.msg || '提交失败，请检查商户ID后重试');
@@ -135,7 +105,7 @@ class DashboardNavItem extends React.Component {
     try {
       const resp = await merchantSvc.inviteUser(userAccountForInvite);
       console.log(resp);
-      if (resp.code == 0) {
+      if (resp.code === '0') {
         this.refs.toast.show('已发送邀请，请等待或联系用户确认');
         this.handleRequestCloseDialog();
       } else this.refs.toast.show(resp.msg || '提交失败，请检查用户ID后重试');
@@ -223,8 +193,8 @@ class DashboardNavItem extends React.Component {
               <span className="display-name">{(currentUser && currentUser.name.slice(0, 2))}</span>
             </div>
             <div className="popover-menu">
-              <RaisedButton label="切换商户" style={{width: 150}} onClick={this.logout}/>
-              <RaisedButton label="退出" style={{width: 150}} onClick={this.logout}/>
+              <RaisedButton label="切换商户" style={{width: 150}}/>
+              <RaisedButton label="退出" style={{width: 150}} onClick={this.props.logout}/>
             </div>
           </div>
         </div>
@@ -242,7 +212,7 @@ class DashboardNavItem extends React.Component {
     );
   }
 }
-const DashboardNav = withRouter(DashboardNavItem);
+// const DashboardNav = withRouter(DashboardNavItem);
 
 const LinkButton = ({icon, text, to}) => (
   <Link className="icon-button" to={to}>

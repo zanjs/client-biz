@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { observer, inject } from 'mobx-react';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { accountService } from "../../services/account";
@@ -8,10 +8,11 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import DatePicker from 'material-ui/DatePicker';
 import Toast from "../../components/Toast";
-import { updateUser } from '../../actions/account';
 import { IndustIdList } from "./indust_id_list";
 
-class AddMerchantContainer extends React.Component {
+@inject('user')
+@observer
+export default class AddMerchant extends React.Component {
   state = {
     mer_name: '',
     type: 0,
@@ -78,12 +79,12 @@ class AddMerchantContainer extends React.Component {
   };
   checkOrgCode = () => {
     let err = {org_code: ''};
-    if (this.state.type == 0 && !this.state.org_code.trim().length) err = {org_code: '组织机构代码为空'};
+    if (this.state.type === 0 && !this.state.org_code.trim().length) err = {org_code: '组织机构代码为空'};
     this.setError(err);
   };
   checkRepresentative = () => {
     let err = {representative: ''};
-    if (this.state.type == 0 && !this.state.representative.trim().length) err = {representative: '法人代表不能为空'};
+    if (this.state.type === 0 && !this.state.representative.trim().length) err = {representative: '法人代表不能为空'};
     this.setError(err);
   };
   setError = (err) => {
@@ -97,10 +98,10 @@ class AddMerchantContainer extends React.Component {
     try {
       const resp = await merchantSvc.createMerchant(mer_name, type, indust_id, org_code, representative,
         establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
-      if (resp.code == 0) {
+      if (resp.code === '0') {
         this.refs.toast.show('创建成功');
         const profileResp = await accountService.getProfile(this.props.token);
-        this.props.updateUser(profileResp.data);
+        this.props.user.update(profileResp.data);
       }
       this.props.close();
     } catch (e) {
@@ -125,7 +126,7 @@ class AddMerchantContainer extends React.Component {
               errorText={error.mer_name}
               className="login-input" />
             <TextField
-              hintText={type == 0 ? "法人代表" : '法人代表 (选填)'}
+              hintText={type === 0 ? "法人代表" : '法人代表 (选填)'}
               value={representative}
               type="text"
               onBlur={this.checkRepresentative}
@@ -151,7 +152,7 @@ class AddMerchantContainer extends React.Component {
               }
             </SelectField>
             <TextField
-              hintText={type == 0 ? "组织机构代码" : '组织机构代码 (选填)'}
+              hintText={type === 0 ? "组织机构代码" : '组织机构代码 (选填)'}
               value={org_code}
               type="text"
               onBlur={this.checkOrgCode}
@@ -218,12 +219,3 @@ class AddMerchantContainer extends React.Component {
   }
 }
 
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    updateUser: user => dispatch(updateUser(user)),
-  }
-};
-
-const AddMerchant = connect(null, mapDispatchToProps)(AddMerchantContainer);
-export default AddMerchant;
