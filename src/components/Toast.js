@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { observable, computed, action } from 'mobx';
 import { observer } from 'mobx-react';
 import Snackbar from 'material-ui/Snackbar';

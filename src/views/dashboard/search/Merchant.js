@@ -9,11 +9,12 @@ import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
-// import BaseSvc from '../../../services/baseData';
+import BaseSvc from '../../../services/baseData';
 import MerchantSvc from '../../../services/merchant';
 import MemberIcon from 'material-ui/svg-icons/action/face';
 import MerchantIcon from 'material-ui/svg-icons/maps/local-mall';
 import CircularProgress from 'material-ui/CircularProgress';
+import FlatButton from 'material-ui/FlatButton';
 import {ToastStore as Toast} from "../../../components/Toast"
 
 class MerchantListStore {
@@ -54,11 +55,31 @@ class MerchantMemberStore {
   }
 }
 
+class DepartmentStore {
+  @observable departmentList = [];
+  @observable loading = false;
+  @action load = async () => {
+    if (this.loading) return;
+    this.loading = true;
+    try {
+      const resp = await BaseSvc.getDepartmentList();
+      runInAction('after load', () => {
+        if (resp.code === '0' && resp.data) this.departmentList = [...resp.data];
+      });
+      console.log(resp);
+    } catch (e) {
+      console.log(e, 'load merchant department list');
+    }
+    this.loading = false;
+  }
+}
+
 @inject('user')
 @observer
 export default class MerchantInfo extends React.Component {
   memberStore = new MerchantMemberStore();
   merchantListStore = new MerchantListStore();
+  departmentStore = new DepartmentStore();
   componentWillMount() {
     this.memberStore.load();
     this.merchantListStore.load();
@@ -85,7 +106,7 @@ export default class MerchantInfo extends React.Component {
       <div className="search-content">
         <MerchantList headerTxt="已加入商户列表" listData={this.merchantListStore.merchantList} loading={this.merchantListStore.loading} switchMerchant={this.switchMerchant}/>
         <MemberList headerTxt="当前商户成员" listData={this.memberStore.memberList} loading={this.memberStore.loading}/>
-        <div style={{flex: 1}}>部门</div>
+        <DepartmentList headerTxt="部门" listData={this.departmentStore.departmentList} loading={this.departmentStore.loading}/>
       </div>
     );
   }
@@ -172,6 +193,48 @@ const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
             </div>
           ))
         }
+      </div>
+    </List>
+  );
+};
+
+const DepartmentList = ({listData, headerTxt, loading, switchMerchant}) => {
+  return (
+    <List className='search-list'>
+      <div style={{backgroundColor: '#FFF'}}>
+        <Subheader >{headerTxt}</Subheader>
+        {loading && <CircularProgress size={28} style={{display: 'block', margin: '0 auto 20px auto'}}/>}
+        {!(listData && listData.length) && !loading && <p className="none-data" style={{textAlign: 'center'}}>商户暂无部门</p>}
+        {(listData && listData.length > 0) && <Divider inset={true} />}
+      </div>
+      <div style={{overflowY: 'auto', overflowX: 'hidden',backgroundColor: '#FFF'}}>
+        {
+          listData && listData.map((item, index) => (
+            <div key={index}>
+              <ListItem
+                leftIcon={<MerchantIcon />}
+                rightIconButton={(
+                  <IconMenu iconButtonElement={iconButtonElement}>
+                    <MenuItem onTouchTap={() => {}}>修改</MenuItem>
+                    <MenuItem onTouchTap={() => {}}>删除</MenuItem>
+                  </IconMenu>
+                )}
+                primaryText={item.username || `商户名称: ${item.mer_name}`}
+                secondaryText={
+                  <p>
+                    <span style={{color: darkBlack}}>id: {item.mer_id}</span><br />
+                    {item.create_time} 加入
+                  </p>
+                }
+                secondaryTextLines={2}
+              />
+              {(listData.length && ((listData.length - 1) !== index)) && <Divider inset={true} />}
+            </div>
+          ))
+        }
+      </div>
+      <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+        <FlatButton label="添加部门" primary={true} />
       </div>
     </List>
   );
