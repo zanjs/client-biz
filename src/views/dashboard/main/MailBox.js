@@ -4,7 +4,6 @@ import {BoxHeader} from "../../../components/BoxHeader";
 import {MessageItem} from "../../../components/ListItem";
 import FlatButton from 'material-ui/FlatButton';
 import mailsStore from "../../stores/mailList";
-import Toast from "../../../components/Toast";
 
 class MailBox extends React.PureComponent {
   store = mailsStore;
@@ -14,7 +13,7 @@ class MailBox extends React.PureComponent {
   // selections = ['全部未读', '未读公告', '未读投诉', '已读'];
   selections = ['全部未读', '已读'];
   componentWillMount() {
-    this.store.load(this.onToast);
+    this.store.load();
   }
   selectionCount = (index) => {
     const {mails, unReadListDS, isReadListDS} = this.store;
@@ -37,7 +36,6 @@ class MailBox extends React.PureComponent {
       case 1: return isReadListDS;
     }
   };
-  onToast = txt => this.refs.toast && this.refs.toast.show(txt);
 
   onSelect = e => this.setState({mailFilterValue: parseInt(e.target.value, 10)});
   render() {
@@ -48,9 +46,8 @@ class MailBox extends React.PureComponent {
           {this.mailDS.map((mail, index) => <MessageItem message={mail} key={index} openDetail={this.props.openDetailDrawer}/>)}
           {!this.mailDS.length && <p className="none-data">暂无邮件</p>}
           {this.store.hasMore && <FlatButton label="加载更多" style={{color: '#999'}}
-                                             onTouchTap={() => this.store.load(this.onToast)}/>}
+                                             onTouchTap={this.store.load}/>}
         </div>
-        <Toast ref="toast"/>
       </div>
     );
   }

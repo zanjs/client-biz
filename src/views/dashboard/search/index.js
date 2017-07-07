@@ -1,7 +1,7 @@
 import Message from './Message';
-import Department from './Department';
+import Merchant from './Merchant';
 
 export {
   Message,
-  Department,
+  Merchant,
 }

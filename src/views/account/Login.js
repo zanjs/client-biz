@@ -7,7 +7,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import {accountService} from "../../services/account";
 import Storage from '../../utils/storage';
-import Toast from "../../components/Toast";
+import Toast, {ToastStore} from "../../components/Toast";
 
 @inject('user')
 @observer
@@ -75,14 +75,14 @@ export default class Login extends React.Component {
           this.props.history.replace('/dashboard/main');
           return;
         } else {
-          this.refs.toast.show('登录失败, 请稍后重试');
+          ToastStore.show('登录失败, 请稍后重试');
         }
       } else {
-        this.refs.toast.show('登录失败, 请稍后重试');
+        ToastStore.show('登录失败, 请稍后重试');
       }
     } catch (e) {
       console.log(e, 'login');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+      ToastStore.show('抱歉，发生未知错误，请稍后重试');
     }
     this.setState({ submitting: false });
   };
@@ -126,7 +126,7 @@ export default class Login extends React.Component {
            </div>
          </from>
        </div>
-       <Toast ref="toast"/>
+        <Toast />
       </div>
     );
   }

@@ -19,6 +19,11 @@ const createMerchant = async (mer_name, type, indust_id, org_code, representativ
   return resp.data;
 };
 
+const switchMerchant = async (mer_id, require_userinfo) => {
+  const resp = await axios.post('/biz_gateway/change_merchant', {mer_id, require_userinfo});
+  return resp.data;
+};
+
 const applyMerchant = async (mer_id) => {
   const resp = await axios.post('/biz_gateway/apply_join_merchant', {mer_id});
   return resp.data;
@@ -36,6 +41,16 @@ const getUserListByApply = async (id) => {
 
 const getMerchantListByInvite = async (id) => {
   const resp = await axios.post('/biz_gateway/batch_query_merchant_invite_req', {id});
+  return resp.data;
+};
+
+const getMerchantListByUser = async () => {
+  const resp = await axios.post('/biz_gateway/batch_query_user_merchant');
+  return resp.data;
+};
+
+const getUserListByMerchant = async () => {
+  const resp = await axios.post('/biz_gateway/batch_query_merchant_user');
   return resp.data;
 };
 
@@ -69,4 +84,7 @@ export default {
   refuseUserApply,
   acceptMerchantInvite,
   refuseMerchantInvite,
+  switchMerchant,
+  getMerchantListByUser,
+  getUserListByMerchant,
 }

@@ -133,8 +133,30 @@ const iconButtonElement = (
   </IconButton>
 );
 
+const MessageType = {
+  INVITE: 0,
+  APPLY: 1,
+};
 
-const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, onToast}) => {
+
+const MessageList = ({listData, loading, serviceAction, actionType, onToast, type}) => {
+  let headerTxt = '';
+  let messageTip = '';
+  let primaryTxtTip = '';
+  switch (type) {
+    default: return;
+    case MessageType.INVITE:
+      headerTxt = '商户邀请';
+      messageTip = '邀请加入商户';
+      primaryTxtTip = '商户';
+      break;
+    case MessageType.APPLY:
+      headerTxt = '用户申请';
+      messageTip = '申请加入商户';
+      primaryTxtTip = '用户';
+      break;
+  }
+  const isInvite = type === MessageType.INVITE;
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
@@ -155,10 +177,10 @@ const MessageList = ({listData, headerTxt, loading, serviceAction, actionType, o
                     <MenuItem onTouchTap={() => serviceAction(item.id, actionType.REFUSE, onToast)}>拒绝</MenuItem>
                   </IconMenu>
                 )}
-                primaryText={item.username || `用户: ${item.name}`}
+                primaryText={`${primaryTxtTip}: ${isInvite ? item.mer_name : item.name}`}
                 secondaryText={
                   <p>
-                    <span style={{color: darkBlack}}>申请加入商户</span><br />
+                    <span style={{color: darkBlack}}>{messageTip}</span><br />
                     {item.create_time}
                   </p>
                 }
@@ -182,7 +204,6 @@ export default class Message extends React.Component {
   inviteStore = this.notJoinMerchant && new inviteMessageStore();
 
   componentWillMount() {
-    console.log(this.props, 'message props');
     const currentUser = this.props.user.user.current;
     if (!this.props.user.user.current) return;
     if (this.isAdmin) this.applyStore.load(currentUser.mer_id);
@@ -193,14 +214,14 @@ export default class Message extends React.Component {
     return (
       <div className="search-content">
         {this.isAdmin && (
-          <MessageList headerTxt="用户申请" listData={this.applyStore.applyDS} loading={this.applyStore.loading}
+          <MessageList listData={this.applyStore.applyDS} loading={this.applyStore.loading}
                        serviceAction={this.applyStore.applyAction} actionType={this.applyStore.serviceType}
-                       onToast={this.props.onToast}/>
+                       onToast={this.props.onToast} type={MessageType.APPLY}/>
         )}
         {this.notJoinMerchant && (
-          <MessageList headerTxt="商户邀请" listData={this.inviteStore.messages} loading={this.inviteStore.loading}
+          <MessageList listData={this.inviteStore.messages} loading={this.inviteStore.loading}
                        serviceAction={this.inviteStore.handleInviteAction} actionType={this.inviteStore.serviceType}
-                       onToast={this.props.onToast}/>
+                       onToast={this.props.onToast} type={MessageType.INVITE}/>
         )}
         <div style={{flex: 1}}/>
         <div style={{flex: 1}}/>

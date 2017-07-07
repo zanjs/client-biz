@@ -7,7 +7,7 @@ import merchantSvc from "../../services/merchant";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import DatePicker from 'material-ui/DatePicker';
-import Toast from "../../components/Toast";
+import {ToastStore as Toast} from "../../components/Toast";
 import { IndustIdList } from "./indust_id_list";
 
 @inject('user')
@@ -99,14 +99,14 @@ export default class AddMerchant extends React.Component {
       const resp = await merchantSvc.createMerchant(mer_name, type, indust_id, org_code, representative,
         establish_date, om_bank_name, bank_account, swift_code, la_bank_account, tel_list, address);
       if (resp.code === '0') {
-        this.refs.toast.show('创建成功');
+        Toast.show('创建成功');
         const profileResp = await accountService.getProfile(this.props.token);
         this.props.user.update(profileResp.data);
       }
       this.props.close();
     } catch (e) {
       console.log(e, 'create merchant');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+      Toast.show('抱歉，发生未知错误，请稍后重试');
       this.props.close();
     }
   };
@@ -213,7 +213,6 @@ export default class AddMerchant extends React.Component {
             </div>
 
           </form>
-          <Toast ref="toast"/>
       </div>
     );
   }

@@ -11,7 +11,7 @@ import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
 import merchantSvc from "../services/merchant";
 import AddMerchant from "./items/AddMerchant";
-import Toast from "../components/Toast";
+import Toast, {ToastStore} from "../components/Toast";
 
 @inject('user')
 @observer
@@ -31,13 +31,14 @@ export default class Dashboard extends React.Component {
   };
   render() {
     const {routes, user} = this.props;
+    console.log(user, user.user.current);
     return (
       <div className="dashboard">
         <DashboardNav currentUser={user.user.current} logout={this.reLogin}/>
         {routes && routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route}/>
         ))}
-        <Toast ref="toast"/>
+        <Toast />
       </div>
     );
   }
@@ -86,12 +87,12 @@ class DashboardNav extends React.Component {
     try {
       const resp = await merchantSvc.applyMerchant(`${merchantIdForApply}`);
       if (resp.code === '0') {
-        this.refs.toast.show('已提交申请，请等待或联系商户通过');
+        ToastStore.show('已提交申请，请等待或联系商户通过');
         this.handleRequestCloseDialog();
-      } else this.refs.toast.show(resp.msg || '提交失败，请检查商户ID后重试');
+      } else ToastStore.show(resp.msg || '提交失败，请检查商户ID后重试');
     } catch (e) {
       console.log(e, 'apply merchant');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+      ToastStore.show('抱歉，发生未知错误，请稍后重试');
     }
     this.setState({ submitting: false });
   };
@@ -106,12 +107,12 @@ class DashboardNav extends React.Component {
       const resp = await merchantSvc.inviteUser(userAccountForInvite);
       console.log(resp);
       if (resp.code === '0') {
-        this.refs.toast.show('已发送邀请，请等待或联系用户确认');
+        ToastStore.show('已发送邀请，请等待或联系用户确认');
         this.handleRequestCloseDialog();
-      } else this.refs.toast.show(resp.msg || '提交失败，请检查用户ID后重试');
+      } else ToastStore.show(resp.msg || '提交失败，请检查用户ID后重试');
     } catch (e) {
       console.log(e, 'invite user');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+      ToastStore.show('抱歉，发生未知错误，请稍后重试');
     }
     this.setState({ submitting: false });
   };
@@ -207,7 +208,6 @@ class DashboardNav extends React.Component {
           onRequestClose={this.handleRequestCloseDialog}>
           <this.DialogContent />
         </Dialog>
-        <Toast ref="toast"/>
       </nav>
     );
   }

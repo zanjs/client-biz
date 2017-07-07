@@ -3,7 +3,6 @@ import {observer} from 'mobx-react';
 import {BoxHeader} from "../../../components/BoxHeader";
 import {MessageItem} from "../../../components/ListItem";
 import FlatButton from 'material-ui/FlatButton';
-import Toast from "../../../components/Toast";
 import sellActivitiesStore from "../../stores/sell-activities";
 
 class SaleBox extends React.PureComponent {
@@ -14,7 +13,7 @@ class SaleBox extends React.PureComponent {
   // selections = ['全部未读', '我负责的', '我参与的', '待处理', '已读'];
   selections = ['全部未读', '我负责的', '我参与的', '已读'];
   componentWillMount() {
-    this.store.load(this.onToast);
+    this.store.load();
   }
   selectionCount = (index) => {
     const {messageList, unReadListDS, isReadListDS, inChargeListDS, participantListDS} = this.store;
@@ -39,7 +38,6 @@ class SaleBox extends React.PureComponent {
       case 3: return isReadListDS;
     }
   };
-  onToast = txt => this.refs.toast && this.refs.toast.show(txt);
 
   onSelect = e => this.setState({messagesFilterValue: parseInt(e.target.value, 10)});
   render() {
@@ -50,9 +48,8 @@ class SaleBox extends React.PureComponent {
           {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index} openDetail={this.props.openDetailDrawer}/>)}
           {!this.messagesDS.length && <p className="none-data">暂无内容</p>}
           {this.store.hasMore && <FlatButton label="加载更多" style={{color: '#999'}}
-                                             onTouchTap={() => this.store.load(this.onToast)}/>}
+                                             onTouchTap={this.store.load}/>}
         </div>
-        <Toast ref="toast"/>
       </div>
     );
   }

@@ -20,8 +20,8 @@ const getMail = async (id) => {
   return resp.data;
 };
 
-const getMailList = async (type, read_flag, page_no, page_size, mer_id) => {
-  const resp = await axios.post('/mail_gateway/batch_query_mail', {type, read_flag, page_no, page_size, mer_id});
+const getMailList = async (type, read_flag, page_no, page_size) => {
+  const resp = await axios.post('/mail_gateway/batch_query_mail', {type, read_flag, page_no, page_size});
   return resp.data;
 };
 

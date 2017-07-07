@@ -1,22 +1,22 @@
 import React from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
-import {Message, Department} from './search/index';
-import Toast from "../../components/Toast";
+import {Message, Merchant} from './search/index';
+import {ToastStore as Toast} from "../../components/Toast";
 
 const TABS = {
-  MESSAGE: '通知',
-  DEPARTMENT: '部门',
-  DRAFT: '未发送邮件',
-  BILLS: '单据',
+  MESSAGE: 1,
+  MERCHANT: 2,
+  DRAFT: 3,
+  BILLS: 4,
 };
 
 export default class Search extends React.PureComponent {
   state={
-    tabValue: TABS.MESSAGE,
+    tabValue: TABS.MERCHANT,
   };
   handleTabsChange = tabValue => this.setState({ tabValue });
-  onToast = txt => this.refs.toast && this.refs.toast.show(txt);
+  onToast = txt => Toast.show(txt);
 
   TabBar = () => {
     const {tabValue} = this.state;
@@ -30,9 +30,9 @@ export default class Search extends React.PureComponent {
         <Tabs onChange={this.handleTabsChange} value={tabValue}
               style={{flex: 1, margin: '0 20px', maxWidth: 400, minWidth: 200}}
               tabItemContainerStyle={{backgroundColor: '#FFF'}}>
+          <Tab label="商户" value={TABS.MERCHANT} style={tabStyle}/>
           <Tab label="通知" value={TABS.MESSAGE} style={tabStyle}/>
-          <Tab label="部门" value={TABS.DEPARTMENT} style={tabStyle}/>
-          <Tab label="邮件" value={TABS.DRAFT} style={tabStyle}/>
+          {/*<Tab label="邮件" value={TABS.DRAFT} style={tabStyle}/>*/}
           <Tab label="单据" value={TABS.BILLS} style={tabStyle}/>
         </Tabs>
         <div className="defaultRight" style={{width: 110, height: 50}}/>
@@ -44,7 +44,7 @@ export default class Search extends React.PureComponent {
     switch (this.state.tabValue) {
       default: return null;
       case TABS.MESSAGE: return <Message onToast={this.onToast}/>;
-      case TABS.DEPARTMENT: return <Department onToast={this.onToast}/>;
+      case TABS.MERCHANT: return <Merchant onToast={this.onToast}/>;
       case TABS.DRAFT: return <p>未发送邮件</p>;
       case TABS.BILLS: return <p>单据</p>;
     }
@@ -55,7 +55,6 @@ export default class Search extends React.PureComponent {
       <div className="search-layout">
         <this.TabBar />
         {this.renderContent()}
-        <Toast ref="toast"/>
       </div>
     );
   }

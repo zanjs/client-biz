@@ -1,6 +1,7 @@
 import {computed, action, runInAction, extendObservable} from 'mobx';
 import mailSvc from "../../services/mail";
 import Storage from '../../utils/storage';
+import {ToastStore as Toast} from "../../components/Toast";
 
 class MailListStore {
   constructor() {
@@ -15,14 +16,13 @@ class MailListStore {
   }
   pageSize = 20;
 
-  load = action(async (errCallback) => {
-    if (this.loading) return;
+  load = action(async () => {
+    const mer_id = Storage.getValue('user').mer_id;
+    if (this.loading || !mer_id) return;
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
-      const mer_id = Storage.getValue('user').mer_id;
-      const resp = await mailSvc.getMailList(0, null, pageNo, this.pageSize, mer_id);
-      console.log(resp, 'mail', Storage.getValue('user'));
+      const resp = await mailSvc.getMailList(0, null, pageNo, this.pageSize);
       runInAction('after load list', () => {
         if (resp.code === '0' && resp.data.list) {
           this.mails = this.pageNo > 1 ? [...this.mails, ...resp.data.list] : resp.data.list;
@@ -32,7 +32,7 @@ class MailListStore {
         }
       })
     } catch (e) {
-      errCallback && errCallback('抱歉，发生未知错误，请稍后重试');
+      Toast.show('抱歉，发生未知错误，请稍后重试');
     }
     this.loading = false;
   })

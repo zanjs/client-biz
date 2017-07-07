@@ -6,7 +6,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import {accountService} from "../../services/account";
-import Toast from "../../components/Toast";
+import Toast, {ToastStore} from "../../components/Toast";
 
 @inject('user')
 @observer
@@ -90,10 +90,10 @@ export default class Register extends React.Component {
         this.props.history.replace('/dashboard/main');
         return;
       }
-      else this.refs.toast.show('注册失败, 请稍后重试');
+      else ToastStore.show('注册失败, 请稍后重试');
     } catch (e) {
       console.log(e, 'register');
-      this.refs.toast.show('抱歉，发生未知错误，请稍后重试');
+      ToastStore.show('抱歉，发生未知错误，请稍后重试');
     }
     this.setState({ submitting: false });
   };
@@ -142,17 +142,8 @@ export default class Register extends React.Component {
             </div>
           </from>
         </div>
-        <Toast ref="toast"/>
+        <Toast />
       </div>
     );
   }
 }
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     login: (user, token) => { dispatch(loginAction(user, token)); }
-//   }
-// };
-//
-// const Register = connect(null, mapDispatchToProps)(RegisterContainer);
-// export default Register;

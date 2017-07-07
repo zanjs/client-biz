@@ -1,6 +1,7 @@
 import {computed, action, runInAction, extendObservable} from 'mobx';
 import homeSvc from "../../services/home";
 import Storage from '../../utils/storage';
+import {ToastStore as Toast} from "../../components/Toast";
 
 class ProcurementActivitiesStore {
    constructor() {
@@ -17,13 +18,13 @@ class ProcurementActivitiesStore {
    }
    pageSize = 20;
 
-   load = action(async (errCallback) => {
+   load = action(async () => {
      if (this.loading) return;
      this.loading = true;
      const pageNo = this.pageNo > 1 ? this.pageNo : null;
      try {
        const resp = await homeSvc.getPurchaseList(pageNo, this.pageSize);
-       console.log(resp, 'procurement store');
+       // console.log(resp, 'procurement store');
        runInAction('after load list', () => {
          if (resp.code === '0' && resp.data.list) {
            this.purchaseList = this.pageNo > 1 ? [...this.purchaseList, ...resp.data.list] : resp.data.list;
@@ -33,7 +34,7 @@ class ProcurementActivitiesStore {
          }
        })
      } catch (e) {
-       errCallback && errCallback('抱歉，发生未知错误，请稍后重试');
+       Toast.show('抱歉，发生未知错误，请稍后重试');
      }
      this.loading = false;
    })
