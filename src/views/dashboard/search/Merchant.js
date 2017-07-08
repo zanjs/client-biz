@@ -15,7 +15,9 @@ import MemberIcon from 'material-ui/svg-icons/action/face';
 import MerchantIcon from 'material-ui/svg-icons/maps/local-mall';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
-import {ToastStore as Toast} from "../../../components/Toast"
+import {ToastStore as Toast} from "../../../components/Toast";
+import {BizDialog} from "../../../components/Dialog";
+import DialogForm from "../../items/DialogForm";
 
 class MerchantListStore {
   @observable merchantList = [];
@@ -124,7 +126,7 @@ const iconButtonElement = (
 
 
 const MemberList = ({listData, headerTxt, loading}) => {
-  // listData = [...Array.from({length: 20}).fill(listData)];
+  const openInviteDialog = () => BizDialog.onOpen('邀请用户', <DialogForm type='invite' hintTxt="请输入用户的账号" submitTxt="邀请"/>);
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
@@ -155,17 +157,22 @@ const MemberList = ({listData, headerTxt, loading}) => {
           ))
         }
       </div>
+      <Divider inset={true} />
+      <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+        <FlatButton label="邀请用户" primary={true} onTouchTap={openInviteDialog}/>
+      </div>
     </List>
   );
 };
 
 const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
+  const openApplyDialog = () => BizDialog.onOpen('加入商户', <DialogForm type='apply' hintTxt="请输入商户的ID" submitTxt="申请"/>);
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
         <Subheader >{headerTxt}</Subheader>
         {loading && <CircularProgress size={28} style={{display: 'block', margin: '0 auto 20px auto'}}/>}
-        {!(listData && listData.length) && !loading && <p className="none-data" style={{textAlign: 'center'}}>暂未加入商户</p>}
+        {!(listData && listData.length) && !loading && <p className="none-data" style={{textAlign: 'center'}}>暂未加入其他商户</p>}
         {(listData && listData.length > 0) && <Divider inset={true} />}
       </div>
       <div style={{overflowY: 'auto', overflowX: 'hidden',backgroundColor: '#FFF'}}>
@@ -194,11 +201,15 @@ const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
           ))
         }
       </div>
+      <Divider inset={true} />
+      <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+        <FlatButton label="加入商户" primary={true} onTouchTap={openApplyDialog}/>
+      </div>
     </List>
   );
 };
 
-const DepartmentList = ({listData, headerTxt, loading, switchMerchant}) => {
+const DepartmentList = ({listData, headerTxt, loading}) => {
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
@@ -233,6 +244,7 @@ const DepartmentList = ({listData, headerTxt, loading, switchMerchant}) => {
           ))
         }
       </div>
+      <Divider inset={true} />
       <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
         <FlatButton label="添加部门" primary={true} />
       </div>

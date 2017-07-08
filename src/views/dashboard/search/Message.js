@@ -12,6 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 import MerchantSvc from '../../../services/merchant';
 import ContentDrafts from 'material-ui/svg-icons/content/drafts';
 import CircularProgress from 'material-ui/CircularProgress';
+import {ToastStore as Toast} from "../../../components/Toast";
 
 class applyMessageStore {
   constructor() {
@@ -41,7 +42,7 @@ class applyMessageStore {
     REFUSE: 'refuse',
   };
 
-  applyAction = action(async (id, type, onToast) => {
+  applyAction = action(async (id, type) => {
     if (this.submitting || !id) return;
     this.submitting = true;
     try {
@@ -57,12 +58,12 @@ class applyMessageStore {
         if (resp.code === '0') {
           this.messages = [...this.messages.filter(m => m.id !== id)]
         } else {
-          onToast && onToast(resp.msg || '抱歉，提交失败，请稍后重试');
+          Toast.show(resp.msg || '抱歉，提交失败，请稍后重试');
         }
       });
     } catch (e) {
       console.log(e, 'accept user apply');
-      onToast && onToast('抱歉，发生未知错误，请稍后重试');
+      Toast.show('抱歉，发生未知错误，请稍后重试');
     }
     this.submitting = false;
   });
@@ -96,7 +97,7 @@ class inviteMessageStore {
     REFUSE: 'refuse',
   };
 
-  handleInviteAction = action(async (id, type, onToast) => {
+  handleInviteAction = action(async (id, type) => {
     if (this.submitting || !id) return;
     this.submitting = true;
     try {
@@ -112,12 +113,12 @@ class inviteMessageStore {
         if (resp.code === '0') {
           this.messages = [...this.messages.filter(m => m.id !== id)]
         } else {
-          onToast && onToast(resp.msg || '抱歉，提交失败，请稍后重试');
+          Toast.show(resp.msg || '抱歉，提交失败，请稍后重试');
         }
       });
     } catch (e) {
       console.log(e, 'accept user apply');
-      onToast && onToast('抱歉，发生未知错误，请稍后重试');
+      Toast.show('抱歉，发生未知错误，请稍后重试');
     }
     this.submitting = false;
   });
@@ -139,7 +140,7 @@ const MessageType = {
 };
 
 
-const MessageList = ({listData, loading, serviceAction, actionType, onToast, type}) => {
+const MessageList = ({listData, loading, serviceAction, actionType, type}) => {
   let headerTxt = '';
   let messageTip = '';
   let primaryTxtTip = '';
@@ -173,8 +174,8 @@ const MessageList = ({listData, loading, serviceAction, actionType, onToast, typ
                 leftIcon={<ContentDrafts />}
                 rightIconButton={(
                   <IconMenu iconButtonElement={iconButtonElement}>
-                    <MenuItem onTouchTap={() => serviceAction(item.id, actionType.ACCEPT, onToast)}>同意</MenuItem>
-                    <MenuItem onTouchTap={() => serviceAction(item.id, actionType.REFUSE, onToast)}>拒绝</MenuItem>
+                    <MenuItem onTouchTap={() => serviceAction(item.id, actionType.ACCEPT)}>同意</MenuItem>
+                    <MenuItem onTouchTap={() => serviceAction(item.id, actionType.REFUSE)}>拒绝</MenuItem>
                   </IconMenu>
                 )}
                 primaryText={`${primaryTxtTip}: ${isInvite ? item.mer_name : item.name}`}
@@ -213,17 +214,10 @@ export default class Message extends React.Component {
   render() {
     return (
       <div className="search-content">
-        {this.isAdmin && (
-          <MessageList listData={this.applyStore.applyDS} loading={this.applyStore.loading}
-                       serviceAction={this.applyStore.applyAction} actionType={this.applyStore.serviceType}
-                       onToast={this.props.onToast} type={MessageType.APPLY}/>
-        )}
-        {this.notJoinMerchant && (
-          <MessageList listData={this.inviteStore.messages} loading={this.inviteStore.loading}
-                       serviceAction={this.inviteStore.handleInviteAction} actionType={this.inviteStore.serviceType}
-                       onToast={this.props.onToast} type={MessageType.INVITE}/>
-        )}
-        <div style={{flex: 1}}/>
+        <MessageList listData={this.applyStore.applyDS} loading={this.applyStore.loading} type={MessageType.APPLY}
+                     serviceAction={this.applyStore.applyAction} actionType={this.applyStore.serviceType}/>
+        <MessageList listData={this.inviteStore.messages} loading={this.inviteStore.loading} type={MessageType.INVITE}
+                     serviceAction={this.inviteStore.handleInviteAction} actionType={this.inviteStore.serviceType}/>
         <div style={{flex: 1}}/>
       </div>
     );

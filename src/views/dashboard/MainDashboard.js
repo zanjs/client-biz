@@ -35,7 +35,7 @@ export default class MainDashboard extends React.PureComponent {
           <Tab label="看板" value={0} style={tabStyle}/>
           <Tab label="采购" value={1} style={tabStyle}/>
           <Tab label="销售" value={2} style={tabStyle}/>
-          <Tab label="日历" value={3} style={tabStyle}/>
+          {/*<Tab label="日历" value={3} style={tabStyle}/>*/}
         </Tabs>
         <div className="defaultRight" style={{width: 110, height: 50}}/>
       </div>

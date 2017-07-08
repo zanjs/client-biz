@@ -9,7 +9,7 @@ class ProcurementActivitiesStore {
        purchaseList: [],
        recordCount: 0,
        pageNo: 1,
-       hasMore: false,
+       hasMore: true,
        unReadListDS: computed(() => this.purchaseList.filter(item => !item.read_flag)),
        isReadListDS: computed(() => this.purchaseList.filter(item => item.read_flag === 1)),
        inChargeListDS: computed(() => this.purchaseList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').current.id))),
@@ -19,7 +19,7 @@ class ProcurementActivitiesStore {
    pageSize = 20;
 
    load = action(async () => {
-     if (this.loading) return;
+     if (this.loading || !this.hasMore) return;
      this.loading = true;
      const pageNo = this.pageNo > 1 ? this.pageNo : null;
      try {
@@ -30,7 +30,7 @@ class ProcurementActivitiesStore {
            this.purchaseList = this.pageNo > 1 ? [...this.purchaseList, ...resp.data.list] : resp.data.list;
            this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
            this.hasMore = this.purchaseList.length < this.recordCount;
-           this.pageNo++;
+           if (this.hasMore)  this.pageNo++;
          }
        })
      } catch (e) {

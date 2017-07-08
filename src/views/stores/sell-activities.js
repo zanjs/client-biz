@@ -9,7 +9,7 @@ class SellActivitiesStore {
       messageList: [],
       recordCount: 0,
       pageNo: 1,
-      hasMore: false,
+      hasMore: true,
       unReadListDS: computed(() => this.messageList.filter(item => !item.read_flag)),
       isReadListDS: computed(() => this.messageList.filter(item => item.read_flag === 1)),
       inChargeListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').current.id))),
@@ -19,7 +19,7 @@ class SellActivitiesStore {
   pageSize = 20;
 
   load = action(async () => {
-    if (this.loading) return;
+    if (this.loading || !this.hasMore) return;
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
@@ -30,7 +30,7 @@ class SellActivitiesStore {
           this.messageList = this.pageNo > 1 ? [...this.messageList, ...resp.data.list] : resp.data.list;
           this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
           this.hasMore = this.messageList.length < this.recordCount;
-          this.pageNo++;
+          if (this.hasMore) this.pageNo++;
         }
       })
     } catch (e) {

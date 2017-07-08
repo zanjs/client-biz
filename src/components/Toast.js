@@ -14,7 +14,10 @@ class Store {
     this.message = message;
     this.duration = duration;
   };
-  @action close = () => this.message = '';
+  @action close = () => {
+    this.message = '';
+    this.duration = 2000;
+  }
 }
 
 export const ToastStore = new Store();
