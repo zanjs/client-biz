@@ -1,15 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
-
-import CircularProgress from 'material-ui/CircularProgress';
+// import {
+//   Table,
+//   TableBody,
+//   TableHeader,
+//   TableHeaderColumn,
+//   TableRow,
+//   TableRowColumn,
+// } from 'material-ui/Table';
+//
+// import CircularProgress from 'material-ui/CircularProgress';
 import MaterialsStore from '../../stores/materials';
 
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
 
 const ProfileDialog = ({user}) => {
   return (
@@ -37,11 +36,6 @@ const ProfileDialog = ({user}) => {
         readOnly
         style={{marginRight: 20}}
       />
-
-      {/*<div className="actions-container">*/}
-        {/*<RaisedButton style={{ marginTop: '20px' }} label="确认" className="btn-login"*/}
-                      {/*primary={this.validated} disabled={!this.validated} onClick={this.submit} />*/}
-      {/*</div>*/}
     </div>
   )
 };

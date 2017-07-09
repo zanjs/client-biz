@@ -9,6 +9,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import {BizDialog} from "../../components/Dialog";
 import {ToastStore as Toast} from "../../components/Toast";
 import BaseSvc from '../../services/baseData';
+import PartnerSvc from '../../services/partner';
 import partnerStore from '../stores/partners';
 
 class AddPartnerState {
@@ -41,7 +42,7 @@ class AddPartnerState {
     if (this.submitting || !this.partner_id) return;
     this.submitting = true;
     try {
-      const service = type === this.submitType.ADD ? BaseSvc.addPartner : BaseSvc.updatePartner;
+      const service = type === this.submitType.ADD ? PartnerSvc.invite : BaseSvc.updatePartner;
       const partner_id = parseInt(this.partner_id, 10);
       const partner_flag = parseInt(this.partner_flag , 10);
       const partner_type = parseInt(this.partner_type, 10);

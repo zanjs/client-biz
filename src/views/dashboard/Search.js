@@ -1,7 +1,7 @@
 import React from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
-import {Message, Merchant, Material} from './search/index';
+import {Message, Merchant} from './search/index';
 
 const TABS = {
   MESSAGE: 1,
@@ -28,7 +28,7 @@ export default class Search extends React.PureComponent {
               style={{flex: 1, margin: '0 20px', maxWidth: 400, minWidth: 200}}
               tabItemContainerStyle={{backgroundColor: '#FFF'}}>
           <Tab label="商户" value={TABS.MERCHANT} style={tabStyle}/>
-          <Tab label="物料" value={TABS.MATERIAL} style={tabStyle}/>
+          {/*<Tab label="物料" value={TABS.MATERIAL} style={tabStyle}/>*/}
           <Tab label="通知" value={TABS.MESSAGE} style={tabStyle}/>
         </Tabs>
         <div className="defaultRight" style={{width: 110, height: 50}}/>
@@ -41,7 +41,7 @@ export default class Search extends React.PureComponent {
       default: return null;
       case TABS.MESSAGE: return <Message />;
       case TABS.MERCHANT: return <Merchant />;
-      case TABS.MATERIAL: return <Material />;
+      // case TABS.MATERIAL: return <Material />;
     }
   };
 

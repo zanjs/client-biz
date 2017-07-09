@@ -1,11 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import {observable, computed, action, runInAction} from 'mobx';
+import {observable, action, runInAction} from 'mobx';
 import FontIcon from 'material-ui/FontIcon';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
-import {grey400, darkBlack} from 'material-ui/styles/colors';
+import {grey400} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
