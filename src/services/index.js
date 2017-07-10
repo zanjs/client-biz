@@ -6,6 +6,11 @@ const client = axios.create({
   timeout: 15000,
 });
 
+export const clientSeq = axios.create({
+  baseURL: '/bizlink-seq-server',
+  timeout: 15000,
+});
+
 
 client.interceptors.request.use(config => {
   const token = Storage.getValue('token');

@@ -7,6 +7,7 @@ import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import AddMerchant from "./items/AddMerchant";
+import AddBill from "./items/AddBill";
 import DialogForm from "./items/DialogForm";
 import ProfileDialog from "./items/ProfileDialog";
 import Toast from "../components/Toast";
@@ -77,6 +78,12 @@ class DashboardNav extends React.Component {
     this.setState({ openQuickCreateMenu: false });
   };
 
+  // 打开创建单据dialog
+  addBill = () => {
+    BizDialog.onOpen('创建单据', <AddBill />);
+    this.setState({ openQuickCreateMenu: false });
+  };
+
   // 打开个人资料dialog
   handleOpenProfileDialog = () => BizDialog.onOpen('个人资料', <ProfileDialog user={this.props.currentUser}/>);
 
@@ -91,7 +98,9 @@ class DashboardNav extends React.Component {
     const {openQuickCreateMenu, quickCreateAnchorEl} = this.state;
     const {currentUser} = this.props;
     const quickCreateAction = currentUser && currentUser.mer_id ? [
+      {name: "创建单据", action: this.addBill},
       {name: "邀请用户", action: this.inviteUser},
+      {name: "加入商户", action: this.handleOpenJoinMerchantDialog},
     ] : [
       {name: "创建商户", action: this.handleOpenCreateMerchantDialog},
     ];

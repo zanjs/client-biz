@@ -18,6 +18,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {ToastStore as Toast} from "../../../components/Toast";
 import {BizDialog} from "../../../components/Dialog";
 import DialogForm from "../../items/DialogForm";
+import MemberStore from "../../stores/merchantMember";
 
 class MerchantListStore {
   @observable merchantList = [];
@@ -33,25 +34,6 @@ class MerchantListStore {
       console.log(resp);
     } catch (e) {
       console.log(e, 'load user merchant list');
-    }
-    this.loading = false;
-  }
-}
-
-class MerchantMemberStore {
-  @observable memberList = [];
-  @observable loading = false;
-  @action load = async () => {
-    if (this.loading) return;
-    this.loading = true;
-    try {
-      const resp = await MerchantSvc.getUserListByMerchant();
-      runInAction('after load', () => {
-        if (resp.code === '0' && resp.data) this.memberList = [...resp.data];
-      });
-      console.log(resp);
-    } catch (e) {
-      console.log(e, 'load merchant member list');
     }
     this.loading = false;
   }
@@ -79,7 +61,7 @@ class DepartmentStore {
 @inject('user')
 @observer
 export default class MerchantInfo extends React.Component {
-  memberStore = new MerchantMemberStore();
+  memberStore = MemberStore;
   merchantListStore = new MerchantListStore();
   departmentStore = new DepartmentStore();
   componentWillMount() {

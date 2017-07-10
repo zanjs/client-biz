@@ -51,7 +51,7 @@ class AddPartnerState {
       console.log(resp);
       runInAction('after submit add', () => {
         if (resp.code === '0') {
-          Toast.show(type === this.submitType.ADD ? '添加成功' : '修改成功');
+          Toast.show(type === this.submitType.ADD ? '已发送合作申请，请等待或通知对方确认' : '修改成功');
           console.log(partnerStore.DS);
           partnerStore.load();
           BizDialog.onClose();

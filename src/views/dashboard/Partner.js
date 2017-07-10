@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import {observable, action, runInAction} from 'mobx';
+import {observable, computed, action, runInAction} from 'mobx';
 import FontIcon from 'material-ui/FontIcon';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
@@ -27,18 +27,22 @@ const ListType = {
 };
 
 class Invitations {
-  @observable DS = [];
+  @observable rawDS = [];
   @observable loading = false;
+
+  @computed get DS() {
+    return this.rawDS.filter(item => !item.accept_status);
+  }
 
   @action load = async () => {
     if (this.loading) return;
     this.loading = true;
     try {
       const resp = await PartnerSvc.getInviteList();
-      console.log(resp);
+      console.log(resp, 'partner invite');
       runInAction('after load invite', () => {
-        if (resp.code === '0' && resp.data.list) {
-          this.DS = resp.data;
+        if (resp.code === '0' && resp.data) {
+          this.rawDS = resp.data;
         } else Toast.show(resp.msg);
       })
     } catch (e) {
@@ -46,7 +50,49 @@ class Invitations {
       Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
     }
     this.loading = false;
-  }
+  };
+
+  @action accept = async (item) => {
+    if (this.accepting || !item) return;
+    this.accepting = true;
+    try {
+      const id = item.src_mer_id;
+      const resp = await PartnerSvc.accept(id);
+      console.log(resp, 'accept invite');
+      runInAction('after accept', () => {
+        if (resp.code === '0') {
+          this.rawDS = this.rawDS.filter(item => item.src_mer_id !== id);
+          partnerStore.load();
+          Toast.show('已接受合作邀请');
+        }else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
+      });
+    } catch (e) {
+      console.log(e, 'accept partner invite');
+      Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
+    }
+    this.accepting = false;
+  };
+
+  @action refuse = async (item) => {
+    if (this.refusing || !item) return;
+    this.refusing = true;
+    try {
+      const id = item.src_mer_id;
+      const resp = await PartnerSvc.refuse(id);
+      console.log(resp, 'refuse invite');
+      runInAction('after refuse', () => {
+        if (resp.code === '0') {
+          this.rawDS = this.rawDS.filter(item => item.src_mer_id !== id);
+          partnerStore.load();
+          Toast.show('已拒绝合作邀请');
+        } else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
+      });
+    } catch (e) {
+      console.log(e, 'refuse partner invite');
+      Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
+    }
+    this.refusing = false;
+  };
 }
 
 const InvitationStore = new Invitations();
@@ -115,7 +161,6 @@ const getPartnerFlag = flag => {
 const DataList = ({listData, loading, type}) => {
   let headerTxt = '';
   let messageA = '';
-  let messageB = '';
   let primaryTxtTip = '';
   let noDataTxt = '';
   let leftIcon = null;
@@ -133,15 +178,14 @@ const DataList = ({listData, loading, type}) => {
       ];
       break;
     case ListType.INVITE:
-      headerTxt = '合作申请';
+      headerTxt = '伙伴申请';
       noDataTxt = '暂无申请';
-      messageA = '申请加入商户';
-      messageB = '申请加入商户';
-      primaryTxtTip = '用户';
+      messageA = '申请成为合作伙伴';
+      primaryTxtTip = '商户(ID)';
       leftIcon = <MailIcon />;
       menuItem = [
-        {name: '同意', action: () => {}},
-        {name: '拒绝', action: () => {}}
+        {name: '同意', action: InvitationStore.accept},
+        {name: '拒绝', action: InvitationStore.refuse}
       ];
       break;
   }
@@ -167,11 +211,11 @@ const DataList = ({listData, loading, type}) => {
                     {menuItem.map((menu, key) => <MenuItem onTouchTap={menu.action.bind(null, item)} key={key}>{menu.name}</MenuItem>)}
                   </IconMenu>
                 )}
-                primaryText={`${primaryTxtTip}: ${isInvite ? item.mer_name : item.inner_partner_name}`}
+                primaryText={`${primaryTxtTip}: ${isInvite ? item.src_mer_id : item.inner_partner_name}`}
                 secondaryText={
                   <p>
                     <span>{isInvite ? messageA : `伙伴标识：${getPartnerFlag(item.partner_flag)}`}</span><br />
-                    {isInvite ? messageB : `伙伴类型：${getPartnerType(item.partner_type)}`}
+                    {isInvite ? item.create_time : `伙伴类型：${getPartnerType(item.partner_type)}`}
                   </p>
                 }
                 secondaryTextLines={2}

@@ -74,6 +74,9 @@
   "proxy": {
     "/bizlink-core-server": {
       "target": "http://39.108.3.114:8080/"
+    },
+    "/bizlink-seq-server": {
+      "target": "http://39.108.3.114:8081/"
     }
   },
   "jest": {
