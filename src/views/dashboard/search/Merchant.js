@@ -31,7 +31,6 @@ class MerchantListStore {
       runInAction('after load', () => {
         if (resp.code === '0' && resp.data) this.merchantList = [...resp.data];
       });
-      console.log(resp);
     } catch (e) {
       console.log(e, 'load user merchant list');
     }
@@ -50,7 +49,6 @@ class DepartmentStore {
       runInAction('after load', () => {
         if (resp.code === '0' && resp.data) this.departmentList = [...resp.data];
       });
-      console.log(resp);
     } catch (e) {
       console.log(e, 'load merchant department list');
     }
@@ -74,7 +72,6 @@ export default class MerchantInfo extends React.Component {
     try {
       const require_userinfo = 1;
       const resp = await MerchantSvc.switchMerchant(id, require_userinfo);
-      console.log(resp);
       if (resp.code === '0') {
         this.props.user.update(resp.data);
         Toast.show('切换商户成功')
@@ -88,9 +85,13 @@ export default class MerchantInfo extends React.Component {
   render() {
     return (
       <div className="search-content">
-        <MerchantList headerTxt="已加入商户列表" listData={this.merchantListStore.merchantList} loading={this.merchantListStore.loading} switchMerchant={this.switchMerchant}/>
-        <MemberList headerTxt="当前商户成员" listData={this.memberStore.memberList} loading={this.memberStore.loading}/>
-        <DepartmentList headerTxt="部门" listData={this.departmentStore.departmentList} loading={this.departmentStore.loading}/>
+        <MerchantList headerTxt={`已加入商户列表(当前id: ${this.props.user.user.current.mer_id})`}
+                      listData={this.merchantListStore.merchantList} loading={this.merchantListStore.loading}
+                      switchMerchant={this.switchMerchant} currentUser={this.props.user.user.current}/>
+        <MemberList headerTxt="当前商户成员" listData={this.memberStore.memberList} loading={this.memberStore.loading}
+                    currentUser={this.props.user.user.current}/>
+        <DepartmentList headerTxt="部门" listData={this.departmentStore.departmentList} loading={this.departmentStore.loading}
+                        currentUser={this.props.user.user.current}/>
       </div>
     );
   }
@@ -107,7 +108,8 @@ const iconButtonElement = (
 );
 
 
-const MemberList = ({listData, headerTxt, loading}) => {
+const MemberList = ({listData, headerTxt, loading, currentUser}) => {
+  const isAdmin = currentUser && (currentUser.is_admin === 1);
   const openInviteDialog = () => BizDialog.onOpen('邀请用户', <DialogForm type='invite' hintTxt="请输入用户的账号" submitTxt="邀请"/>);
   return (
     <List className='search-list'>
@@ -126,8 +128,7 @@ const MemberList = ({listData, headerTxt, loading}) => {
                 rightIconButton={(
                   <IconMenu iconButtonElement={iconButtonElement}>
                     <MenuItem onTouchTap={() => {}}>查看</MenuItem>
-                    <MenuItem onTouchTap={() => {}}>复制账号</MenuItem>
-                    <MenuItem onTouchTap={() => {}}>移除</MenuItem>
+                    {isAdmin && <MenuItem onTouchTap={() => {}}>移除</MenuItem>}
                   </IconMenu>
                 )}
                 primaryText={item.username || `用户名: ${item.user_name}`}
@@ -139,15 +140,19 @@ const MemberList = ({listData, headerTxt, loading}) => {
           ))
         }
       </div>
-      <Divider inset={true} />
-      <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
-        <FlatButton label="邀请用户" primary={true} onTouchTap={openInviteDialog}/>
-      </div>
+      {
+        isAdmin && (
+          <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+            <Divider inset={true} />
+            <FlatButton label="邀请用户" primary={true} onTouchTap={openInviteDialog}/>
+          </div>
+        )
+      }
     </List>
   );
 };
 
-const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
+const MerchantList = ({listData, headerTxt, loading, switchMerchant, currentUser}) => {
   const openApplyDialog = () => BizDialog.onOpen('加入商户', <DialogForm type='apply' hintTxt="请输入商户的ID" submitTxt="申请"/>);
   return (
     <List className='search-list'>
@@ -163,12 +168,11 @@ const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
             <div key={index}>
               <ListItem
                 leftIcon={<MerchantIcon />}
-                rightIconButton={(
+                rightIconButton={(currentUser && !currentUser.is_admin) ? (
                   <IconMenu iconButtonElement={iconButtonElement}>
-                    <MenuItem onTouchTap={switchMerchant.bind(null, item.mer_id)}>切换至该商户</MenuItem>
-                    <MenuItem onTouchTap={() => {}}>退出</MenuItem>
+                    { <MenuItem onTouchTap={switchMerchant.bind(null, item.mer_id)}>切换至该商户</MenuItem>}
                   </IconMenu>
-                )}
+                ) : null}
                 primaryText={item.username || `商户名称: ${item.mer_name}`}
                 secondaryText={
                   <p>
@@ -183,15 +187,16 @@ const MerchantList = ({listData, headerTxt, loading, switchMerchant}) => {
           ))
         }
       </div>
-      <Divider inset={true} />
       <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+        <Divider inset={true} />
         <FlatButton label="加入商户" primary={true} onTouchTap={openApplyDialog}/>
       </div>
     </List>
   );
 };
 
-const DepartmentList = ({listData, headerTxt, loading}) => {
+const DepartmentList = ({listData, headerTxt, loading, currentUser}) => {
+  const isAdmin = currentUser && (currentUser.is_admin === 1);
   return (
     <List className='search-list'>
       <div style={{backgroundColor: '#FFF'}}>
@@ -226,10 +231,12 @@ const DepartmentList = ({listData, headerTxt, loading}) => {
           ))
         }
       </div>
-      <Divider inset={true} />
-      <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
-        <FlatButton label="添加部门" primary={true} />
-      </div>
+      {isAdmin && (
+        <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+          <Divider inset={true} />
+          <FlatButton label="添加部门" primary={true} />
+        </div>
+      )}
     </List>
   );
 };

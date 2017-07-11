@@ -5,7 +5,6 @@ import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
 import CircularProgress from 'material-ui/CircularProgress';
 import DatePicker from 'material-ui/DatePicker';
 import Dialog from 'material-ui/Dialog';
@@ -39,7 +38,7 @@ class AddBillState {
   @observable content = '';
   @observable priorityA = null;
   @observable priorityB = null;
-  @observable item_list = [{}, {}];
+  @observable item_list = [];
   @observable openMemberListDialog = false;
   @observable openAddItemDialog = false;
   @observable editingMaterial = {};
@@ -54,12 +53,22 @@ class AddBillState {
     return idArr.join(', ');
   }
 
+  @computed get priority() {
+    if (this.priorityA && this.priorityB) return `${this.priorityA}, ${this.priorityB}`;
+    if (this.priorityA) return this.priorityA;
+    if (this.priorityB) return this.priorityB;
+    return null;
+  }
+
   // constructor(bill = {}) {}
 
   @action setKey = (key, val) => this[key] = val;
   @action closeMemberDialog = () => this.openMemberListDialog = false;
   @action openMemberDialog = () => this.openMemberListDialog = true;
-  @action openItemDialog = () => this.openAddItemDialog = true;
+  @action openItemDialog = item => {
+    if (item) this.editingMaterial = item;
+    this.openAddItemDialog = true;
+  };
   @action closeItemDialog = () => this.openAddItemDialog = false;
 
   @action getBillNo = async () => {
@@ -93,12 +102,12 @@ class AddBillState {
       const pay_type = parseInt(this.pay_type, 10);
       const tax_flag = parseInt(this.tax_flag, 10);
       const tax_rate = parseFloat(this.tax_rate);
-      const priority = `${this.priorityA}, ${this.priorityB}`; // TODO check
       const notice_list = this.noticeIdStr;
-      console.log(this.valid_begin_time, this.valid_end_time);
+      const item_list = JSON.stringify(this.item_list.length ? [...this.item_list] : ['null']);
+      console.log(item_list);
       const resp = await BillSvc.create(bill_no, bill_type, relative_mer_id, this.currency, pay_type,
         tax_flag, tax_rate, this.valid_begin_time, this.valid_end_time, notice_list, this.content,
-        priority, this.item_list);
+        this.priority, item_list);
       console.log(resp);
       runInAction('after create bill', () => {
         if (resp.code === '0') {
@@ -121,11 +130,12 @@ class AddBillState {
     }
   };
 
-  @action addMaterialItem = item => this.item_list = this.item_list.push(item);
+  @action addMaterialItem = item => this.item_list = [...this.item_list, item];
   @action deleteMaterialItem = item => this.item_list = this.item_list.filter(raw => raw.id !== item.id);
   @action updateMaterialItem = item => {
     this.item_list.map(rawData => {
       if (rawData.id === item.id) return item;
+      return rawData;
     });
   }
 }
@@ -138,6 +148,7 @@ export default class AddBill extends React.PureComponent {
   componentWillMount() {
     MemberStore.load();
   }
+
   render() {
     const followArray = [...this.store.notice_list];
     return (
@@ -255,27 +266,36 @@ export default class AddBill extends React.PureComponent {
           <TableBody showRowHover displayRowCheckbox={false}>
             {this.store.item_list.map((item, key) => (
               <TableRow key={key}>
-                <TableHeaderColumn >{item.line_no}</TableHeaderColumn>
-                <TableHeaderColumn>{item.name}</TableHeaderColumn>
-                <TableHeaderColumn >{item.item_code}</TableHeaderColumn>
-                <TableHeaderColumn >{item.item_spec}</TableHeaderColumn>
-                <TableHeaderColumn >{item.unit}</TableHeaderColumn>
-                <TableHeaderColumn >{item.price}</TableHeaderColumn>
-                <TableHeaderColumn >
-                  <button>修改</button>
-                  <button>删除</button>
-                  {/*<FlatButton style={{}} label='修改'*/}
-                                {/*onClick={this.store.updateMaterialItem.bind(null, item)} />*/}
-                  {/*<FlatButton style={{}} label="删除"*/}
-                                {/*onClick={this.store.deleteMaterialItem.bind(null, item)} />*/}
-                </TableHeaderColumn>
+                <TableRowColumn >{item.line_no}</TableRowColumn>
+                <TableRowColumn>{item.name}</TableRowColumn>
+                <TableRowColumn>{item.item_code}</TableRowColumn>
+                <TableRowColumn>{item.item_spec}</TableRowColumn>
+                <TableRowColumn>{item.unit}</TableRowColumn>
+                <TableRowColumn>{item.price}</TableRowColumn>
+                <TableRowColumn>
+                  <button className="btn-material-action" onClick={e => {
+                    e.preventDefault();
+                    this.store.openItemDialog(item);
+                  }}>
+                    修改
+                  </button>
+                  <button className="btn-material-action" onClick={e => {
+                    e.preventDefault();
+                    this.store.deleteMaterialItem(item);
+                  }}>
+                    删除
+                  </button>
+                </TableRowColumn>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <FloatingActionButton mini={true} style={{marginTop: 20}} onTouchTap={this.store.openItemDialog}>
-          <ContentAdd />
-        </FloatingActionButton><br/>
+        <div style={{textAlign: 'right'}}>
+          <FloatingActionButton mini={true} style={{marginTop: 20}} onTouchTap={this.store.openItemDialog}>
+            <ContentAdd />
+          </FloatingActionButton>
+        </div>
+        <br/>
         <div style={{textAlign: 'right'}}>
           <RaisedButton style={{ marginTop: 20 }} label={this.store.submitting ? null : '确认'}
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
@@ -301,7 +321,7 @@ export default class AddBill extends React.PureComponent {
           </div>
         </Dialog>
         <Dialog
-          title='商户成员列表'
+          title='物料'
           titleStyle={{fontSize: 18}}
           modal={false}
           autoScrollBodyContent
@@ -309,7 +329,6 @@ export default class AddBill extends React.PureComponent {
           onRequestClose={this.store.closeItemDialog}>
           <AddMaterial material={this.store.editingMaterial}
                        onAdd={this.store.addMaterialItem}
-                       onDel={this.store.deleteMaterialItem}
                        onUpdate={this.store.updateMaterialItem}
                        onclose={this.store.closeItemDialog}/>
         </Dialog>

@@ -31,7 +31,6 @@ export default class Dashboard extends React.Component {
   };
   render() {
     const {routes, user} = this.props;
-    console.log(user.user.current);
     return (
       <div className="dashboard">
         <DashboardNav currentUser={user.user.current} logout={this.reLogin}/>
@@ -94,14 +93,19 @@ class DashboardNav extends React.Component {
 
   handleQuickCreateRequestClose = () => this.setState({ openQuickCreateMenu: false });
 
+  handleSwitchMerchant = () => {
+    BizDialog.onOpen('切换商户', <DialogForm type='switchMerchant' hintTxt="请输入切换的商户ID" submitTxt="切换"/>);
+  };
+
   render() {
     const {openQuickCreateMenu, quickCreateAnchorEl} = this.state;
     const {currentUser} = this.props;
-    const quickCreateAction = currentUser && currentUser.mer_id ? [
+    const quickCreateAction = currentUser && currentUser.is_admin ? [
       {name: "创建单据", action: this.addBill},
       {name: "邀请用户", action: this.inviteUser},
-      {name: "加入商户", action: this.handleOpenJoinMerchantDialog},
     ] : [
+      {name: "创建单据", action: this.addBill},
+      {name: "加入商户", action: this.handleOpenJoinMerchantDialog},
       {name: "创建商户", action: this.handleOpenCreateMerchantDialog},
     ];
     return (
@@ -138,7 +142,8 @@ class DashboardNav extends React.Component {
             </div>
             <div className="popover-menu">
               <RaisedButton label="查看个人资料" style={{width: 150}} onTouchTap={this.handleOpenProfileDialog}/>
-              <RaisedButton label="退出" style={{width: 150}} onTouchTap={this.props.logout}/>
+              {currentUser && !currentUser.is_admin && <RaisedButton label="切换商户" style={{width: 150}} onTouchTap={this.handleSwitchMerchant}/>}
+              <RaisedButton label="退出登录" style={{width: 150}} onTouchTap={this.props.logout}/>
             </div>
           </div>
         </div>

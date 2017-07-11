@@ -1,4 +1,5 @@
 import React from 'react';
+import {observer, inject} from 'mobx-react';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -6,6 +7,8 @@ import {BizDialog} from "../../components/Dialog";
 import {ToastStore} from "../../components/Toast";
 import merchantSvc from '../../services/merchant';
 
+@inject('user')
+@observer
 export default class DialogForm extends React.PureComponent {
   state = {value: '', submitting: false};
   render() {
@@ -19,6 +22,9 @@ export default class DialogForm extends React.PureComponent {
         break;
       case 'apply':
         onTouchTap = this.submitJoinMerchant;
+        break;
+      case 'switchMerchant':
+        onTouchTap = this.switchMerchant;
         break;
     }
     return (
@@ -64,6 +70,25 @@ export default class DialogForm extends React.PureComponent {
     } catch (e) {
       console.log(e, 'invite user');
       ToastStore.show('抱歉，发生未知错误，请稍后重试');
+    }
+    this.setState({ submitting: false });
+  };
+
+  switchMerchant = async (e) => {
+    e.preventDefault();
+    const {submitting, value} = this.state;
+    if (submitting) return;
+    this.setState({ submitting: true });
+    try {
+      const require_userinfo = 1;
+      const resp = await merchantSvc.switchMerchant(value, require_userinfo);
+      if (resp.code === '0') {
+        this.props.user.update(resp.data);
+        ToastStore.show('切换商户成功')
+      } else ToastStore.show(resp.msg || '切换商户失败，请稍后重试');
+    } catch (e) {
+      console.log(e, 'switch merchant');
+      ToastStore.show('切换商户失败，请稍后重试')
     }
     this.setState({ submitting: false });
   };

@@ -17,7 +17,6 @@ class Partners {
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
       const resp = await BaseSvc.getPartnerList(pageNo, this.pageSize);
-      console.log(resp, 'Partners');
       runInAction('after load ds', () => {
         if (resp.code === '0' && resp.data.list) {
           this.DS = this.pageNo > 1 ? [...this.DS, ...resp.data.list] : [...resp.data.list];

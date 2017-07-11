@@ -46,8 +46,10 @@ const updateDepartment = async (id, name, parent_id, remark) => {
   return resp.data;
 };
 
-const addItem = async (name, item_code, item_spec, unit, price) => {
-  const resp = await axios.post('/base_gateway/add_item', {name, item_code, item_spec, unit, price});
+const addItem = async (name, line_no, item_code, item_spec, unit, price,
+  quantity, deliver_time) => {
+  const resp = await axios.post('/base_gateway/add_item', {name, line_no, item_code, item_spec, unit, price,
+    quantity, deliver_time});
   return resp.data;
 };
 

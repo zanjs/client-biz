@@ -117,6 +117,7 @@ export default class AddMerchant extends React.Component {
     return (
         <div className="add-merchant">
           <form onSubmit={this.submit} style={{paddingTop: 10}}>
+            <p>(提示：创建商户后, 当前用户将不能切换至其他商户！)</p>
             <TextField
               hintText="商户名称"
               value={mer_name}

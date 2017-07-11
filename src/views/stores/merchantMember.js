@@ -12,7 +12,6 @@ class MerchantMemberStore {
       runInAction('after load', () => {
         if (resp.code === '0' && resp.data) this.memberList = [...resp.data];
       });
-      console.log(resp);
     } catch (e) {
       console.log(e, 'load merchant member list');
     }

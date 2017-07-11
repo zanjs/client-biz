@@ -16,12 +16,13 @@ class AddMaterialState {
   @observable unit = '';
   @observable price = 0;
   @observable quantity = 0;
+  @observable deliver_time = null;
   @observable submitting = false;
   @observable submitType = this.SubmitType.ADD;
   id = null;
 
   constructor(material = {}) {
-    this.name = material.item_name || '';
+    this.name = material.name || '';
     this.line_no = material.line_no || '';
     this.item_code = material.item_code || '';
     this.item_spec = material.item_spec || '';
@@ -46,16 +47,17 @@ class AddMaterialState {
   }
 
   @action setKey = (key, val) => this[key] = val;
-  @action submit = async (onCloseCallback) => {
+  @action submit = async (onCloseCallback, onAddCallBack) => {
     if (this.submitting || !this.validated) return;
     this.submitting = true;
     try {
-      const resp = await BaseSvc.addItem(this.name, this.line_no, this.item_code, this.item_spec, this.unit, this.price,
-        this.quantity);
-      console.log(resp);
+      const price = parseFloat(this.price);
+      const resp = await BaseSvc.addItem(this.name, this.line_no, this.item_code, this.item_spec, this.unit, price,
+        this.quantity, this.deliver_time);
       runInAction('after submit add', () => {
         if (resp.code === '0') {
           Toast.show('创建成功');
+          onAddCallBack && onAddCallBack(resp.data);
         }
         else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
       })
@@ -67,16 +69,16 @@ class AddMaterialState {
     this.submitting = false;
   };
 
-  @action update = async (onCloseCallback) => {
+  @action update = async (onCloseCallback, onAddCallback, onUpdateCallback) => {
     if (this.submitting || !this.validated) return;
     this.submitting = true;
     try {
       const resp = await BaseSvc.updateItem(this.id, this.name, this.line_no, this.item_code, this.item_spec, this.unit, this.price,
         this.quantity);
-      console.log(resp);
       runInAction('after submit add', () => {
         if (resp.code === '0') {
           Toast.show('修改成功');
+          // onUpdateCallback && onUpdateCallback(resp.data);
         }
         else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
       })
@@ -115,24 +117,26 @@ class AddPartner extends React.PureComponent {
                    value={this.store.item_spec} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('item_spec', value)}/>
         <TextField floatingLabelText="数量"
+                   type="number"
                    value={this.store.quantity} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('quantity', parseInt(value, 10))}/>
         <TextField floatingLabelText="单位"
-                   defaultValue={this.store.unit} style={{marginRight: 20}}
+                   value={this.store.unit} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('unit', value)}/>
         <TextField floatingLabelText="单价"
+                   type="number"
                    value={this.store.price} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('price', parseFloat(value).toFixed(2))}/>
         <TextField floatingLabelText="金额" readOnly style={{marginRight: 20}}
-                   value={this.store.quantity * this.store.price}/>
+                   value={((this.store.quantity || 0) * (this.store.price || 0)).toFixed(2)}/>
         <DatePicker floatingLabelText="交期/收货" style={{marginRight: 20}}
-                    defaultDate={this.store.deliver_time && new Date(this.store.deliver_time)}
-                    onChange={(e, value) => this.store.deliver_time = new Date(value).getTime()}/>
+                    defaultDate={this.store.deliver_time ? new Date(this.store.deliver_time) : new Date()}
+                    onChange={(e, value) => this.store.setKey('deliver_time', new Date(value).getTime()) }/>
         <div style={{textAlign: 'right'}}>
           <RaisedButton style={{ marginTop: 20 }} label={this.store.submitting ? null : submitTxt}
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
                         primary={!!this.store.validated} disabled={!this.store.validated}
-                        onClick={submitAction.bind(null, this.props.onclose)} />
+                        onClick={submitAction.bind(null, this.props.onclose, this.props.onAdd, this.props.onUpdate)} />
           <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label="取消"
                         primary={false} onClick={this.props.onclose} />
         </div>

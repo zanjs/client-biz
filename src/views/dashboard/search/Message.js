@@ -104,20 +104,21 @@ class inviteMessageStore {
       let service = null;
       switch (type) {
         default: return;
-        case this.serviceType.ACCEPT: service = MerchantSvc.acceptUserApply; break;
-        case this.serviceType.REFUSE: service = MerchantSvc.refuseUserApply; break;
+        case this.serviceType.ACCEPT: service = MerchantSvc.acceptMerchantInvite; break;
+        case this.serviceType.REFUSE: service = MerchantSvc.refuseMerchantInvite; break;
       }
       const resp = await service(id);
       console.log(resp, type);
       runInAction('after accept', () => {
         if (resp.code === '0') {
           this.messages = [...this.messages.filter(m => m.id !== id)]
+          Toast.show('已同意加入该商户');
         } else {
           Toast.show(resp.msg || '抱歉，提交失败，请稍后重试');
         }
       });
     } catch (e) {
-      console.log(e, 'accept user apply');
+      console.log(e, 'handle invite error');
       Toast.show('抱歉，发生未知错误，请稍后重试');
     }
     this.submitting = false;
@@ -199,16 +200,18 @@ const MessageList = ({listData, loading, serviceAction, actionType, type}) => {
 @inject('user')
 @observer
 export default class Message extends React.Component {
-  isAdmin = this.props.user.user.current && (this.props.user.user.current.is_admin === 1);
-  notJoinMerchant = !(this.props.user.user.current && this.props.user.user.current.mer_id);
-  applyStore = this.isAdmin && new applyMessageStore();
-  inviteStore = this.notJoinMerchant && new inviteMessageStore();
+  // isAdmin = this.props.user.user.current && (this.props.user.user.current.is_admin === 1);
+  // notJoinMerchant = !(this.props.user.user.current && this.props.user.user.current.mer_id);
+  applyStore = new applyMessageStore();
+  inviteStore = new inviteMessageStore();
 
   componentWillMount() {
     const currentUser = this.props.user.user.current;
     if (!this.props.user.user.current) return;
-    if (this.isAdmin) this.applyStore.load(currentUser.mer_id);
-    if (this.notJoinMerchant) this.inviteStore.load(currentUser.id);
+    this.applyStore.load(currentUser.mer_id);
+    this.inviteStore.load(currentUser.id);
+    // if (this.isAdmin) this.applyStore.load(currentUser.mer_id);
+    // if (this.notJoinMerchant) this.inviteStore.load(currentUser.id);
   }
 
   render() {
@@ -216,7 +219,7 @@ export default class Message extends React.Component {
       <div className="search-content">
         <MessageList listData={this.applyStore.applyDS} loading={this.applyStore.loading} type={MessageType.APPLY}
                      serviceAction={this.applyStore.applyAction} actionType={this.applyStore.serviceType}/>
-        <MessageList listData={this.inviteStore.messages} loading={this.inviteStore.loading} type={MessageType.INVITE}
+        <MessageList listData={this.inviteStore.inviteDS} loading={this.inviteStore.loading} type={MessageType.INVITE}
                      serviceAction={this.inviteStore.handleInviteAction} actionType={this.inviteStore.serviceType}/>
         <div style={{flex: 1}}/>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import {observable, computed, action, runInAction} from 'mobx';
 import FontIcon from 'material-ui/FontIcon';
 import {List, ListItem} from 'material-ui/List';
@@ -39,7 +39,6 @@ class Invitations {
     this.loading = true;
     try {
       const resp = await PartnerSvc.getInviteList();
-      console.log(resp, 'partner invite');
       runInAction('after load invite', () => {
         if (resp.code === '0' && resp.data) {
           this.rawDS = resp.data;
@@ -58,7 +57,6 @@ class Invitations {
     try {
       const id = item.src_mer_id;
       const resp = await PartnerSvc.accept(id);
-      console.log(resp, 'accept invite');
       runInAction('after accept', () => {
         if (resp.code === '0') {
           this.rawDS = this.rawDS.filter(item => item.src_mer_id !== id);
@@ -79,7 +77,6 @@ class Invitations {
     try {
       const id = item.src_mer_id;
       const resp = await PartnerSvc.refuse(id);
-      console.log(resp, 'refuse invite');
       runInAction('after refuse', () => {
         if (resp.code === '0') {
           this.rawDS = this.rawDS.filter(item => item.src_mer_id !== id);
@@ -97,14 +94,17 @@ class Invitations {
 
 const InvitationStore = new Invitations();
 
+@inject('user')
 @observer
 export default class Partner extends React.PureComponent {
   state={};
   partners = partnerStore;
   invitations = InvitationStore;
   componentWillMount() {
+    const {current} = this.props.user.user;
+    const isAdmin = current && (current.is_admin === 1);
     this.partners.load();
-    this.invitations.load();
+    if (isAdmin) this.invitations.load();
   }
   TabBar = () => {
     return (
@@ -118,12 +118,14 @@ export default class Partner extends React.PureComponent {
   };
 
   render() {
+    const {current} = this.props.user.user;
+    const isAdmin = current && (current.is_admin === 1);
     return (
       <div style={{flex: 1}}>
         <this.TabBar />
         <div className="main-board">
-          <DataList type={ListType.PARTNERS} listData={this.partners.DS} loading={this.partners.loading}/>
-          <DataList type={ListType.INVITE} listData={this.invitations.DS} loading={this.invitations.loading}/>
+          <DataList type={ListType.PARTNERS} listData={this.partners.DS} loading={this.partners.loading} currentUser={current}/>
+          {isAdmin && <DataList type={ListType.INVITE} listData={this.invitations.DS} loading={this.invitations.loading}/>}
         </div>
       </div>
     );
@@ -141,24 +143,24 @@ const iconButtonElement = (
 );
 
 const getPartnerType = type => {
-  switch (type) {
-    case 1: return '多个送达方';
-    case 2: return '付款方';
-    case 3: return '开票方';
-    default: return '未设定';
-  }
+  let str = type;
+  str = str.replace('SHIPTO', '送达方');
+  str = str.replace('PAYER', '付款方');
+  str = str.replace('DRAWER', '开票方');
+  return str;
 };
 
 const getPartnerFlag = flag => {
   switch (flag) {
-    case 1: return '客户';
-    case 2: return '供应商';
-    case 3: return '客户、供应商';
+    case 'CUSTOMER': return '客户';
+    case 'SUPPLIER': return '供应商';
+    case 'CUSTOMER,SUPPLIER': return '客户、供应商';
     default: return '未设定';
   }
 };
 
-const DataList = ({listData, loading, type}) => {
+const DataList = ({listData, loading, type, currentUser}) => {
+  const isAdmin = currentUser && (currentUser.is_admin === 1);
   let headerTxt = '';
   let messageA = '';
   let primaryTxtTip = '';
@@ -173,8 +175,8 @@ const DataList = ({listData, loading, type}) => {
       primaryTxtTip = '商户名（内部）';
       leftIcon = <PartnerIcon />;
       menuItem = [
-        {name: '查看/修改资料', action: partner => BizDialog.onOpen('合作伙伴详情', <AddPartner partner={partner}/>)},
-        {name: '解除合作关系', action: partner => BizDialog.onOpen('确认解除？', <ComfirmAction partner={partner}/>)}
+        {name: isAdmin ? '查看/修改资料' : '查看资料', action: partner => BizDialog.onOpen('合作伙伴详情', <AddPartner partner={partner}/>)},
+        // {name: '解除合作关系', action: partner => BizDialog.onOpen('确认解除？', <ComfirmAction partner={partner}/>)}
       ];
       break;
     case ListType.INVITE:
@@ -225,7 +227,7 @@ const DataList = ({listData, loading, type}) => {
           ))
         }
       </div>
-      {!isInvite && (
+      {!isInvite && isAdmin && (
         <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
           <Divider inset={true} />
           <FlatButton label="添加合作伙伴" primary={true} onTouchTap={handleAddPartner}/>
@@ -235,10 +237,10 @@ const DataList = ({listData, loading, type}) => {
   );
 };
 
-const ComfirmAction = ({partner}) => (
-  <div>
-    <RaisedButton label="确定" primary={true} style={{width: '40%', marginRight: '15%'}}
-                  onTouchTap={partnerStore.delete.bind(null, partner)}/>
-    <RaisedButton label="取消" secondary={true} style={{width: '40%'}} onTouchTap={BizDialog.onClose}/>
-  </div>
-);
+// const ComfirmAction = ({partner}) => (
+//   <div>
+//     <RaisedButton label="确定" primary={true} style={{width: '40%', marginRight: '15%'}}
+//                   onTouchTap={partnerStore.delete.bind(null, partner)}/>
+//     <RaisedButton label="取消" secondary={true} style={{width: '40%'}} onTouchTap={BizDialog.onClose}/>
+//   </div>
+// );
