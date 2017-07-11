@@ -22,15 +22,16 @@ class AddMaterialState {
   id = null;
 
   constructor(material = {}) {
-    this.name = material.name || '';
+    this.name = material.item_name || '';
     this.line_no = material.line_no || '';
     this.item_code = material.item_code || '';
     this.item_spec = material.item_spec || '';
     this.unit = material.unit || '';
     this.price = material.price || 0;
     this.quantity = material.quantity || 0;
-    this.id = material.id;
-    this.submitType = material.id ? this.SubmitType.MODIFY : this.SubmitType.ADD;
+    this.id = material.item_id;
+    this.deliver_time = material.deliver_time || Date.now();
+    this.submitType = material.item_id ? this.SubmitType.MODIFY : this.SubmitType.ADD;
   }
 
   SubmitType = {
@@ -39,9 +40,13 @@ class AddMaterialState {
   };
 
   @computed get validated() {
+    let lineNoValidated = true;
+    if (this.line_no || this.line_no === 0) {
+      lineNoValidated = !(this.line_no < 10 || (this.line_no % 10 !== 0));
+    }
     switch (this.submitType) {
-      case this.SubmitType.ADD: return !!this.name;
-      case this.SubmitType.MODIFY: return !!this.id;
+      case this.SubmitType.ADD: return !!this.name && lineNoValidated;
+      case this.SubmitType.MODIFY: return !!this.id && lineNoValidated;
       default: return false;
     }
   }
@@ -57,6 +62,9 @@ class AddMaterialState {
       runInAction('after submit add', () => {
         if (resp.code === '0') {
           Toast.show('创建成功');
+          resp.data.line_no = this.line_no;
+          resp.data.quantity = this.quantity;
+          resp.data.deliver_time = this.deliver_time;
           onAddCallBack && onAddCallBack(resp.data);
         }
         else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
@@ -77,10 +85,20 @@ class AddMaterialState {
         this.quantity);
       runInAction('after submit add', () => {
         if (resp.code === '0') {
-          Toast.show('修改成功');
           // onUpdateCallback && onUpdateCallback(resp.data);
         }
         else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
+      });
+      if (!this.id || resp.code !== '0') return;
+      const data = await BaseSvc.getItem(this.id);
+      runInAction('after load item detail', () => {
+        if (data.code === '0' && onUpdateCallback) {
+          data.data[0].line_no = this.line_no;
+          data.data[0].quantity = this.quantity;
+          data.data[0].deliver_time = this.deliver_time;
+          onUpdateCallback(data.data[0]);
+          Toast.show('修改成功');
+        } else Toast.show(data.msg || '抱歉，发生未知错误，请稍后重试');
       })
     } catch (e) {
       console.log(e, 'submit material item');
@@ -96,8 +114,8 @@ class AddPartner extends React.PureComponent {
   store = new AddMaterialState(this.props.material);
   render() {
     const {material} = this.props;
-    const submitTxt = material.id ? '修改' : '创建';
-    const submitAction = material.id ? this.store.update : this.store.submit;
+    const submitTxt = material.item_id ? '修改' : '创建';
+    const submitAction = material.item_id ? this.store.update : this.store.submit;
     return (
       <form onSubmit={submitAction}>
         <TextField floatingLabelText="物料名称"
@@ -106,9 +124,10 @@ class AddPartner extends React.PureComponent {
         <TextField floatingLabelText="自定义物料编码"
                    value={this.store.item_code} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('item_code', value)}/>
-        <TextField floatingLabelText="行号"
+        <TextField floatingLabelText="行号（10的整数倍数）"
+                   type="number"
                    value={this.store.line_no} style={{marginRight: 20}}
-                   onChange={(e, value) => this.store.setKey('line_no', value)}/>
+                   onChange={(e, value) => this.store.setKey('line_no', value ? parseInt(value, 10) : '')}/>
         {/*{detail.type === DetailContentType.SALE_ORDER && <TextField floatingLabelText="客户物料号"*/}
                                                                     {/*className="edit-field"*/}
                                                                     {/*defaultValue={this.focusGoodData && this.focusGoodData.client_goods_no}*/}
@@ -119,14 +138,14 @@ class AddPartner extends React.PureComponent {
         <TextField floatingLabelText="数量"
                    type="number"
                    value={this.store.quantity} style={{marginRight: 20}}
-                   onChange={(e, value) => this.store.setKey('quantity', parseInt(value, 10))}/>
+                   onChange={(e, value) => this.store.setKey('quantity', value ? parseFloat(value) : '')}/>
         <TextField floatingLabelText="单位"
                    value={this.store.unit} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('unit', value)}/>
         <TextField floatingLabelText="单价"
                    type="number"
                    value={this.store.price} style={{marginRight: 20}}
-                   onChange={(e, value) => this.store.setKey('price', parseFloat(value).toFixed(2))}/>
+                   onChange={(e, value) => this.store.setKey('price', value ? parseFloat(value).toFixed(2) : '')}/>
         <TextField floatingLabelText="金额" readOnly style={{marginRight: 20}}
                    value={((this.store.quantity || 0) * (this.store.price || 0)).toFixed(2)}/>
         <DatePicker floatingLabelText="交期/收货" style={{marginRight: 20}}

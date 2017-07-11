@@ -36,6 +36,8 @@ export const DetailContentType = {
   APPEAL: 1,
   PROCUREMENT_ORDER: 2,
   SALE_ORDER: 3,
+  MAIL: 4,
+  DETAIL: 5,
 };
 
 export const CurrencyType = {

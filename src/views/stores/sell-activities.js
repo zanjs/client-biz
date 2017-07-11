@@ -12,8 +12,8 @@ class SellActivitiesStore {
       hasMore: true,
       unReadListDS: computed(() => this.messageList.filter(item => !item.read_flag)),
       isReadListDS: computed(() => this.messageList.filter(item => item.read_flag === 1)),
-      inChargeListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').current.id))),
-      participantListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id !== Storage.getValue('user').current.id))),
+      inChargeListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id === Storage.getValue('user').id))),
+      participantListDS: computed(() => this.messageList.filter(item => !item.read_flag && (item.user_id !== Storage.getValue('user').id))),
     });
   }
   pageSize = 20;

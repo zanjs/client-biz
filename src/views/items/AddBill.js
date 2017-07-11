@@ -30,14 +30,13 @@ class AddBillState {
   @observable relative_mer_id = '';
   @observable currency = null;
   @observable pay_type = null;
-  @observable tax_flag = null;
+  @observable tax_flag = 0;
   @observable tax_rate = '';
   @observable valid_begin_time = '';
   @observable valid_end_time = '';
   @observable notice_list = [];
   @observable content = '';
-  @observable priorityA = null;
-  @observable priorityB = null;
+  @observable priority = [];
   @observable item_list = [];
   @observable openMemberListDialog = false;
   @observable openAddItemDialog = false;
@@ -53,14 +52,37 @@ class AddBillState {
     return idArr.join(', ');
   }
 
-  @computed get priority() {
-    if (this.priorityA && this.priorityB) return `${this.priorityA}, ${this.priorityB}`;
-    if (this.priorityA) return this.priorityA;
-    if (this.priorityB) return this.priorityB;
-    return null;
+  @computed get validated() {
+    const taxRateValidated = this.tax_flag ? !!this.tax_rate : true;
+    const defaultValidated = !!this.bill_type && !!this.relative_mer_id;
+    let termsValidated = false;
+    let itemListValidated = true;
+    switch (this.bill_type) {
+      default: return false;
+      case 2:
+        termsValidated = !!this.currency && !!this.pay_type && !!this.tax_flag && !!this.item_list.length;
+        this.item_list.forEach(item => {
+          if (!(item.item_code && item.quantity && item.line_no)) {
+            itemListValidated = false;
+          }
+        });
+        return defaultValidated && taxRateValidated && termsValidated && itemListValidated;
+      case 3:
+        termsValidated = !!this.item_list.length;
+        this.item_list.forEach(item => {
+          if (!(item.item_code && item.quantity && item.line_no && item.item_name && item.price)) {
+            itemListValidated = false;
+          }
+        });
+        return defaultValidated && taxRateValidated && termsValidated && itemListValidated;
+      case 4:
+        termsValidated = !!this.valid_begin_time && !!this.valid_end_time && !!this.content;
+        return defaultValidated && termsValidated;
+      case 1:
+        termsValidated = !!this.content;
+        return defaultValidated && termsValidated;
+    }
   }
-
-  // constructor(bill = {}) {}
 
   @action setKey = (key, val) => this[key] = val;
   @action closeMemberDialog = () => this.openMemberListDialog = false;
@@ -78,7 +100,6 @@ class AddBillState {
     try {
       const key = '9deb17fa79572cdbe980ff9257009edd7fdb8a50';
       const resp = await BillSvc.getBillNo(key);
-      console.log(resp);
       runInAction('after get no', () => {
         if (resp.code === '0') {
           bill_no = resp.data.bill_no;
@@ -92,7 +113,7 @@ class AddBillState {
   };
 
   @action submit = async () => {
-    if (this.submitting) return;
+    if (this.submitting || !this.validated) return;
     this.submitting = true;
     try {
       const bill_no = await this.getBillNo();
@@ -104,11 +125,10 @@ class AddBillState {
       const tax_rate = parseFloat(this.tax_rate);
       const notice_list = this.noticeIdStr;
       const item_list = JSON.stringify(this.item_list.length ? [...this.item_list] : ['null']);
-      console.log(item_list);
+      const priority = this.priority.slice(0, 2).join(',');
       const resp = await BillSvc.create(bill_no, bill_type, relative_mer_id, this.currency, pay_type,
         tax_flag, tax_rate, this.valid_begin_time, this.valid_end_time, notice_list, this.content,
-        this.priority, item_list);
-      console.log(resp);
+        priority, item_list);
       runInAction('after create bill', () => {
         if (resp.code === '0') {
           Toast.show('创建成功');
@@ -131,12 +151,12 @@ class AddBillState {
   };
 
   @action addMaterialItem = item => this.item_list = [...this.item_list, item];
-  @action deleteMaterialItem = item => this.item_list = this.item_list.filter(raw => raw.id !== item.id);
+  @action deleteMaterialItem = item => this.item_list = this.item_list.filter(raw => raw.item_id !== item.item_id);
   @action updateMaterialItem = item => {
-    this.item_list.map(rawData => {
-      if (rawData.id === item.id) return item;
-      return rawData;
-    });
+    const index = this.item_list.findIndex(r => r.item_id === item.item_id);
+    if (index > -1) {
+      this.item_list[index] = item;
+    }
   }
 }
 
@@ -151,17 +171,18 @@ export default class AddBill extends React.PureComponent {
 
   render() {
     const followArray = [...this.store.notice_list];
+    const tableRowStyle = {padding: 0};
     return (
       <form onSubmit={this.store.submit}>
         <TextField
-          floatingLabelText="合作商户ID"
+          floatingLabelText="合作商户ID（必填）"
           value={this.store.relative_mer_id}
           type="number"
           onChange={e => this.store.setKey('relative_mer_id', e.target.value)}
           style={{marginRight: 20}}
         /><br/>
         <SelectField
-          floatingLabelText="单据类型"
+          floatingLabelText="单据类型（必选）"
           value={this.store.bill_type}
           style={{marginRight: 20}}
           onChange={(event, index, val) => this.store.setKey('bill_type', val)}
@@ -172,7 +193,7 @@ export default class AddBill extends React.PureComponent {
           <MenuItem value={4} primaryText="协议" />
         </SelectField>
         <SelectField
-          floatingLabelText="汇率"
+          floatingLabelText={`汇率${this.store.bill_type === 2 ? '（必选）' : ''}`}
           value={this.store.currency}
           style={{marginRight: 20}}
           onChange={(event, index, val) => this.store.setKey('currency', val)}
@@ -183,7 +204,7 @@ export default class AddBill extends React.PureComponent {
           <MenuItem value='JPY' primaryText='JPY' />
         </SelectField>
         <SelectField
-          floatingLabelText="付款方式"
+          floatingLabelText={`付款方式${this.store.bill_type === 2 ? '（必选）' : ''}`}
           value={this.store.pay_type}
           style={{marginRight: 20}}
           onChange={(event, index, val) => this.store.setKey('pay_type', val)}
@@ -192,7 +213,7 @@ export default class AddBill extends React.PureComponent {
           <MenuItem value={2} primaryText='月结' />
         </SelectField>
         <SelectField
-          floatingLabelText="含税标志"
+          floatingLabelText={`含税标志${this.store.bill_type === 2 ? '（必选）' : ''}`}
           value={this.store.tax_flag}
           style={{marginRight: 20}}
           onChange={(event, index, val) => this.store.setKey('tax_flag', val)}
@@ -201,18 +222,18 @@ export default class AddBill extends React.PureComponent {
           <MenuItem value={1} primaryText='含税' />
         </SelectField>
         {!!this.store.tax_flag && <TextField
-          floatingLabelText="税率"
+          floatingLabelText="税率（必填）"
           value={this.store.tax_rate}
           type="number"
           onChange={e => this.store.setKey('tax_rate', e.target.value)}
           style={{marginRight: 20}}
         />}<br/>
-        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效开始时间"
-                                                   onChange={(e, value) => this.store.setKey('valid_begin_time', value)}/>}
-        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效结束时间"
-                                                   onChange={(e, value) => this.store.setKey('valid_end_time', value)}/>}
+        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效开始时间（必填）"
+                                                   onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>}
+        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效结束时间（必填）"
+                                                   onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>}
         <TextField
-          floatingLabelText="单据文字内容"
+          floatingLabelText={`单据文字内容${(this.store.bill_type === 1 || this.store.bill_type === 4) ? '（必填）' : ''}`}
           value={this.store.content}
           type="text"
           multiLine={true}
@@ -222,24 +243,24 @@ export default class AddBill extends React.PureComponent {
           style={{marginRight: 20}}
         /><br/>
         <SelectField
-          floatingLabelText="重要度"
-          value={this.store.priorityA}
+          floatingLabelText="优先级(最多2个)"
+          value={this.store.priority}
           style={{marginRight: 20}}
-          onChange={(event, index, val) => this.store.setKey('priorityA', val)}
+          multiple={true}
+          onChange={(event, index, val) => this.store.setKey('priority', val)}
         >
-          <MenuItem value='NOT_IMPORTENT' primaryText='不重要' />
-          <MenuItem value='NORMAL' primaryText='正常' />
-          <MenuItem value='IMPORTENT' primaryText='重要' />
-          <MenuItem value='VERY_IMPORTENT' primaryText='非常重要' />
-        </SelectField>
-        <SelectField
-          floatingLabelText="紧急度"
-          value={this.store.priorityB}
-          style={{marginRight: 20}}
-          onChange={(event, index, val) => this.store.setKey('priorityB', val)}
-        >
-          <MenuItem value='HURRY' primaryText='紧急' />
-          <MenuItem value='VERY_HURRY' primaryText='非常紧急' />
+          <MenuItem value='NOT_IMPORTENT' primaryText='不重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('NOT_IMPORTENT') > -1}/>
+          <MenuItem value='NORMAL' primaryText='正常' insetChildren={true}
+                    checked={this.store.priority.indexOf('NORMAL') > -1}/>
+          <MenuItem value='IMPORTENT' primaryText='重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('IMPORTENT') > -1}/>
+          <MenuItem value='VERY_IMPORTENT' primaryText='非常重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('VERY_IMPORTENT') > -1}/>
+          <MenuItem value='HURRY' primaryText='紧急' insetChildren={true}
+                    checked={this.store.priority.indexOf('HURRY') > -1}/>
+          <MenuItem value='VERY_HURRY' primaryText='非常紧急' insetChildren={true}
+                    checked={this.store.priority.indexOf('VERY_HURRY') > -1}/>
         </SelectField><br/>
         <TextField
           floatingLabelText="单据关注人列表"
@@ -254,25 +275,27 @@ export default class AddBill extends React.PureComponent {
         <Table>
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>
-              <TableHeaderColumn >行号</TableHeaderColumn>
-              <TableHeaderColumn>物料名称</TableHeaderColumn>
-              <TableHeaderColumn >物料编码</TableHeaderColumn>
-              <TableHeaderColumn >物料规格</TableHeaderColumn>
-              <TableHeaderColumn >单位</TableHeaderColumn>
-              <TableHeaderColumn >单价</TableHeaderColumn>
-              <TableHeaderColumn >操作</TableHeaderColumn>
+              <TableHeaderColumn style={{...tableRowStyle, width: 50}}>行号</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>物料名称</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>物料编码</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>物料规格</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>单位</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>单价</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>数量</TableHeaderColumn>
+              <TableHeaderColumn style={tableRowStyle}>操作</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody showRowHover displayRowCheckbox={false}>
             {this.store.item_list.map((item, key) => (
               <TableRow key={key}>
-                <TableRowColumn >{item.line_no}</TableRowColumn>
-                <TableRowColumn>{item.name}</TableRowColumn>
-                <TableRowColumn>{item.item_code}</TableRowColumn>
-                <TableRowColumn>{item.item_spec}</TableRowColumn>
-                <TableRowColumn>{item.unit}</TableRowColumn>
-                <TableRowColumn>{item.price}</TableRowColumn>
-                <TableRowColumn>
+                <TableRowColumn style={{...tableRowStyle, width: 50}}>{item.line_no}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.item_name}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.item_code}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.item_spec}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.unit}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.price}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>{item.quantity}</TableRowColumn>
+                <TableRowColumn style={tableRowStyle}>
                   <button className="btn-material-action" onClick={e => {
                     e.preventDefault();
                     this.store.openItemDialog(item);
@@ -296,11 +319,20 @@ export default class AddBill extends React.PureComponent {
           </FloatingActionButton>
         </div>
         <br/>
+        <div>
+          <p style={{marginTop: 15, fontSize: 14, color: '#CCC'}}>提示：</p>
+          <p style={{fontSize: 12, color: '#CCC'}}>
+            单据类型为询报价单时，物料行物料编码、行号、数量为必填；
+          </p>
+          <p style={{fontSize: 12, color: '#CCC'}}>
+            单据类型为采购订单时，物料行名称、物料编码、行号、单价、数量为必填。
+          </p>
+        </div>
         <div style={{textAlign: 'right'}}>
           <RaisedButton style={{ marginTop: 20 }} label={this.store.submitting ? null : '确认'}
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
-                        primary={!!(this.store.bill_type && this.store.relative_mer_id)}
-                        disabled={!(this.store.bill_type && this.store.relative_mer_id)}
+                        primary={this.store.validated}
+                        disabled={!this.store.validated}
                         onClick={this.store.submit} />
           <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label="取消"
                         primary={false} onClick={BizDialog.onClose} />

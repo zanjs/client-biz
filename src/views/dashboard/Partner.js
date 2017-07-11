@@ -14,7 +14,6 @@ import MailIcon from 'material-ui/svg-icons/content/mail';
 import PartnerIcon from 'material-ui/svg-icons/social/group';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import {ToastStore as Toast} from "../../components/Toast";
 import PartnerSvc from "../../services/partner";
 import {BizDialog} from "../../components/Dialog";

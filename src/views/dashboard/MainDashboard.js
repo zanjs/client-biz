@@ -15,7 +15,7 @@ export default class MainDashboard extends React.PureComponent {
     tabValue: 0,
     openDrawer: false,
     drawerWidth: 0,
-    detailId: null,
+    message: null,
   };
 
   handleTabsChange = tabValue => this.setState({ tabValue });
@@ -54,26 +54,28 @@ export default class MainDashboard extends React.PureComponent {
       default: return;
     }
   };
-  openDetailDrawer = (detailType, detailId) => {
+  openDetailDrawer = (detailType, message) => {
     let drawerWidth = 0;
     switch (detailType) {
       default: return;
       case DetailContentType.ANNOUNCE:
       case DetailContentType.APPEAL:
+      case DetailContentType.MAIL:
         drawerWidth = 500;
         break;
       case DetailContentType.PROCUREMENT_ORDER:
       case DetailContentType.SALE_ORDER:
+      case DetailContentType.DETAIL:
         drawerWidth = 620;
         break;
     }
-    this.setState({openDrawer: true, drawerWidth, detailId});
+    this.setState({openDrawer: true, drawerWidth, message});
   };
 
   closeDetailDrawer = () => this.setState({openDrawer: false, drawerWidth: 0, detailId: null});
 
   render() {
-    const {detailId, drawerWidth, openDrawer} = this.state;
+    const {message, drawerWidth, openDrawer} = this.state;
     return (
       <div className="work-panel">
         <this.TabBar/>
@@ -85,7 +87,9 @@ export default class MainDashboard extends React.PureComponent {
           docked={false}
           overlayStyle={{backgroundColor: 'transparent'}}
           onRequestChange={open => this.setState({openDrawer: open})}>
-          <Detail id={detailId} close={this.closeDetailDrawer}/>
+          {
+            message && <Detail message={message} close={this.closeDetailDrawer}/>
+          }
         </Drawer>
       </div>
     );

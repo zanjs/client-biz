@@ -46,15 +46,14 @@ const updateDepartment = async (id, name, parent_id, remark) => {
   return resp.data;
 };
 
-const addItem = async (name, line_no, item_code, item_spec, unit, price,
-  quantity, deliver_time) => {
-  const resp = await axios.post('/base_gateway/add_item', {name, line_no, item_code, item_spec, unit, price,
+const addItem = async (item_name, line_no, item_code, item_spec, unit, price, quantity, deliver_time) => {
+  const resp = await axios.post('/base_gateway/add_item', {item_name, line_no, item_code, item_spec, unit, price,
     quantity, deliver_time});
   return resp.data;
 };
 
-const updateItem = async (id, name, item_code, item_spec, unit, price) => {
-  const resp = await axios.post('/base_gateway/update_item', {id, name, item_code, item_spec, unit, price});
+const updateItem = async (item_id, item_name, line_no, item_code, item_spec, unit, price, quantity) => {
+  const resp = await axios.post('/base_gateway/update_item', {item_id, item_name, line_no, item_code, item_spec, unit, price, quantity});
   return resp.data;
 };
 
@@ -68,8 +67,8 @@ const getItemList = async (id) => {
   return resp.data;
 };
 
-const getItem = async (id) => {
-  const resp = await axios.post('/base_gateway/query_item', {id});
+const getItem = async (item_id) => {
+  const resp = await axios.post('/base_gateway/query_item', {item_id});
   return resp.data;
 };
 
