@@ -46,7 +46,7 @@ export default class ProcurementBox extends React.PureComponent {
   render() {
     return (
       <div className="board-layout message-box">
-        <BoxHeader title="采购任务" selections={this.selections} onSelect={this.onSelect}
+        <BoxHeader title="采购动态" selections={this.selections} onSelect={this.onSelect}
                    selectionCount={this.selectionCount}/>
         <div className="message-list">
           {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index}/>)}

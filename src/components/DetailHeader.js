@@ -22,7 +22,8 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import {List, ListItem} from 'material-ui/List';
-import {getContacts} from "../services/message";
+import AddMail from "../views/items/AddMail";
+import {BizDialog} from "./Dialog";
 
 export class DetailHeader extends React.PureComponent {
 
@@ -45,11 +46,6 @@ export class DetailHeader extends React.PureComponent {
     this.editRowNumber = null;
     this.contactsFilter = [];
     this.contactsSelectType = null;
-  }
-
-  async componentWillMount() {
-    const contacts = await getContacts();
-    this.setState({ contacts });
   }
 
   static styles = {
@@ -90,31 +86,6 @@ export class DetailHeader extends React.PureComponent {
     </IconButton>
   );
 
-  onReply = () => alert('reply');
-  onReplyAll = () => alert('replyAll');
-  onForward = () => alert('forward');
-  onAttach = async () => {
-    if (!window.FileReader) {
-      return;
-    }
-    if (this.uploading) return;
-    const files = await new Promise(resolve => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.onchange = e => resolve(e.target.files);
-      input.click();
-    });
-    const file = files[0];
-    this.uploading = true;
-    const data = new FormData();
-    data.append('uploadfile', file);
-    try {
-      // const resp = await uploadFile(data);
-    } catch (e) {
-      console.log(e);
-    }
-    this.uploading = false;
-  };
   onChangeChargePerson = () => {
     this.contactsFilter = [this.props.detail.in_charge];
     this.contactsSelectType = 'IN_CHARGE';
@@ -132,8 +103,7 @@ export class DetailHeader extends React.PureComponent {
   onShare = () => alert('share');
   onAddNote = () => alert('add note');
 
-  handleFollowActions = (event) => {
-    // This prevents ghost click.
+  handleFollowActions = event => {
     event.preventDefault();
 
     this.setState({
@@ -176,22 +146,63 @@ export class DetailHeader extends React.PureComponent {
     </div>
   );
 
-  TitleItem = () => {
+  onReply = () => {
     const {detail} = this.props;
-    if (detail.type === DetailContentType.ANNOUNCE || detail.type === DetailContentType.APPEAL) {
+    if (!detail) return;
+    BizDialog.onOpen('回复邮件', <AddMail mail={{
+      receiver_id: detail.sender,
+      mail_title: `回复: ${detail.mail_title}`,
+      // mail_content: `原文: "${detail.mail_content}"`,
+    }}/>)
+  };
+  // onReplyAll = () => alert('replyAll');
+  onForward = () => {
+    const {detail} = this.props;
+    if (!detail) return;
+    BizDialog.onOpen('转发邮件', <AddMail mail={{
+      mail_title: `转发: ${detail.mail_title}`,
+      mail_content: `"原文: ${detail.mail_content}"`, // `"原文: ${detail.mail_content}"\n\n` 目前发送邮件不支持手动换行
+    }}/>)
+  };
+  onAttach = async () => {
+    if (!window.FileReader) {
+      return;
+    }
+    if (this.uploading) return;
+    const files = await new Promise(resolve => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = e => resolve(e.target.files);
+      input.click();
+    });
+    const file = files[0];
+    this.uploading = true;
+    const data = new FormData();
+    data.append('uploadfile', file);
+    try {
+      // const resp = await uploadFile(data);
+    } catch (e) {
+      console.log(e);
+    }
+    this.uploading = false;
+  };
+
+  TitleItem = () => {
+    const {detail, isMail} = this.props;
+    if (isMail) {
       return (
         <div className="detail-title message">
-          <p className="detail-label">{detail.type === DetailContentType.ANNOUNCE ? '公告' : '投诉'}</p>
+          <p className="detail-label">邮件</p>
           <div>
             <this.ActionButton icon='reply' tooltip='回复' action={this.onReply}/>
-            <this.ActionButton icon='reply_all' tooltip='回复全部' action={this.onReplyAll}/>
+            {/*<this.ActionButton icon='reply_all' tooltip='回复全部' action={this.onReplyAll}/>*/}
             <this.ActionButton icon='forward' tooltip='转发' action={this.onForward}/>
-            <this.ActionButton icon='attachment' tooltip='附件' action={this.onAttach}/>
+            {/*<this.ActionButton icon='attachment' tooltip='附件' action={this.onAttach}/>*/}
             <IconButton
               iconClassName="material-icons"
               onClick={this.props.onClose}
               iconStyle={DetailHeader.styles.smallIcon}
-              style={{...DetailHeader.styles.small, marginLeft: 20}}>
+              style={{...DetailHeader.styles.small, marginLeft: 10}}>
               {'close'}
             </IconButton>
           </div>
@@ -222,8 +233,47 @@ export class DetailHeader extends React.PureComponent {
   };
 
   MessageInfo = () => {
-    const {detail} = this.props;
-    return (
+    const {detail, isMail} = this.props;
+    return isMail ? (
+      <div className="message-info-item">
+        <div className="title-container">
+          <p className="detail-title-txt">标题: {detail.mail_title}</p>
+          <p className="detail-time-txt">{detail.send_time}</p>
+        </div>
+        <div className="sender-info-item">
+          <p>来自商户：</p>
+          <p className="company-txt">( id: {detail.sender} )</p>
+          {/*<p>发件人: {detail.sender && detail.sender.display_name} / {detail.sender && detail.sender.position}</p>*/}
+        </div>
+        {/*<div className="member-relatives">*/}
+          {/*<p>负责人：</p>*/}
+          {/*<div>*/}
+            {/*<p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>*/}
+            {/*<button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>*/}
+              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>*/}
+            {/*</button>*/}
+          {/*</div>*/}
+        {/*</div>*/}
+        {/*<div className="member-relatives">*/}
+          {/*<p>关注人：</p>*/}
+          {/*<div>*/}
+            {/*<p>*/}
+              {/*{detail.follower && detail.follower.map((f, index) => (*/}
+                {/*<span key={index}>{f.display_name} / {f.position}{index === (detail.follower.length - 1) ? null : '；'}</span>*/}
+              {/*))}*/}
+            {/*</p>*/}
+            {/*<button onClick={this.onAddFollowers} style={{marginLeft: 5}}>*/}
+              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
+            {/*</button>*/}
+          {/*</div>*/}
+        {/*</div>*/}
+        {/*<div className="line"/>*/}
+        <p className="message-content" style={{color: '#333'}}>内容:</p>
+        <p className="message-content" style={{color: '#333'}}>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{detail.mail_content}
+        </p>
+      </div>
+    ) : (
       <div className="message-info-item">
         <div className="title-container">
           <p className="detail-title-txt">{detail.title}</p>

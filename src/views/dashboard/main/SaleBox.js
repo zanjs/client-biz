@@ -43,7 +43,7 @@ class SaleBox extends React.PureComponent {
   render() {
     return (
       <div className="board-layout message-box">
-        <BoxHeader title="销售任务" selections={this.selections} onSelect={this.onSelect} selectionCount={this.selectionCount}/>
+        <BoxHeader title="销售动态" selections={this.selections} onSelect={this.onSelect} selectionCount={this.selectionCount}/>
         <div className="message-list">
           {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index}/>)}
           {!this.messagesDS.length && <p className="none-data">暂无内容</p>}

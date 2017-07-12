@@ -1,6 +1,6 @@
 import {computed, action, runInAction, extendObservable} from 'mobx';
 import mailSvc from "../../services/mail";
-import Storage from '../../utils/storage';
+// import Storage from '../../utils/storage';
 import {ToastStore as Toast} from "../../components/Toast";
 
 class MailListStore {
@@ -9,16 +9,15 @@ class MailListStore {
       mails: [],
       recordCount: 0,
       pageNo: 1,
-      hasMore: true,
+      hasMore: false,
       unReadListDS: computed(() => this.mails.filter(item => !item.read_flag)),
-      isReadListDS: computed(() => this.mails.filter(item => item.read_flag === 1)),
+      isReadListDS: computed(() => this.mails.filter(item => !!item.read_flag)),
     });
   }
   pageSize = 20;
 
   load = action(async () => {
-    const mer_id = Storage.getValue('user').mer_id;
-    if (this.loading || !mer_id || !this.hasMore) return;
+    if (this.loading) return;
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
@@ -35,7 +34,25 @@ class MailListStore {
       Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
     }
     this.loading = false;
-  })
+  });
+
+  @action setRead = async (message) => {
+    console.log(message);
+    if (!message.id || !!message.read_flag || this.submitting) return;
+    this.submitting = true;
+    try {
+      const resp = await mailSvc.setRead(message.id);
+      if (resp.code === '0') {
+        this.mails.forEach(mail => {
+          if (mail.id === message.id) mail.read_flag = true;
+        })
+      } else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');
+    } catch (e) {
+      console.log(e, 'set read flag');
+      Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
+    }
+    this.submitting = false;
+  }
 }
 const mailsStore = new MailListStore();
 export default mailsStore;

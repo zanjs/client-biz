@@ -243,11 +243,11 @@ export default class AddBill extends React.PureComponent {
           style={{marginRight: 20}}
         /><br/>
         <SelectField
-          floatingLabelText="优先级(最多2个)"
+          floatingLabelText="优先级(重要度与紧急度各一项)"
           value={this.store.priority}
           style={{marginRight: 20}}
           multiple={true}
-          onChange={(event, index, val) => this.store.setKey('priority', val)}
+          onChange={(event, index, val) => this.store.setKey('priority', (val && val.slice(0, 2)) || val)}
         >
           <MenuItem value='NOT_IMPORTENT' primaryText='不重要' insetChildren={true}
                     checked={this.store.priority.indexOf('NOT_IMPORTENT') > -1}/>

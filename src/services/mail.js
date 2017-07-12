@@ -20,6 +20,11 @@ const getMail = async (id) => {
   return resp.data;
 };
 
+const search = async (type, keyword) => {
+  const resp = await axios.post('/mail_gateway/search_mail', {type, keyword});
+  return resp.data;
+};
+
 const getMailList = async (type, read_flag, page_no, page_size) => {
   const resp = await axios.post('/mail_gateway/batch_query_mail', {type, read_flag, page_no, page_size});
   return resp.data;
@@ -31,4 +36,5 @@ export default {
   setRead,
   getMail,
   getMailList,
+  search
 }
