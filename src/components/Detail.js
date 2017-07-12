@@ -1,9 +1,9 @@
 import React from 'react';
 import {observable, action, runInAction} from 'mobx';
 import {observer} from 'mobx-react'
+import CircularProgress from 'material-ui/CircularProgress';
 import {Comments} from "./Comments"
 import {DetailHeader} from "./DetailHeader";
-import CircularProgress from 'material-ui/CircularProgress';
 
 class DetailStore {
   @observable detail = null;

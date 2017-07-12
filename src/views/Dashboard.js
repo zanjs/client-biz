@@ -12,6 +12,7 @@ import DialogForm from "./items/DialogForm";
 import ProfileDialog from "./items/ProfileDialog";
 import Toast from "../components/Toast";
 import {DialogComponent, BizDialog} from "../components/Dialog";
+import DetailDrawer from "../components/Drawer";
 
 @inject('user')
 @observer
@@ -39,6 +40,7 @@ export default class Dashboard extends React.Component {
         ))}
         <Toast />
         <DialogComponent />
+        <DetailDrawer />
       </div>
     );
   }

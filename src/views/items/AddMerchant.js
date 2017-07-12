@@ -125,6 +125,7 @@ export default class AddMerchant extends React.Component {
               onBlur={this.checkName}
               onChange={e => this.setState({ mer_name: e.target.value })}
               errorText={error.mer_name}
+              style={{marginRight: 20}}
               className="login-input" />
             <TextField
               hintText={type === 0 ? "法人代表" : '法人代表 (选填)'}
@@ -133,10 +134,12 @@ export default class AddMerchant extends React.Component {
               onBlur={this.checkRepresentative}
               onChange={e => this.setState({ representative: e.target.value })}
               errorText={error.representative}
+              style={{marginRight: 20}}
               className="login-input" />
             <SelectField
               floatingLabelText="选择类型"
               value={type}
+              style={{marginRight: 20}}
               className="login-input"
               onChange={(event, index, type) => this.setState({ type })}
             >
@@ -147,6 +150,7 @@ export default class AddMerchant extends React.Component {
               floatingLabelText="行业类型"
               value={indust_id}
               className="login-input"
+              style={{marginRight: 20}}
               onChange={(event, index, indust_id) => this.setState({ indust_id })}>
               {
                 IndustIdList.map((item, index) => <MenuItem value={`${item.id}`} primaryText={item.name} key={index}/>)
@@ -157,6 +161,7 @@ export default class AddMerchant extends React.Component {
               value={org_code}
               type="text"
               onBlur={this.checkOrgCode}
+              style={{marginRight: 20}}
               onChange={e => this.setState({ org_code: e.target.value })}
               errorText={error.org_code}
               className="login-input" />
@@ -169,6 +174,7 @@ export default class AddMerchant extends React.Component {
               hintText="开户银行 (选填)"
               value={om_bank_name}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ om_bank_name: e.target.value })}
               errorText={error.username}
               className="login-input" />
@@ -176,6 +182,7 @@ export default class AddMerchant extends React.Component {
               hintText="银行账号 (选填)"
               value={bank_account}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ bank_account: e.target.value })}
               errorText={error.bank_account}
               className="login-input" />
@@ -183,6 +190,7 @@ export default class AddMerchant extends React.Component {
               hintText="跨境可能需要 (选填)"
               value={swift_code}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ swift_code: e.target.value })}
               errorText={error.swift_code}
               className="login-input" />
@@ -190,6 +198,7 @@ export default class AddMerchant extends React.Component {
               hintText="大额行号 (选填)"
               value={la_bank_account}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ la_bank_account: e.target.value })}
               errorText={error.la_bank_account}
               className="login-input" />
@@ -197,6 +206,7 @@ export default class AddMerchant extends React.Component {
               hintText="电话号码 (多个以逗号分隔, 选填)"
               value={tel_list}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ tel_list: e.target.value })}
               errorText={error.username}
               className="login-input" />
@@ -204,6 +214,7 @@ export default class AddMerchant extends React.Component {
               hintText="公司地址 (选填)"
               value={address}
               type="text"
+              style={{marginRight: 20}}
               onChange={e => this.setState({ address: e.target.value })}
               errorText={error.address}
               className="login-input" />

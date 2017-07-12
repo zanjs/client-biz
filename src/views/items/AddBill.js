@@ -60,7 +60,7 @@ class AddBillState {
     switch (this.bill_type) {
       default: return false;
       case 2:
-        termsValidated = !!this.currency && !!this.pay_type && !!this.tax_flag && !!this.item_list.length;
+        termsValidated = !!this.currency && !!this.pay_type && !!this.item_list.length;
         this.item_list.forEach(item => {
           if (!(item.item_code && item.quantity && item.line_no)) {
             itemListValidated = false;

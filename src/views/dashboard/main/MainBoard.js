@@ -7,12 +7,9 @@ export default class MainBoard extends React.PureComponent {
   render() {
     return (
       <div className="main-board">
-        <MailBox openDetailDrawer={this.props.openDetailDrawer}
-                 closeDetailDrawer={this.props.closeDetailDrawer}/>
-        <ProcurementBox openDetailDrawer={this.props.openDetailDrawer}
-                        closeDetailDrawer={this.props.closeDetailDrawer}/>
-        <SaleBox openDetailDrawer={this.props.openDetailDrawer}
-                 closeDetailDrawer={this.props.closeDetailDrawer}/>
+        <MailBox />
+        <ProcurementBox />
+        <SaleBox />
       </div>
     );
   }

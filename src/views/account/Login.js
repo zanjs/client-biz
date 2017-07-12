@@ -65,7 +65,6 @@ export default class Login extends React.Component {
     const {username, password} = this.state;
     try {
       const resp = await accountService.login(username, password);
-      console.log(resp);
       if (resp.code === '0') {
         const token = resp.data.access_token;
         const userData = await accountService.getProfile(resp.data.access_token);

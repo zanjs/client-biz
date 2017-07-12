@@ -43,7 +43,7 @@ class MailBox extends React.PureComponent {
       <div className="board-layout message-box">
         <BoxHeader title="收件箱" selections={this.selections} onSelect={this.onSelect} selectionCount={this.selectionCount}/>
         <div className="message-list">
-          {this.mailDS.map((mail, index) => <MessageItem message={mail} key={index} openDetail={this.props.openDetailDrawer}/>)}
+          {this.mailDS.map((mail, index) => <MessageItem message={mail} key={index}/>)}
           {!this.mailDS.length && <p className="none-data">暂无邮件</p>}
           {this.store.hasMore && <FlatButton label="加载更多" style={{color: '#999'}}
                                              onTouchTap={this.store.load}/>}

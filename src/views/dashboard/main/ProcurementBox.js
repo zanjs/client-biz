@@ -49,8 +49,7 @@ export default class ProcurementBox extends React.PureComponent {
         <BoxHeader title="采购任务" selections={this.selections} onSelect={this.onSelect}
                    selectionCount={this.selectionCount}/>
         <div className="message-list">
-          {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index}
-                                                                 openDetail={this.props.openDetailDrawer}/>)}
+          {this.messagesDS.map((messages, index) => <MessageItem message={messages} key={index}/>)}
           {!this.messagesDS.length && <p className="none-data">暂无内容</p>}
           {this.store.hasMore && <FlatButton label="加载更多" style={{color: '#999'}}
                                               onTouchTap={this.store.load}/>}

@@ -1,5 +1,6 @@
 import React from 'react';
-import {TagType, DetailContentType} from "../services/data-type";
+import {TagType} from "../services/data-type";
+import {DrawerStore} from "./Drawer";
 
 export class MessageItem extends React.PureComponent {
   getTagStyle = (tag) => {
@@ -17,7 +18,7 @@ export class MessageItem extends React.PureComponent {
     return (
       <div className="message-item" style={{marginBottom: 5}}>
         <input type="checkbox"/>
-        <div className="message-detail" onClick={() => this.props.openDetail(DetailContentType.DETAIL, message)}
+        <div className="message-detail" onClick={() => DrawerStore.onOpen(message)}
              style={{display: 'block', marginLeft: 5}}>
           <p className="message-title">{message.content}</p>
           <p className="message-content">{message.create_time}</p>
