@@ -1,9 +1,9 @@
 import Message from './Message';
 import Merchant from './Merchant';
-import Material from './Material';
+import Mail from './Mail';
 
 export {
   Message,
   Merchant,
-  Material,
+  Mail,
 }

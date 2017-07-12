@@ -31,6 +31,7 @@ class MailListStore {
         }
       })
     } catch (e) {
+      console.log(e, 'load mail list');
       Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
     }
     this.loading = false;

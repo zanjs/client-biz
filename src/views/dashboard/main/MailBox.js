@@ -111,7 +111,7 @@ class MessageItem extends React.PureComponent {
               {message.priority && message.priority.split(',').filter(tag => tag !== 'NOT_IMPORTENT').map((tag, index) => <p
                 key={index} className="tag" style={this.getTagStyle(tag)}>{this.getTagTxt(tag)}</p>)}
             </div>
-            <p className="source">来自：{message.mer_name} （id: {message.sender}）</p>
+            <p className="source">来自：{message.sender_name} （id: {message.sender}）</p>
           </div>
         </div>
       </div>

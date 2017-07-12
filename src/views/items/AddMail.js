@@ -73,6 +73,7 @@ class MailStore {
       console.log(e, 'save draft');
       Toast.show('抱歉，发生未知错误，请稍后重试');
     }
+    this.saving = false;
   }
 }
 
@@ -129,7 +130,7 @@ class AddMail extends React.PureComponent {
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
                         primary={this.store.submitValidated} disabled={!this.store.submitValidated}
                         onClick={this.store.submit} />
-          <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label={this.store.saving ? null : '保存'}
+          <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label={this.store.saving ? null : '保存草稿'}
                         icon={this.store.saving ? <CircularProgress size={28}/> : null}
                         primary={this.store.saveDraftValidated} disabled={!this.store.saveDraftValidated}
                         onClick={this.store.save} />

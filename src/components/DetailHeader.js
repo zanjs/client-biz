@@ -242,7 +242,7 @@ export class DetailHeader extends React.PureComponent {
         </div>
         <div className="sender-info-item">
           <p>来自商户：</p>
-          <p className="company-txt">( id: {detail.sender} )</p>
+          <p className="company-txt">{detail.sender_name} (id: {detail.sender})</p>
           {/*<p>发件人: {detail.sender && detail.sender.display_name} / {detail.sender && detail.sender.position}</p>*/}
         </div>
         {/*<div className="member-relatives">*/}

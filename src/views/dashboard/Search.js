@@ -1,7 +1,7 @@
 import React from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
-import {Message, Merchant} from './search/index';
+import {Message, Merchant, Mail} from './search/index';
 
 const TABS = {
   MESSAGE: 1,
@@ -41,7 +41,7 @@ export default class Search extends React.PureComponent {
       default: return null;
       case TABS.MESSAGE: return <Message />;
       case TABS.MERCHANT: return <Merchant />;
-      case TABS.MAIL: return <p>邮箱</p>;
+      case TABS.MAIL: return <Mail />;
     }
   };
 
