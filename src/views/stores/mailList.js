@@ -1,5 +1,5 @@
 import {computed, action, runInAction, extendObservable} from 'mobx';
-import mailSvc from "../../services/mail";
+import MailSvc from "../../services/mail";
 // import Storage from '../../utils/storage';
 import {ToastStore as Toast} from "../../components/Toast";
 
@@ -21,7 +21,7 @@ class MailListStore {
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
-      const resp = await mailSvc.getMailList(0, null, pageNo, this.pageSize);
+      const resp = await MailSvc.getMailList(null, pageNo, this.pageSize);
       runInAction('after load list', () => {
         if (resp.code === '0' && resp.data.list) {
           this.mails = this.pageNo > 1 ? [...this.mails, ...resp.data.list] : resp.data.list;
@@ -42,7 +42,7 @@ class MailListStore {
     if (!message.id || !!message.read_flag || this.submitting) return;
     this.submitting = true;
     try {
-      const resp = await mailSvc.setRead(message.id);
+      const resp = await MailSvc.setRead(message.id);
       if (resp.code === '0') {
         this.mails.forEach(mail => {
           if (mail.id === message.id) mail.read_flag = true;

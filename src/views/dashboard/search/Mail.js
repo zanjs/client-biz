@@ -31,13 +31,18 @@ class MailDraftStore {
   @observable landed = false;
   pageSize = 20;
 
+  @action refresh = () => {
+    this.hasMore = false;
+    this.pageNo = 1;
+    this.load();
+  };
+
   @action load = async () => {
     if (this.loading) return;
     this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
-      const resp = await MailSvc.getMailList(1, null, pageNo, this.pageSize);
-      console.log(resp, 'draft list');
+      const resp = await MailSvc.getDraftList(pageNo, this.pageSize);
       runInAction('after load list', () => {
         if (resp.code === '0' && resp.data.list) {
           this.DS = this.pageNo > 1 ? [...this.DS, ...resp.data.list] : resp.data.list;
@@ -53,7 +58,36 @@ class MailDraftStore {
     this.loading = false;
     if (!this.landed) this.landed = true;
   };
+
+  @action onDelete = async (item) => {
+    if (!item.id || this.submitting) return;
+    this.submitting = true;
+    try {
+      const resp = await MailSvc.delDraft(item.id);
+      runInAction('after delete', () => {
+        if (resp.code === '0') {
+          Toast.show('删除成功');
+          this.DS = this.DS.filter(data => data.id !== item.id);
+        } else Toast.show(resp.msg || '抱歉，删除失败，请稍后重试');
+      });
+    } catch (e) {
+      console.log(e, 'delete draft');
+      Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
+    }
+    this.submitting = false;
+  };
+
+  @action handleSendByDraft = id => this.DS = this.DS.filter(data => data.id !== id);
+  @action updateDraft = item => {
+    console.log(item);
+    this.DS.forEach((data, index, key) => {
+      console.log(data, index, key);
+      if (data.id === item.id) data = {...data, ...item}
+    })
+  }
 }
+
+export const DraftStore = new MailDraftStore();
 
 class SearchStore {
   @observable DS = [];
@@ -96,12 +130,10 @@ class SearchStore {
   }
 }
 
-const MailStore = new MailDraftStore();
-
 @inject('user')
 @observer
 export default class Mail extends React.PureComponent {
-  store = MailStore;
+  store = DraftStore;
   searchStore = new SearchStore();
   componentWillMount() {
     this.store.load();
@@ -114,6 +146,7 @@ export default class Mail extends React.PureComponent {
     return (
       <div className="main-board">
         <DataList listData={this.store.DS} landed={this.store.landed} loadMore={this.loadMore}
+                  onDelete={this.store.onDelete}
                   hasMore={this.store.hasMore}/>
         <div className="search-mail-container">
           <h3>查找邮件</h3>
@@ -126,7 +159,7 @@ export default class Mail extends React.PureComponent {
             <MenuItem value={0} primaryText="邮件标题" />
             <MenuItem value={1} primaryText="邮件正文" />
             <MenuItem value={2} primaryText="发件人" />
-          </SelectField>
+          </SelectField><br/>
           <TextField
             floatingLabelText="请输入查找关键字"
             value={this.searchStore.searchKeyWord}
@@ -154,7 +187,7 @@ const iconButtonElement = (
   </IconButton>
 );
 
-const DataList = ({listData, landed, loadMore, hasMore}) => {
+const DataList = ({listData, landed, loadMore, hasMore, onDelete}) => {
   return (
     <List style={{width: 400, marginRight: 10}}>
       <div style={{backgroundColor: '#FFF'}}>
@@ -173,7 +206,7 @@ const DataList = ({listData, landed, loadMore, hasMore}) => {
                 rightIconButton={(
                   <IconMenu iconButtonElement={iconButtonElement}>
                     <MenuItem onTouchTap={() => BizDialog.onOpen('邮件草稿', <AddMail mail={item}/>)}>查看</MenuItem>
-                    <MenuItem onTouchTap={() => {}}>删除</MenuItem>
+                    <MenuItem onTouchTap={() => onDelete(item)}>删除</MenuItem>
                   </IconMenu>
                 )}
                 primaryText={`标题: ${item.mail_title}`}
@@ -184,12 +217,11 @@ const DataList = ({listData, landed, loadMore, hasMore}) => {
             </div>
           ))
         }
-        {hasMore && (
-          <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
-            <Divider inset={true} />
-            <FlatButton label="加载更多" primary={true} onTouchTap={loadMore}/>
-          </div>
-        )}
+        <div style={{backgroundColor: '#FFF', textAlign: 'right'}}>
+          <Divider inset={true} />
+          {hasMore && <FlatButton label="加载更多" primary={true} onTouchTap={loadMore}/>}
+          <FlatButton label="发送邮件" primary onTouchTap={() => BizDialog.onOpen('发送邮件', <AddMail />)}/>
+        </div>
       </div>
     </List>
   );
