@@ -1,12 +1,11 @@
 import React from 'react';
-import {observable, action, runInAction} from 'mobx';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {BizDialog} from "../../components/Dialog";
 import CircularProgress from 'material-ui/CircularProgress';
 import BaseSvc from '../../services/baseData';
 import {ToastStore as Toast} from "../../components/Toast";
-import MerchantMenbers from '../stores/merchantMember';
+import MerchantMembers from '../stores/merchantMember';
 
 class UserDetail extends React.PureComponent {
   render() {
@@ -57,7 +56,7 @@ export class SetDepartment extends React.PureComponent {
       const resp = await BaseSvc.updateUser(user.user_name, this.state.id);
       if (resp.code === '0') {
         const newUser = {...user, dep_id: this.state.id};
-        MerchantMenbers.updateUser(newUser);
+        MerchantMembers.updateUser(newUser);
         BizDialog.onClose();
         Toast.show('设置成功');
       } else Toast.show(resp.msg || '抱歉，设置失败，请刷新页面重新尝试');

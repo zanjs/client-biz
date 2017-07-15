@@ -13,6 +13,7 @@ class Store {
   @action show = (message, duration = 2000) => {
     this.message = message;
     this.duration = duration;
+    if (message === 'token已过期') window.location.replace('/');
   };
   @action close = () => {
     this.message = '';

@@ -115,7 +115,7 @@ class SearchStore {
       console.log(resp);
       runInAction('after search', () => {
         if (resp.code === '0') {
-          this.DS = this.pageNo > 1 ? [...this.DS, ...resp.data.list] : resp.data.list;
+          this.DS = this.pageNo > 1 ? [...this.DS, ...resp.data] : resp.data;
           this.recordCount = (resp.data.pagination && resp.data.pagination.record_count) || 0;
           this.hasMore = this.DS.length < this.recordCount;
           if (this.hasMore) this.pageNo++;

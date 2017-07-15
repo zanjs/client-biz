@@ -1,5 +1,5 @@
 import React from 'react';
-import { observable, computed, action, runInAction} from 'mobx';
+import { observable, action, runInAction} from 'mobx';
 import { observer } from 'mobx-react';
 import {MessageItem} from "../../../components/ListItem";
 import IconButton from 'material-ui/IconButton';

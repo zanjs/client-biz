@@ -1,4 +1,5 @@
 import React from 'react';
+import {observer} from 'mobx-react';
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
@@ -24,19 +25,16 @@ import {
 import {List, ListItem} from 'material-ui/List';
 import AddMail from "../views/items/AddMail";
 import {BizDialog} from "./Dialog";
+import {CURRENCY} from "../services/bill";
+import {detailStore} from "./Detail";
 
+@observer
 export class DetailHeader extends React.PureComponent {
+  store = detailStore;
 
   constructor(props) {
     super(props);
-    const {detail} = props;
-    const defaultPayment = (detail && this.PAYMENT_SELECTIONS.findIndex(p => p === detail.payment)) || 0;
-    const defaultPriceType = (detail && this.PRICE_TYPE_SELECTION.findIndex(p => p === detail.price_type)) || 0;
-    const defaultCurrency = (detail && detail.currency) || 0;
     this.state = {
-      priceType: defaultPriceType,
-      currency: defaultCurrency,
-      payment: defaultPayment,
       openFollowActions: false,
       openEditDialog: false,
       contacts: [],
@@ -187,6 +185,17 @@ export class DetailHeader extends React.PureComponent {
     this.uploading = false;
   };
 
+  get billTitle() {
+    const {bill_type, isProcurement} = this.props.detail;
+    switch (bill_type) {
+      default: return '单据';
+      case 1: return '产能反馈单';
+      case 2: return '询报价单';
+      case 3: return isProcurement ? '采购订单' : '销售订单';
+      case 4: return '协议';
+    }
+  }
+
   TitleItem = () => {
     const {detail, isMail} = this.props;
     if (isMail) {
@@ -211,14 +220,14 @@ export class DetailHeader extends React.PureComponent {
     } else {
       return (
         <div className="detail-title order">
-          <p className="detail-label">{detail.label}: {detail.order_no}</p>
+          <p className="detail-label">{this.billTitle}: {detail.head.bill_no}</p>
           <div>
-            <this.ActionButton icon='send' tooltip='发送' action={this.onSend}/>
+            {/*<this.ActionButton icon='send' tooltip='发送' action={this.onSend}/>*/}
             <this.ActionButton icon='save' tooltip='保存' action={this.onSave}/>
-            <this.ActionButton icon='attachment' tooltip='附件' action={this.onAttach}/>
-            <this.ActionButton icon='content_copy' tooltip='复制' action={this.onCopy}/>
+            {/*<this.ActionButton icon='attachment' tooltip='附件' action={this.onAttach}/>*/}
+            {/*<this.ActionButton icon='content_copy' tooltip='复制' action={this.onCopy}/>*/}
             <this.FollowActions/>
-            <this.ActionButton icon='share' tooltip='分享' action={this.onShare}/>
+            {/*<this.ActionButton icon='share' tooltip='分享' action={this.onShare}/>*/}
             <IconButton
               iconClassName="material-icons"
               onClick={this.props.onClose}
@@ -243,31 +252,7 @@ export class DetailHeader extends React.PureComponent {
         <div className="sender-info-item">
           <p>来自商户：</p>
           <p className="company-txt">{detail.sender_name} (id: {detail.sender})</p>
-          {/*<p>发件人: {detail.sender && detail.sender.display_name} / {detail.sender && detail.sender.position}</p>*/}
         </div>
-        {/*<div className="member-relatives">*/}
-          {/*<p>负责人：</p>*/}
-          {/*<div>*/}
-            {/*<p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>*/}
-            {/*<button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>*/}
-              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>*/}
-            {/*</button>*/}
-          {/*</div>*/}
-        {/*</div>*/}
-        {/*<div className="member-relatives">*/}
-          {/*<p>关注人：</p>*/}
-          {/*<div>*/}
-            {/*<p>*/}
-              {/*{detail.follower && detail.follower.map((f, index) => (*/}
-                {/*<span key={index}>{f.display_name} / {f.position}{index === (detail.follower.length - 1) ? null : '；'}</span>*/}
-              {/*))}*/}
-            {/*</p>*/}
-            {/*<button onClick={this.onAddFollowers} style={{marginLeft: 5}}>*/}
-              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
-            {/*</button>*/}
-          {/*</div>*/}
-        {/*</div>*/}
-        {/*<div className="line"/>*/}
         <p className="message-content" style={{color: '#333'}}>内容:</p>
         <p className="message-content" style={{color: '#333'}}>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{detail.mail_content}
@@ -277,7 +262,7 @@ export class DetailHeader extends React.PureComponent {
       <div className="message-info-item">
         <div className="title-container">
           <p className="detail-title-txt">{detail.title}</p>
-          <p className="detail-time-txt">{formatTime(detail.timestamp, "YYYY-MM-D h:mm")}</p>
+          <p className="detail-time-txt">{detail.create_time}</p>
         </div>
         <div className="sender-info-item">
           <p>来自客户：</p>
@@ -312,7 +297,6 @@ export class DetailHeader extends React.PureComponent {
     );
   };
 
-  CURRENCY_SELECTIONS = ['CNY', 'USD', 'EUR', 'JPY'];
   PAYMENT_SELECTIONS = ['预付', '现款现结', '10天', '30天', '60天', '90天', '分期', '自定义'];
   PRICE_TYPE_SELECTION = ['单价', '总价', '金额'];
 
@@ -322,101 +306,92 @@ export class DetailHeader extends React.PureComponent {
     </SelectField>
   );
 
-  onCurrencyChange = (event, index, value) => {
-    this.props.detail.currency = value;
-    this.setState({currency: value});
-  };
-
-  onPaymentChange = (event, index, value) => {
-    this.props.detail.payment = this.PAYMENT_SELECTIONS[value];
-    this.setState({payment: value});
-  };
-
-  onPriceTypeChange = (event, index, value) => {
-    this.props.detail.price_type = this.PRICE_TYPE_SELECTION[value];
-    this.setState({priceType: value});
-  };
-
-  onTaxChange = (e, v) => {
-    this.props.detail.tax = (v === 0);
-  };
-
-  OrderInfo = () => {
+  OrderInfo = observer(() => {
     const {detail} = this.props;
-    if (!detail.order_no) return;
-    const isProcurement = detail.type === DetailContentType.PROCUREMENT_ORDER;
+    const {isProcurement, head} = detail;
     return (
       <div className="order-info-item">
         <div className="order-source">
-          <p style={{maxWidth: 260}}>{isProcurement ? '供应商：' : '客户：'}{detail.supplier.company}</p>
-          <p style={{maxWidth: 160}}>{detail.supplier.display_name} / {detail.supplier.position}</p>
-          <p>{formatTime(detail.timestamp, "YYYY-MM-D h:mm")}</p>
-          <this.ActionButton icon='note_add' tooltip='添加备注' action={this.onAddNote}/>
+          <p style={{maxWidth: 260}}>{isProcurement ? '供应商：' : '客户：'}{head.mer_name}</p>
+          <p style={{maxWidth: 160}}>{head.user_name}</p>
+          <p>{head.create_time}</p>
+          {/*<this.ActionButton icon='note_add' tooltip='添加备注' action={this.onAddNote}/>*/}
         </div>
-        <div className="member-relatives" style={{marginTop: 10}}>
-          <p>负责人：</p>
-          <div>
-            <p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>
-            <button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>
-              <FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>
-            </button>
-          </div>
-        </div>
-        <div className="member-relatives" style={{marginTop: 10, marginBottom: 5}}>
+        {/*<div className="member-relatives" style={{marginTop: 10}}>*/}
+          {/*<p>负责人：</p>*/}
+          {/*<div>*/}
+            {/*<p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>*/}
+            {/*<button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>*/}
+              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>*/}
+            {/*</button>*/}
+          {/*</div>*/}
+        {/*</div>*/}
+        <div className="member-relatives">
           <p>关注人：</p>
           <div>
             <p>
-              {detail.follower && detail.follower.map((f, index) => (
-                <span key={index}>{f.display_name} / {f.position}{index === (detail.follower.length - 1) ? null : '；'}</span>
-              ))}
+              {head.notice_list && head.notice_list.map((item, index) => (
+                <span key={index}>{item.name}{index === (head.notice_list.length - 1) ? null : '；'}</span>))}
             </p>
-            <button onClick={this.onAddFollowers} style={{marginLeft: 5}}>
-              <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
-            </button>
+            {/*<button onClick={this.onAddFollowers} style={{marginLeft: 5}}>*/}
+              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
+            {/*</button>*/}
           </div>
         </div>
         <div className="select-actions" style={{marginBottom: 10}}>
           <div style={{flex: 1}}>
-            <this.SelectItem selections={this.CURRENCY_SELECTIONS}
-                             hintTxt="币种: "
-                             width={90}
-                             value={this.state.currency}
-                             onSelect={this.onCurrencyChange}/>
+            <SelectField floatingLabelText="币种: " value={this.store.currency} disabled
+                         onChange={(e, i, v) => this.store.setKey('currency', v)} style={{width: 120}}>
+              { CURRENCY.map(((c, index) => <MenuItem value={c.value} primaryText={c.name} key={index}/>)) }
+            </SelectField>
           </div>
           <div style={{flex: 1}}>
-            <this.SelectItem selections={this.PAYMENT_SELECTIONS}
-                             hintTxt="付款条件: "
-                             width={120}
-                             value={this.state.payment}
-                             onSelect={this.onPaymentChange}/>
-          </div>
-          <div style={{flex: 1}}>
-            <this.SelectItem selections={this.PRICE_TYPE_SELECTION}
-                             hintTxt="输入单价: "
-                             width={90}
-                             value={this.state.priceType}
-                             onSelect={this.onPriceTypeChange}/>
+            <SelectField floatingLabelText="付款方式: " value={this.store.pay_type}
+                         onChange={(e, i, v) => this.store.setKey('pay_type', v)} style={{width: 120}}>
+              { ['', '现款现结', '月结'].map(((item, index) => <MenuItem value={index} primaryText={item || '暂无'} key={index}/>)) }
+            </SelectField>
           </div>
         </div>
-        <RadioButtonGroup name="tax-radios" defaultSelected={detail.tax ? 0 : 1} className="tax-radios" onChange={this.onTaxChange}>
-          <RadioButton value={0} label="含税" iconStyle={{marginRight: 5}} labelStyle={{color: '#999', fontSize: 12}} style={{}}/>
-          <RadioButton value={1} label="不含税" iconStyle={{marginRight: 5}} labelStyle={{color: '#999', fontSize: 12}} style={{marginLeft: -50}}/>
-        </RadioButtonGroup>
-        <div className="flex-row" style={{justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #E6E6E6'}}>
-          <p className="total-price-txt">总价：{`${detail.total_price}`.replace(/\d{1,3}(?=(\d{3})+$)/g,function(s){ return s+',' })}</p>
-          <div className="flex-row">
-            <button className="btn-change-discount" onClick={() => alert('change discount')}>￥</button>
-            <p>-5%</p>
+        <div className="flex-row" style={{margin: '-20px 0 20px 0'}}>
+          <div style={{flex: 1}}>
+            {this.store.valid_begin_time ? (
+              <DatePicker floatingLabelText="协议有效开始时间"
+                          defaultDate={new Date(this.store.valid_begin_time)}
+                          onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
+            ): (
+              <DatePicker floatingLabelText="协议有效开始时间"
+                          onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
+            )}
+
           </div>
+          <div style={{flex: 1}}>
+            {this.store.valid_end_time ? (
+              <DatePicker floatingLabelText="协议有效结束时间"
+                          defaultDate={new Date(this.store.valid_end_time)}
+                          onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
+            ) : (
+              <DatePicker floatingLabelText="协议有效结束时间"
+                          onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
+            )}
+          </div>
+        </div>
+        <RadioButtonGroup name="tax-radios" defaultSelected={this.store.tax_flag} className="tax-radios">
+          {/*onChange={(e, v) => this.store.setKey('tax_flag', v)}*/}
+          <RadioButton value={1} label="含税" disabled iconStyle={{marginRight: 5}} labelStyle={{color: '#999', fontSize: 12}} style={{}}/>
+          <RadioButton value={0} label="不含税" disabled iconStyle={{marginRight: 5}} labelStyle={{color: '#999', fontSize: 12}} style={{marginLeft: -50}}/>
+        </RadioButtonGroup>
+        <div className="bill-price flex-row">
+          <p className="price-txt">总价：{`${head.amount}`.replace(/\d{1,3}(?=(\d{3})+$)/g,function(s){ return s+',' })}</p>
+          <p className="price-txt">税率: {head.tax_rate}</p>
           <div/>
         </div>
         <this.GoodsTable />
-        <button onClick={this.handleAddGoods} className="btn-add-goods" style={{marginLeft: 10}}>
-          <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
-        </button>
+        {/*<button onClick={this.handleAddGoods} className="btn-add-goods" style={{marginLeft: 10}}>*/}
+          {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
+        {/*</button>*/}
       </div>
     );
-  };
+  });
 
   handleAddGoods = () => {
     this.isCreateGood = true;
@@ -612,12 +587,11 @@ export class DetailHeader extends React.PureComponent {
   };
 
   render() {
-    const {detail} = this.props;
-    const isOrder = detail.type === DetailContentType.PROCUREMENT_ORDER || detail.type === DetailContentType.SALE_ORDER;
+    const {isMail} = this.props;
     return (
       <div className="detail-header">
         <this.TitleItem />
-        {isOrder ? <this.OrderInfo /> : <this.MessageInfo />}
+        {isMail ? <this.MessageInfo /> : <this.OrderInfo />}
         <this.EditGoodsDialog />
         <this.SelectUserDialog />
       </div>

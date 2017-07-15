@@ -30,14 +30,15 @@ export const DrawerStore = new DrawerState();
 export default class DetailDrawer extends React.PureComponent {
   store = DrawerStore;
   render() {
+    const isMail = this.store.contentDS && this.store.contentDS.hasOwnProperty('mail_title');
     return (
       <Drawer
         width={this.store.width}
         style={{transition: 'width .3s linear'}}
         openSecondary={true}
         open={this.store.open}
-        docked={false}
-        overlayStyle={{backgroundColor: 'transparent'}}
+        docked={!isMail}
+        // overlayStyle={{backgroundColor: 'transparent'}}
         onRequestChange={this.store.onClose}>
         {
           this.store.contentDS && <Detail message={this.store.contentDS} close={this.store.onClose}/>

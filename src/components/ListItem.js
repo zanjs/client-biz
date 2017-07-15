@@ -1,5 +1,4 @@
 import React from 'react';
-import {TagType} from "../services/data-type";
 import {DrawerStore} from "./Drawer";
 
 const PriorityType = {
@@ -53,7 +52,8 @@ export class MessageItem extends React.PureComponent {
     return `${message.mer_name}(id: ${message.mer_id})`;
   }
   render() {
-    const {message} = this.props;
+    const {message, isProcurement} = this.props;
+    message.isProcurement = isProcurement;
     return (
       <div className="message-item" style={{marginBottom: 5}}>
         <input type="checkbox" style={{visibility: 'hidden'}}/>

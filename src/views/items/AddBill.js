@@ -225,10 +225,10 @@ export default class AddBill extends React.PureComponent {
           onChange={e => this.store.setKey('tax_rate', e.target.value)}
           style={{marginRight: 20}}
         />}<br/>
-        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效开始时间（必填）"
-                                                   onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>}
-        {this.store.bill_type === 4 && <DatePicker floatingLabelText="协议有效结束时间（必填）"
-                                                   onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>}
+        <DatePicker floatingLabelText={`协议有效开始时间${this.store.bill_type === 4 ? '（必填）' : ''}`}
+                    onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
+        <DatePicker floatingLabelText={`协议有效开始时间${this.store.bill_type === 4 ? '（必填）' : ''}`}
+                    onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
         <TextField
           floatingLabelText={`单据文字内容${(this.store.bill_type === 1 || this.store.bill_type === 4) ? '（必填）' : ''}`}
           value={this.store.content}
