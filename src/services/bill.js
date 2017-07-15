@@ -58,6 +58,21 @@ const returnItem = async (bill_no, line_no, quatity) => {
   return resp.data;
 };
 
+export const CURRENCY = [
+  {value: 'CNY', name: '人民币'},
+  {value: 'USD', name: '美元'},
+  {value: 'EUR', name: '欧元'},
+  {value: 'HKD', name: '港元'},
+  {value: 'GBP', name: '英镑'},
+  {value: 'KRW', name: '韩元'},
+  {value: 'CAD', name: '加元'},
+  {value: 'CHF', name: '瑞士法郎'},
+  {value: 'SGD', name: '新加坡元'},
+  {value: 'MYR', name: '马来西亚元'},
+  {value: 'IDR', name: '印尼盾'},
+  {value: 'PHP', name: '菲律宾比索'},
+];
+
 export default {
   create,
   update,

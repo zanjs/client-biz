@@ -38,7 +38,6 @@ class MailListStore {
   });
 
   @action setRead = async (message) => {
-    console.log(message);
     if (!message.id || !!message.read_flag || this.submitting) return;
     this.submitting = true;
     try {

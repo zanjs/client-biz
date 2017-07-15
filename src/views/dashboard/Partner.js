@@ -14,10 +14,9 @@ import MailIcon from 'material-ui/svg-icons/content/mail';
 import PartnerIcon from 'material-ui/svg-icons/social/group';
 import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import {ToastStore as Toast} from "../../components/Toast";
 import PartnerSvc from "../../services/partner";
-import {BizDialog} from "../../components/Dialog";
+import {BizDialog, ComfirmDialog} from "../../components/Dialog";
 import AddPartner from "../items/AddPartner";
 import partnerStore from '../stores/partners';
 
@@ -176,7 +175,7 @@ const DataList = ({listData, loading, type, currentUser}) => {
       leftIcon = <PartnerIcon />;
       menuItem = isAdmin ? [
         {name: '查看/修改资料', action: partner => BizDialog.onOpen('合作伙伴详情', <AddPartner partner={partner}/>)},
-        {name: '解除合作关系', action: partner => BizDialog.onOpen('确认解除？', <ComfirmAction partner={partner}/>)}
+        {name: '解除合作关系', action: partner => BizDialog.onOpen('确认解除？', <ComfirmDialog submitAction={partnerStore.delete.bind(null, partner)}/>)}
       ] : [
         {name: '查看资料', action: partner => BizDialog.onOpen('合作伙伴详情', <AddPartner partner={partner}/>)},
       ];
@@ -239,10 +238,3 @@ const DataList = ({listData, loading, type, currentUser}) => {
   );
 };
 
-const ComfirmAction = ({partner}) => (
-  <div>
-    <RaisedButton label="确定" primary={true} style={{width: '40%', marginRight: '15%'}}
-                  onTouchTap={partnerStore.delete.bind(null, partner)}/>
-    <RaisedButton label="取消" secondary={true} style={{width: '40%'}} onTouchTap={BizDialog.onClose}/>
-  </div>
-);

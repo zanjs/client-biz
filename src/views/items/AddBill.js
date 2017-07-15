@@ -20,7 +20,7 @@ import {
 } from 'material-ui/Table';
 import {BizDialog} from "../../components/Dialog";
 import {ToastStore as Toast} from "../../components/Toast";
-import BillSvc from '../../services/bill';
+import BillSvc, {CURRENCY} from '../../services/bill';
 import Checkbox from 'material-ui/Checkbox';
 import MemberStore from "../stores/merchantMember";
 import AddMaterial from "./AddMaterial";
@@ -198,10 +198,7 @@ export default class AddBill extends React.PureComponent {
           style={{marginRight: 20}}
           onChange={(event, index, val) => this.store.setKey('currency', val)}
         >
-          <MenuItem value='CNY' primaryText='CNY' />
-          <MenuItem value='USD' primaryText='USD' />
-          <MenuItem value='EUR' primaryText='EUR' />
-          <MenuItem value='JPY' primaryText='JPY' />
+          {CURRENCY.map((item, index) => <MenuItem value={item.value} primaryText={item.name} key={index}/>)}
         </SelectField>
         <SelectField
           floatingLabelText={`付款方式${this.store.bill_type === 2 ? '（必选）' : ''}`}

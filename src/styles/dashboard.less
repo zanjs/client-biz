@@ -324,7 +324,7 @@ a {
   }
 
   .source {
-    width: 100px;
+    width: 140px;
     text-align: right;
     .text-ellipsis;
   }
@@ -362,7 +362,7 @@ a {
 
 // procurement board
 
-.procurement-board {
+.bill-board {
   margin: 5px 20px;
   height: 90%;
   min-width: 800px;
@@ -372,7 +372,7 @@ a {
   padding: 5px;
 }
 
-.procurement-header {
+.bill-header {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -397,11 +397,16 @@ a {
   align-items: center;
 }
 
-.procurement-item {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
+.bill-list {
+  width: 280px;
+  height: 92%;
+  overflow-y: auto;
+
+  .none-data {
+    color: #797979;
+    font-size: 16px;
+    //padding-left: 20px;
+  }
 }
 
 .btn-actions {
