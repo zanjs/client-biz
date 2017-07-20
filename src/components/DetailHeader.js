@@ -1,5 +1,5 @@
 import React from 'react';
-import {observer} from 'mobx-react';
+import {observer, inject} from 'mobx-react';
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
@@ -7,13 +7,10 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import SelectField from 'material-ui/SelectField';
 import FontIcon from 'material-ui/FontIcon';
-import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
-import FlatButton from 'material-ui/FlatButton';
+import Checkbox from 'material-ui/Checkbox';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
-import {DetailContentType} from "../services/data-type";
-import {formatTime} from "../utils/time";
 import {
   Table,
   TableBody,
@@ -22,12 +19,14 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import {List, ListItem} from 'material-ui/List';
 import AddMail from "../views/items/AddMail";
-import {BizDialog} from "./Dialog";
+import AddMaterial from "../views/items/AddMaterial";
+import {BizDialog, ComfirmDialog} from "./Dialog";
 import {CURRENCY} from "../services/bill";
 import {detailStore} from "./Detail";
+import MemberStore from "../views/stores/merchantMember";
 
+@inject('user')
 @observer
 export class DetailHeader extends React.PureComponent {
   store = detailStore;
@@ -36,14 +35,12 @@ export class DetailHeader extends React.PureComponent {
     super(props);
     this.state = {
       openFollowActions: false,
-      openEditDialog: false,
-      contacts: [],
-      openContactList: false,
+      openMemberListDialog: false,
     };
-    this.focusGoodData = null;
-    this.editRowNumber = null;
-    this.contactsFilter = [];
-    this.contactsSelectType = null;
+  }
+
+  componentWillMount() {
+    MemberStore.load();
   }
 
   static styles = {
@@ -64,46 +61,45 @@ export class DetailHeader extends React.PureComponent {
       paddingLeft: 0,
       paddingRight: 0,
       wordBreak: 'normal',
-      whiteSpace: 'normal',
-      overflow: 'visible',
-      textOverflow: 'clip',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      textAlign: 'center'
     },
     styleLineNo: {
       width: 30,
     },
   };
 
-  ActionButton = ({icon, action, tooltip}) => (
+  ActionButton = ({icon, action, tooltip, active}) => (
     <IconButton
       iconClassName="material-icons"
       onClick={action}
       tooltip={tooltip}
-      iconStyle={DetailHeader.styles.smallIcon}
+      iconStyle={{...DetailHeader.styles.smallIcon, color: active ? '#189acf' : '#d9d7d3'}}
       style={DetailHeader.styles.small}>
       {icon}
     </IconButton>
   );
 
-  onChangeChargePerson = () => {
-    this.contactsFilter = [this.props.detail.in_charge];
-    this.contactsSelectType = 'IN_CHARGE';
-    this.handleContactSelect();
-  };
-  onAddFollowers = () => {
-    this.contactsFilter = [...this.props.detail.follower];
-    this.contactsSelectType = 'FOLLOW';
-    this.handleContactSelect();
-  };
-
   onSend = () => alert('send');
-  onSave = () => alert('save');
+  onSave = () => this.store.update();
   onCopy = () => alert('copy');
   onShare = () => alert('share');
   onAddNote = () => alert('add note');
+  onClose = () => {
+    if (this.store.shouldSaveBill) {
+      BizDialog.onOpen('未保存修改，是否直接退出？', <ComfirmDialog submitAction={() => {
+        BizDialog.onClose();
+        this.props.onClose();
+      }}/>)
+    } else {
+      this.props.onClose();
+    }
+  };
 
   handleFollowActions = event => {
     event.preventDefault();
-
     this.setState({
       openFollowActions: true,
       anchorEl: event.currentTarget,
@@ -115,34 +111,6 @@ export class DetailHeader extends React.PureComponent {
       openFollowActions: false,
     });
   };
-
-  FollowActions = () => (
-    <div style={{marginLeft: 5}}>
-      <RaisedButton
-        onTouchTap={this.handleFollowActions}
-        style={{height: 26, fontSize: 12}}
-        label="后续操作"/>
-      <Popover
-        open={this.state.openFollowActions}
-        anchorEl={this.state.anchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={this.handleFollowActionsClose}>
-        { this.props.detail.type === DetailContentType.PROCUREMENT_ORDER ? <Menu>
-            <MenuItem primaryText="已发货" />
-            <MenuItem primaryText="收货" />
-            <MenuItem primaryText="退货" />
-            <MenuItem primaryText="生成结算单" />
-            <MenuItem primaryText="完成" />
-            <MenuItem primaryText="取消" />
-          </Menu> : <Menu>
-          <MenuItem primaryText="生成框架协议" />
-          <MenuItem primaryText="生成订单" />
-          <MenuItem primaryText="完成" />
-        </Menu>}
-      </Popover>
-    </div>
-  );
 
   onReply = () => {
     const {detail} = this.props;
@@ -162,28 +130,28 @@ export class DetailHeader extends React.PureComponent {
       mail_content: `"原文: ${detail.mail_content}"`, // `"原文: ${detail.mail_content}"\n\n` 目前发送邮件不支持手动换行
     }}/>)
   };
-  onAttach = async () => {
-    if (!window.FileReader) {
-      return;
-    }
-    if (this.uploading) return;
-    const files = await new Promise(resolve => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.onchange = e => resolve(e.target.files);
-      input.click();
-    });
-    const file = files[0];
-    this.uploading = true;
-    const data = new FormData();
-    data.append('uploadfile', file);
-    try {
-      // const resp = await uploadFile(data);
-    } catch (e) {
-      console.log(e);
-    }
-    this.uploading = false;
-  };
+  // onAttach = async () => {
+  //   if (!window.FileReader) {
+  //     return;
+  //   }
+  //   if (this.uploading) return;
+  //   const files = await new Promise(resolve => {
+  //     const input = document.createElement('input');
+  //     input.type = 'file';
+  //     input.onchange = e => resolve(e.target.files);
+  //     input.click();
+  //   });
+  //   const file = files[0];
+  //   this.uploading = true;
+  //   const data = new FormData();
+  //   data.append('uploadfile', file);
+  //   try {
+  //     // const resp = await uploadFile(data);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   this.uploading = false;
+  // };
 
   get billTitle() {
     const {bill_type, isProcurement} = this.props.detail;
@@ -196,7 +164,7 @@ export class DetailHeader extends React.PureComponent {
     }
   }
 
-  TitleItem = () => {
+  TitleItem = observer(() => {
     const {detail, isMail} = this.props;
     if (isMail) {
       return (
@@ -223,14 +191,39 @@ export class DetailHeader extends React.PureComponent {
           <p className="detail-label">{this.billTitle}: {detail.head.bill_no}</p>
           <div>
             {/*<this.ActionButton icon='send' tooltip='发送' action={this.onSend}/>*/}
-            <this.ActionButton icon='save' tooltip='保存' action={this.onSave}/>
+            <this.ActionButton icon='save' tooltip='保存' action={this.onSave}
+                               active={this.store.shouldSaveBill}/>
             {/*<this.ActionButton icon='attachment' tooltip='附件' action={this.onAttach}/>*/}
             {/*<this.ActionButton icon='content_copy' tooltip='复制' action={this.onCopy}/>*/}
-            <this.FollowActions/>
+            <div style={{marginLeft: 5}}>
+              <RaisedButton
+                onTouchTap={this.handleFollowActions}
+                style={{height: 26, fontSize: 12}}
+                label="后续操作"/>
+              <Popover
+                open={this.state.openFollowActions}
+                anchorEl={this.state.anchorEl}
+                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                onRequestClose={this.handleFollowActionsClose}>
+                { this.props.detail.isProcurement ? <Menu>
+                  <MenuItem primaryText="已发货" />
+                  <MenuItem primaryText="收货" />
+                  <MenuItem primaryText="退货" />
+                  <MenuItem primaryText="生成结算单" />
+                  <MenuItem primaryText="完成" />
+                  <MenuItem primaryText="取消" />
+                </Menu> : <Menu>
+                  <MenuItem primaryText="生成框架协议" />
+                  <MenuItem primaryText="生成订单" />
+                  <MenuItem primaryText="完成" />
+                </Menu>}
+              </Popover>
+            </div>
             {/*<this.ActionButton icon='share' tooltip='分享' action={this.onShare}/>*/}
             <IconButton
               iconClassName="material-icons"
-              onClick={this.props.onClose}
+              onClick={this.onClose}
               iconStyle={DetailHeader.styles.smallIcon}
               style={{...DetailHeader.styles.small, marginLeft: 20}}>
               {'close'}
@@ -239,11 +232,11 @@ export class DetailHeader extends React.PureComponent {
         </div>
       );
     }
-  };
+  });
 
   MessageInfo = () => {
-    const {detail, isMail} = this.props;
-    return isMail ? (
+    const {detail} = this.props;
+    return (
       <div className="message-info-item">
         <div className="title-container">
           <p className="detail-title-txt">标题: {detail.mail_title}</p>
@@ -258,57 +251,13 @@ export class DetailHeader extends React.PureComponent {
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{detail.mail_content}
         </p>
       </div>
-    ) : (
-      <div className="message-info-item">
-        <div className="title-container">
-          <p className="detail-title-txt">{detail.title}</p>
-          <p className="detail-time-txt">{detail.create_time}</p>
-        </div>
-        <div className="sender-info-item">
-          <p>来自客户：</p>
-          <p className="company-txt">{detail.sender && detail.sender.company}</p>
-          <p>发件人: {detail.sender && detail.sender.display_name} / {detail.sender && detail.sender.position}</p>
-        </div>
-        <div className="member-relatives">
-          <p>负责人：</p>
-          <div>
-            <p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>
-            <button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>
-              <FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>
-            </button>
-          </div>
-        </div>
-        <div className="member-relatives">
-          <p>关注人：</p>
-          <div>
-            <p>
-              {detail.follower && detail.follower.map((f, index) => (
-                <span key={index}>{f.display_name} / {f.position}{index === (detail.follower.length - 1) ? null : '；'}</span>
-              ))}
-            </p>
-            <button onClick={this.onAddFollowers} style={{marginLeft: 5}}>
-              <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
-            </button>
-          </div>
-        </div>
-        <div className="line"/>
-        <p className="message-content">{detail.content}</p>
-      </div>
-    );
+    )
   };
-
-  PAYMENT_SELECTIONS = ['预付', '现款现结', '10天', '30天', '60天', '90天', '分期', '自定义'];
-  PRICE_TYPE_SELECTION = ['单价', '总价', '金额'];
-
-  SelectItem = ({selections, onSelect, width=100, hintTxt, value=0}) => (
-    <SelectField floatingLabelText={hintTxt} value={value} onChange={onSelect} style={{width}}>
-      { selections.map(((selection, index) => <MenuItem value={index} primaryText={selection} key={index}/>)) }
-    </SelectField>
-  );
 
   OrderInfo = observer(() => {
     const {detail} = this.props;
     const {isProcurement, head} = detail;
+    const currentUser = this.props.user.user.current;
     return (
       <div className="order-info-item">
         <div className="order-source">
@@ -317,25 +266,31 @@ export class DetailHeader extends React.PureComponent {
           <p>{head.create_time}</p>
           {/*<this.ActionButton icon='note_add' tooltip='添加备注' action={this.onAddNote}/>*/}
         </div>
-        {/*<div className="member-relatives" style={{marginTop: 10}}>*/}
-          {/*<p>负责人：</p>*/}
-          {/*<div>*/}
-            {/*<p>{detail.in_charge && detail.in_charge.display_name} / {detail.in_charge && detail.in_charge.position}</p>*/}
-            {/*<button onClick={this.onChangeChargePerson} style={{marginLeft: 5}}>*/}
-              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 14}}>autorenew</FontIcon>*/}
-            {/*</button>*/}
-          {/*</div>*/}
-        {/*</div>*/}
         <div className="member-relatives">
           <p>关注人：</p>
           <div>
             <p>
-              {head.notice_list && head.notice_list.map((item, index) => (
-                <span key={index}>{item.name}{index === (head.notice_list.length - 1) ? null : '；'}</span>))}
+              {this.store.notice_list.map((item, index) => (
+                <span key={index}>{item.name}{index === (this.store.notice_list.length - 1) ? null : '；'}</span>))}
             </p>
-            {/*<button onClick={this.onAddFollowers} style={{marginLeft: 5}}>*/}
-              {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
-            {/*</button>*/}
+            <button onClick={() => this.setState({openMemberListDialog: true})} style={{margin: '1px 0 0 5px'}}>
+              <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
+            </button>
+            <Dialog
+              title='商户成员列表'
+              titleStyle={{fontSize: 18}}
+              modal={false}
+              autoScrollBodyContent
+              open={this.state.openMemberListDialog}
+              onRequestClose={() => this.setState({openMemberListDialog: false})}>
+              <div>
+                {MemberStore.memberList.filter(member => member.user_id !== currentUser.id).map((member, key) => (
+                  <Checkbox label={member.user_name} key={key}
+                            checked={this.store.notice_list.findIndex(follow => follow.id === member.user_id) > -1}
+                            onCheck={(event, checked) => this.store.updateFollow(member, checked)}/>
+                ))}
+              </div>
+            </Dialog>
           </div>
         </div>
         <div className="select-actions" style={{marginBottom: 10}}>
@@ -347,19 +302,41 @@ export class DetailHeader extends React.PureComponent {
           </div>
           <div style={{flex: 1}}>
             <SelectField floatingLabelText="付款方式: " value={this.store.pay_type}
+                         disabled={isProcurement}
                          onChange={(e, i, v) => this.store.setKey('pay_type', v)} style={{width: 120}}>
               { ['', '现款现结', '月结'].map(((item, index) => <MenuItem value={index} primaryText={item || '暂无'} key={index}/>)) }
             </SelectField>
           </div>
         </div>
+        <SelectField
+          floatingLabelText="优先级(重要度与紧急度各一项)"
+          value={this.store.priority}
+          style={{marginBottom: 20}}
+          multiple={true}
+          onChange={(event, index, val) => this.store.setKey('priority', (val && val.slice(0, 2)) || "")}
+        >
+          <MenuItem value='NOT_IMPORTENT' primaryText='不重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('NOT_IMPORTENT') > -1}/>
+          <MenuItem value='NORMAL' primaryText='正常' insetChildren={true}
+                    checked={this.store.priority.indexOf('NORMAL') > -1}/>
+          <MenuItem value='IMPORTENT' primaryText='重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('IMPORTENT') > -1}/>
+          <MenuItem value='VERY_IMPORTENT' primaryText='非常重要' insetChildren={true}
+                    checked={this.store.priority.indexOf('VERY_IMPORTENT') > -1}/>
+          <MenuItem value='HURRY' primaryText='紧急' insetChildren={true}
+                    checked={this.store.priority.indexOf('HURRY') > -1}/>
+          <MenuItem value='VERY_HURRY' primaryText='非常紧急' insetChildren={true}
+                    checked={this.store.priority.indexOf('VERY_HURRY') > -1}/>
+        </SelectField><br/>
         <div className="flex-row" style={{margin: '-20px 0 20px 0'}}>
           <div style={{flex: 1}}>
             {this.store.valid_begin_time ? (
               <DatePicker floatingLabelText="协议有效开始时间"
+                          disabled={isProcurement}
                           defaultDate={new Date(this.store.valid_begin_time)}
                           onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
             ): (
-              <DatePicker floatingLabelText="协议有效开始时间"
+              <DatePicker floatingLabelText="协议有效开始时间" disabled={isProcurement}
                           onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
             )}
 
@@ -367,10 +344,11 @@ export class DetailHeader extends React.PureComponent {
           <div style={{flex: 1}}>
             {this.store.valid_end_time ? (
               <DatePicker floatingLabelText="协议有效结束时间"
+                          disabled={isProcurement}
                           defaultDate={new Date(this.store.valid_end_time)}
                           onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
             ) : (
-              <DatePicker floatingLabelText="协议有效结束时间"
+              <DatePicker floatingLabelText="协议有效结束时间" disabled={isProcurement}
                           onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
             )}
           </div>
@@ -386,205 +364,131 @@ export class DetailHeader extends React.PureComponent {
           <div/>
         </div>
         <this.GoodsTable />
-        {/*<button onClick={this.handleAddGoods} className="btn-add-goods" style={{marginLeft: 10}}>*/}
-          {/*<FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>*/}
-        {/*</button>*/}
+        {
+          !isProcurement && <button onClick={() => {this.store.openItemDialog()}}
+                                    className="btn-add-goods" style={{marginLeft: 10}}>
+            <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
+          </button>
+        }
       </div>
     );
   });
 
-  handleAddGoods = () => {
-    this.isCreateGood = true;
-    this.handleDialogOpen();
-  };
-
-
   onCellClick = (row,column) => {
+    if (this.props.detail.isProcurement) return;
     if (column > -1) {
-      this.focusGoodData = this.props.detail.goods_list[row];
-      this.editRowNumber = row;
-      this.handleDialogOpen();
+      const itemConfirmed = (this.store.item_list[row].relative_confirm_status === 1) || (this.store.item_list[row].confirm_status === 1);
+      if (!itemConfirmed) this.store.openItemDialog(this.store.item_list[row]);
     }
   };
 
-  GoodsTable = () => {
+  onRowSelection = (value) => this.store.setConfirmedItem(value);
+
+  get enableSelectAllItem() {
+    let result = true;
+    if (!this.props.detail.isProcurement) return result;
+    this.store.item_list.forEach(item => {
+      if (item.relative_confirm_status === 0) result = false;
+    });
+    return result;
+  }
+
+  GoodsTable = observer(() => {
     const {detail} = this.props;
     const {styles} = DetailHeader;
     return (
-      <Table className="goods-table" multiSelectable onCellClick={this.onCellClick}>
-        <TableHeader enableSelectAll>
+      <Table className="goods-table" multiSelectable onCellClick={this.onCellClick} onRowSelection={this.onRowSelection}>
+        <TableHeader enableSelectAll={this.enableSelectAllItem} >
           <TableRow>
-            <TableHeaderColumn style={{...styles.noPadding, width: 26}}>行号</TableHeaderColumn>
-            <TableHeaderColumn style={{...styles.noPadding, width: 40}}>物料号</TableHeaderColumn>
-            {detail.type === DetailContentType.SALE_ORDER &&
-              <TableHeaderColumn style={{...styles.noPadding, width: 70}}>客户物料号</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 40}}>行号</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 60}}>物料号</TableHeaderColumn>
+            {!detail.isProcurement &&
+              <TableHeaderColumn style={{...styles.noPadding, width: 60}}>客户物料号</TableHeaderColumn>
             }
             <TableHeaderColumn style={styles.noPadding}>物料名称</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>规格备注</TableHeaderColumn>
-            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>数量</TableHeaderColumn>
-            <TableHeaderColumn style={{...styles.noPadding, width: 30}}>单位</TableHeaderColumn>
-            <TableHeaderColumn style={{...styles.noPadding, width: 40}}>单价</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>金额</TableHeaderColumn>
-            <TableHeaderColumn style={styles.noPadding}>交期/收货</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 50}}>规格备注</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 50}}>数量</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 50}}>单位</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 50}}>单价</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 50}}>金额</TableHeaderColumn>
+            <TableHeaderColumn style={{...styles.noPadding, width: 70}}>交期/收货</TableHeaderColumn>
           </TableRow>
         </TableHeader>
-        <TableBody showRowHover>
-          {detail.goods_list && detail.goods_list.map((item, index) => (
-            <TableRow key={index} selectable={true}>
-              <TableRowColumn style={{...styles.noPadding, width: 20}}>{item.line_no || 0}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.goods_no || 0}</TableRowColumn>
+        <TableBody showRowHover deselectOnClickaway={false}>
+          {this.store.item_list.map((item, index) => (
+            <TableRow key={index}
+                      selectable={true}
+                      selected={this.store.currentComfirmedItems.findIndex(i => i === index) > -1}>
+              <TableRowColumn style={{...styles.noPadding, width: 40}}>
+                {/* 扩展行点击事件， 以修复点击行而不触发checkbox */}
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, 0);}}>
+                  <p>{item.line_no || '暂无'}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 60}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, 1);}}>
+                  <p>{item.item_code || '暂无'}</p>
+                </div>
+              </TableRowColumn>
               {
-                detail.type === DetailContentType.SALE_ORDER && <TableRowColumn
-                style={{...styles.noPadding, width: 70}}>{item.client_goods_no || 0}</TableRowColumn>
+                !detail.isProcurement && <TableRowColumn
+                style={{...styles.noPadding, width: 60}}>
+                  <div className="expend-tab-row"
+                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, 2);}}>
+                    <p>{item.source_no || '暂无'}</p>
+                  </div>
+                </TableRowColumn>
               }
-              <TableRowColumn style={styles.noPadding}>{item.name || '暂无'}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.size || '暂无'}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.count || 0}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 30}}>{item.unit || '暂无'}</TableRowColumn>
-              <TableRowColumn style={{...styles.noPadding, width: 40}}>{item.unit_price || 0}{item.discount}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.total_price}</TableRowColumn>
-              <TableRowColumn style={styles.noPadding}>{item.due_date ? formatTime(item.due_date, 'YYYY/M/D') : '暂无'}</TableRowColumn>
+              <TableRowColumn style={styles.noPadding}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 3 : 2);}}>
+                  <p>{item.item_name || '暂无'}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 50}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 4 : 3);}}>
+                  <p>{item.item_spec || '暂无'}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 50}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 5 : 4);}}>
+                  <p>{item.quantity || 0}</p>
+                </div>
+                </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 50}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 6 : 5);}}>
+                  <p>{item.unit || '暂无'}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 50}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 7 : 6);}}>
+                  <p>{item.price || 0}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 50}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 8 : 7);}}>
+                  <p>{item.amount}</p>
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{...styles.noPadding, width: 70}}>
+                <div className="expend-tab-row"
+                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); this.onCellClick(index, !detail.isProcurement ? 9 : 8);}}>
+                  <p>{(item.deliver_time && item.deliver_time.split(' ')[0]) || '暂无'}</p>
+                </div>
+              </TableRowColumn>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
-  };
-
-  EditGoodsDialog = () => {
-    const {detail} = this.props;
-    const title = this.focusGoodData ? '编辑' : '创建';
-    if (this.isCreateGood) this.focusGoodData = {};
-    const actions = [
-      <FlatButton
-        label="确认"
-        primary={true}
-        keyboardFocused={false}
-        onTouchTap={this.submitEdit}
-      />,
-      <FlatButton
-        label="取消"
-        primary={false}
-        keyboardFocused={true}
-        onTouchTap={this.handleDialogClose}
-      />,
-    ];
-    return (
-      <Dialog
-        title={title}
-        actions={actions}
-        modal={false}
-        autoScrollBodyContent
-        open={this.state.openEditDialog}
-        onRequestClose={this.handleDialogClose}>
-        <div className="edit-form">
-          <TextField floatingLabelText="行号" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.line_no}
-                     onChange={(e, value) => this.focusGoodData.line_no = parseInt(value, 10)}/>
-          <TextField floatingLabelText="物料号" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.goods_no}
-                     onChange={(e, value) => this.focusGoodData.goods_no = parseInt(value, 10)}/>
-          {detail.type === DetailContentType.SALE_ORDER && <TextField floatingLabelText="客户物料号"
-                                                                      className="edit-field"
-                                                                      defaultValue={this.focusGoodData && this.focusGoodData.client_goods_no}
-                                                                      onChange={(e, value) => this.focusGoodData.client_goods_no = parseInt(value, 10)}/>}
-          <TextField floatingLabelText="物料名称" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.name}
-                     onChange={(e, value) => this.focusGoodData.name = value}/>
-          <TextField floatingLabelText="规格备注" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.size}
-                     onChange={(e, value) => this.focusGoodData.size = value}/>
-          <TextField floatingLabelText="数量" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.count}
-                     onChange={(e, value) => this.focusGoodData.count = parseInt(value, 10)}/>
-          <TextField floatingLabelText="单位" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.unit}
-                     onChange={(e, value) => this.focusGoodData.unit = value}/>
-          <TextField floatingLabelText="单价" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.unit_price}
-                     onChange={(e, value) => this.focusGoodData.unit_price = parseInt(value, 10)}/>
-          <TextField floatingLabelText="金额" className="edit-field"
-                     defaultValue={this.focusGoodData && this.focusGoodData.total_price}
-                     onChange={(e, value) => this.focusGoodData.total_price = parseInt(value, 10)}/>
-          <DatePicker floatingLabelText="交期/收货" className="edit-field"
-                      defaultDate={this.focusGoodData && this.focusGoodData.due_date && new Date(this.focusGoodData.due_date)}
-                      onChange={(e, value) => this.focusGoodData.due_date = new Date(value).getTime()}/>
-        </div>
-      </Dialog>
-    )
-  };
-
-  submitEdit = () => {
-    if (this.isCreateGood) {
-      this.props.detail.goods_list.push(this.focusGoodData);
-    } else {
-      this.props.detail.goods_list[this.editRowNumber] = {...this.props.detail.goods_list[this.editRowNumber], ...this.focusGoodData}
-    }
-    this.handleDialogClose();
-  };
-
-  handleDialogOpen = () => {
-    this.setState({openEditDialog: true});
-  };
-
-  handleDialogClose = () => {
-    this.focusGoodData = null;
-    this.editRowNumber = null;
-    this.isCreateGood = false;
-    this.setState({openEditDialog: false});
-  };
-
-  handleCloseSelect = () => {
-    this.contactsFilter = [];
-    this.contactsSelectType = null;
-    this.setState({openContactList: false});
-  };
-
-  handleContactSelect = () => {
-    this.setState({openContactList: true});
-  };
-
-  onSelectContact = (user) => {
-    switch (this.contactsSelectType) {
-      default: break;
-      case 'IN_CHARGE': this.props.detail.in_charge = user; break;
-      case 'FOLLOW': this.props.detail.follower.push(user); break;
-    }
-    this.handleCloseSelect();
-  };
-
-  SelectUserDialog = () => {
-    const {contacts, openContactList} = this.state;
-    const contactDS = contacts.filter(c => (this.contactsFilter.findIndex(filter => filter.display_name === c.display_name) === -1));
-    const actions = [
-      <FlatButton
-        label="取消"
-        primary={false}
-        keyboardFocused={true}
-        onTouchTap={this.handleCloseSelect}
-      />,
-    ];
-    return (
-      <Dialog
-        title={'请选择联系人'}
-        actions={actions}
-        modal={false}
-        autoScrollBodyContent
-        open={openContactList}
-        onRequestClose={this.handleCloseSelect}>
-        <List>
-          {contactDS.map((user, index) => <ListItem
-            primaryText={user.display_name}
-            secondaryText={user.position}
-            secondaryTextLines={1}
-            onClick={() => {this.onSelectContact({display_name: user.display_name, position: user.position});}}
-            key={index}
-          />)}
-          {!contactDS.length && <p>暂无联系人</p>}
-        </List>
-      </Dialog>
-    )
-  };
+  });
 
   render() {
     const {isMail} = this.props;
@@ -592,8 +496,19 @@ export class DetailHeader extends React.PureComponent {
       <div className="detail-header">
         <this.TitleItem />
         {isMail ? <this.MessageInfo /> : <this.OrderInfo />}
-        <this.EditGoodsDialog />
-        <this.SelectUserDialog />
+        <Dialog
+          title='物料'
+          titleStyle={{fontSize: 18}}
+          modal={false}
+          autoScrollBodyContent
+          open={this.store.openEditItemDialog}
+          onRequestClose={this.store.closeItemDialog}>
+          <AddMaterial material={this.store.editingMaterial}
+                       onDel={this.store.deleteMaterialItem}
+                       onAdd={this.store.addMaterialItem}
+                       onUpdate={this.store.updateMaterialItem}
+                       onclose={this.store.closeItemDialog}/>
+        </Dialog>
       </div>
     );
   }

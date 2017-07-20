@@ -112,7 +112,6 @@ class SearchStore {
     try {
       // const pageNo = this.pageNo > 1 ? this.pageNo : null;
       const resp = await MailSvc.search(this.searchType, this.searchKeyWord);
-      console.log(resp);
       runInAction('after search', () => {
         if (resp.code === '0') {
           this.DS = this.pageNo > 1 ? [...this.DS, ...resp.data] : resp.data;

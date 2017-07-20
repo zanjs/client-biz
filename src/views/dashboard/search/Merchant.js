@@ -256,7 +256,7 @@ const MemberList = ({listData, headerTxt, loading, currentUser, deleteUser}) => 
                   <IconMenu iconButtonElement={iconButtonElement}>
                     <MenuItem onTouchTap={() => BizDialog.onOpen('用户资料', <UserDetail user={item}/>)}>查看</MenuItem>
                     {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('设置部门', <SetDepartment user={item}/>)}>设置部门</MenuItem>}
-                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('用户资料', <ComfirmDialog submitAction={deleteUser.bind(null, item)}/>)}>移出商户</MenuItem>}
+                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('移出商户', <ComfirmDialog submitAction={deleteUser.bind(null, item)}/>)}>移出商户</MenuItem>}
                   </IconMenu>
                 )}
                 primaryText={item.username || `用户名: ${item.user_name}`}

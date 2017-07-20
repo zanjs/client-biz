@@ -58,6 +58,11 @@ const returnItem = async (bill_no, line_no, quatity) => {
   return resp.data;
 };
 
+const setNoticeList = async (bill_no, notice_list) => {
+  const resp = await axios.post('/bill_gateway/set_notice_list', {bill_no, notice_list});
+  return resp.data;
+};
+
 export const CURRENCY = [
   {value: 'CNY', name: '人民币'},
   {value: 'USD', name: '美元'},
@@ -85,4 +90,5 @@ export default {
   getBillNo,
   sendItem,
   returnItem,
+  setNoticeList,
 }

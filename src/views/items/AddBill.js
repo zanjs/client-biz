@@ -91,7 +91,10 @@ class AddBillState {
     if (item) this.editingMaterial = item;
     this.openAddItemDialog = true;
   };
-  @action closeItemDialog = () => this.openAddItemDialog = false;
+  @action closeItemDialog = () => {
+    this.editingMaterial = {};
+    this.openAddItemDialog = false;
+  };
 
   @action getBillNo = async () => {
     if (this.getting) return;
@@ -311,7 +314,7 @@ export default class AddBill extends React.PureComponent {
           </TableBody>
         </Table>
         <div style={{textAlign: 'right'}}>
-          <FloatingActionButton mini={true} style={{marginTop: 20}} onTouchTap={this.store.openItemDialog}>
+          <FloatingActionButton mini={true} style={{marginTop: 20}} onTouchTap={this.store.openItemDialog.bind(null, null)}>
             <ContentAdd />
           </FloatingActionButton>
         </div>

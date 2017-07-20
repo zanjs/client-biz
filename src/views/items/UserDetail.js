@@ -68,7 +68,7 @@ export class SetDepartment extends React.PureComponent {
   };
   render() {
     return (
-      <form>
+      <form onSubmit={this.submit}>
         <TextField
           floatingLabelText="用户名"
           value={this.props.user.user_name}

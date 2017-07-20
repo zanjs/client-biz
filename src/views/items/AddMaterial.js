@@ -21,7 +21,8 @@ class AddMaterialState {
   @observable submitType = this.SubmitType.ADD;
   id = null;
 
-  constructor(material = {}) {
+  constructor(material) {
+    if (!material) material = {};
     this.name = material.item_name || '';
     this.line_no = material.line_no || '';
     this.item_code = material.item_code || '';
@@ -30,7 +31,7 @@ class AddMaterialState {
     this.price = material.price || 0;
     this.quantity = material.quantity || 0;
     this.id = material.item_id;
-    this.deliver_time = material.deliver_time || Date.now();
+    this.deliver_time = material.deliver_time || null;
     this.submitType = material.item_id ? this.SubmitType.MODIFY : this.SubmitType.ADD;
   }
 
@@ -110,12 +111,12 @@ class AddMaterialState {
 }
 
 @observer
-class AddPartner extends React.PureComponent {
+class AddMaterial extends React.PureComponent {
   store = new AddMaterialState(this.props.material);
   render() {
-    const {material} = this.props;
-    const submitTxt = material.item_id ? '修改' : '创建';
-    const submitAction = material.item_id ? this.store.update : this.store.submit;
+    const {material, onDel} = this.props;
+    const submitTxt = (material && material.item_id) ? '修改' : '创建';
+    const submitAction = (material && material.item_id) ? this.store.update : this.store.submit;
     return (
       <form onSubmit={submitAction}>
         <TextField floatingLabelText="物料名称"
@@ -128,10 +129,6 @@ class AddPartner extends React.PureComponent {
                    type="number"
                    value={this.store.line_no} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('line_no', value ? parseInt(value, 10) : '')}/>
-        {/*{detail.type === DetailContentType.SALE_ORDER && <TextField floatingLabelText="客户物料号"*/}
-                                                                    {/*className="edit-field"*/}
-                                                                    {/*defaultValue={this.focusGoodData && this.focusGoodData.client_goods_no}*/}
-                                                                    {/*onChange={(e, value) => this.focusGoodData.client_goods_no = parseInt(value, 10)}/>}*/}
         <TextField floatingLabelText="规格备注"
                    value={this.store.item_spec} style={{marginRight: 20}}
                    onChange={(e, value) => this.store.setKey('item_spec', value)}/>
@@ -148,14 +145,22 @@ class AddPartner extends React.PureComponent {
                    onChange={(e, value) => this.store.setKey('price', value ? parseFloat(value).toFixed(2) : '')}/>
         <TextField floatingLabelText="金额" readOnly style={{marginRight: 20}}
                    value={((this.store.quantity || 0) * (this.store.price || 0)).toFixed(2)}/>
-        <DatePicker floatingLabelText="交期/收货" style={{marginRight: 20}}
-                    defaultDate={this.store.deliver_time ? new Date(this.store.deliver_time) : new Date()}
-                    onChange={(e, value) => this.store.setKey('deliver_time', new Date(value).getTime()) }/>
+        { this.store.deliver_time ? (
+          <DatePicker floatingLabelText="交期/收货" style={{marginRight: 20}}
+                      defaultDate={new Date(this.store.deliver_time)}
+                      onChange={(e, value) => this.store.setKey('deliver_time', new Date(value).getTime()) }/>
+        ) : (
+          <DatePicker floatingLabelText="交期/收货" style={{marginRight: 20}}
+                      onChange={(e, value) => this.store.setKey('deliver_time', new Date(value).getTime()) }/>
+        )}
         <div style={{textAlign: 'right'}}>
           <RaisedButton style={{ marginTop: 20 }} label={this.store.submitting ? null : submitTxt}
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
                         primary={!!this.store.validated} disabled={!this.store.validated}
                         onClick={submitAction.bind(null, this.props.onclose, this.props.onAdd, this.props.onUpdate)} />
+          {onDel && material && (
+            <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label="删除" primary
+                          onClick={() => {onDel(material); this.props.onclose();}} />)}
           <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label="取消"
                         primary={false} onClick={this.props.onclose} />
         </div>
@@ -164,4 +169,4 @@ class AddPartner extends React.PureComponent {
   }
 }
 
-export default AddPartner;
+export default AddMaterial;

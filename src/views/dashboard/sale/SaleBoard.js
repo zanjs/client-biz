@@ -171,7 +171,7 @@ export default class SaleBoard extends React.PureComponent {
         <div className="bill-list">
           {!this.store.DS.length && <p className="none-data">暂无业务单据</p>}
           {this.store.DS.map((data, index) => (
-            <MessageItem message={data} isProcurement key={index}/>
+            <MessageItem message={data} key={index}/>
           ))}
           <div style={{width: '100%', textAlign: 'right'}}>
             {this.store.hasMore && <FlatButton label="加载更多" primary onTouchTap={this.store.load}/>}

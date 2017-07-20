@@ -3999,9 +3999,9 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/map-obj/download/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
 
-material-ui@^0.18.1:
-  version "0.18.1"
-  resolved "http://registry.npm.taobao.org/material-ui/download/material-ui-0.18.1.tgz#1c8a47d7e930ff0b07064dd8633035984a5a3569"
+material-ui@^0.18.6:
+  version "0.18.6"
+  resolved "http://registry.npm.taobao.org/material-ui/download/material-ui-0.18.6.tgz#29b8ef78952872c821e8599e5edd9ae276dcdaae"
   dependencies:
     babel-runtime "^6.23.0"
     inline-style-prefixer "^3.0.2"

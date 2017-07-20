@@ -8,8 +8,7 @@ class MerchantMemberStore {
   @observable loading = false;
 
   @computed get memberList() {
-    // return this.members.filter(m => !!m.status);
-    return this.members;
+    return this.members.filter(m => m.status === 0);
   }
 
   @action load = async () => {
