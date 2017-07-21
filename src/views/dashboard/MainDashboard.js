@@ -3,7 +3,8 @@ import FontIcon from 'material-ui/FontIcon';
 import MainBoard from './main/MainBoard';
 import ProcurementBoard from './procurement/ProcurementBoard';
 import SaleBoard from './sale/SaleBoard';
-import Calendar from './calendar/Calendar';
+import FinancialBoard from './financial/FinancialBoard';
+// import Calendar from './calendar/Calendar';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
 
@@ -27,7 +28,7 @@ export default class MainDashboard extends React.PureComponent {
           <Tab label="看板" value={0} style={tabStyle}/>
           <Tab label="采购" value={1} style={tabStyle}/>
           <Tab label="销售" value={2} style={tabStyle}/>
-          {/*<Tab label="日历" value={3} style={tabStyle}/>*/}
+          <Tab label="结算" value={3} style={tabStyle}/>
         </Tabs>
         <div className="defaultRight" style={{width: 110, height: 50}}/>
       </div>
@@ -39,7 +40,7 @@ export default class MainDashboard extends React.PureComponent {
       case 0: return <MainBoard />;
       case 1: return <ProcurementBoard />;
       case 2: return <SaleBoard />;
-      case 3: return <Calendar />;
+      case 3: return <FinancialBoard />;
       default: return;
     }
   };

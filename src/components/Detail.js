@@ -25,6 +25,7 @@ class DetailStore {
   @observable currentComfirmedItems = [];
   @observable openEditItemDialog = false;
   @observable editingMaterial = null;
+  @observable confirm_status = 0;
 
   @computed get comfirmedItemChanged() {
     if (this.comfirmedItems.length !== this.currentComfirmedItems.length) return true;
@@ -37,6 +38,10 @@ class DetailStore {
 
   @computed get shouldSaveBill() {
     return this.isNoticeChanged || !!this.modifiedList.length || this.comfirmedItemChanged;
+  }
+
+  @computed get lockModifyBill() {
+    return !!this.confirm_status || (this.detail && !!this.detail.head.relative_confirm_status);
   }
 
   @action setConfirmedItem = value => {
@@ -162,6 +167,7 @@ class DetailStore {
           this.valid_end_time = head.valid_end_time;
           this.priority = head.priority;
           this.notice_list = head.notice_list;
+          this.confirm_status = head.confirm_status;
           this.item_list = [...bodies];
           this.item_list.forEach((item, index) => {
             if (!!item.confirm_status) this.comfirmedItems.push(index);
@@ -268,6 +274,40 @@ class DetailStore {
     this.updating = false;
   };
 
+  @action confirmBill = async () => {
+    if (this.confirmingBill || !!this.confirm_status) return;
+    this.confirmingBill = true;
+    try {
+      const resp = await BillSvc.confirmBill(this.detail.head.bill_no);
+      runInAction('after confirm bill', () => {
+        if (resp.code === '0') {
+          this.confirm_status = 1;
+          Toast.show('确认单据成功');
+        } else Toast.show(resp.msg || '抱歉，确认单据失败，请刷新页面后重新尝试')
+      })
+    } catch (e) {
+      console.log(e, 'comirm bill');
+    }
+    this.confirmingBill = false;
+  };
+
+  @action cancelConfirmBill = async () => {
+    if (this.cancelConfirmingBill || !this.confirm_status) return;
+    this.cancelConfirmingBill = true;
+    try {
+      const resp = await BillSvc.cancelConfirmBill(this.detail.head.bill_no);
+      runInAction('after confirm bill', () => {
+        if (resp.code === '0') {
+          this.confirm_status = 0;
+          Toast.show('取消确认单据成功');
+        } else Toast.show(resp.msg || '抱歉，取消确认单据失败，请刷新页面后重新尝试')
+      })
+    } catch (e) {
+      console.log(e, 'cancel comirm bill');
+    }
+    this.cancelConfirmingBill = false;
+  };
+
   @action clear = () => {
     this.detail = null;
     this.isMail = false;
@@ -285,6 +325,7 @@ class DetailStore {
     this.currentComfirmedItems = [];
     this.openEditItemDialog = false;
     this.editingMaterial = null;
+    this.confirm_status = 0;
   }
 }
 

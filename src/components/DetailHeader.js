@@ -165,7 +165,8 @@ export class DetailHeader extends React.PureComponent {
   }
 
   TitleItem = observer(() => {
-    const {detail, isMail} = this.props;
+    const {detail, isMail, confirm_status} = this.store;
+    // const {head} = detail;
     if (isMail) {
       return (
         <div className="detail-title message">
@@ -207,16 +208,24 @@ export class DetailHeader extends React.PureComponent {
                 targetOrigin={{horizontal: 'left', vertical: 'top'}}
                 onRequestClose={this.handleFollowActionsClose}>
                 { this.props.detail.isProcurement ? <Menu>
-                  <MenuItem primaryText="已发货" />
-                  <MenuItem primaryText="收货" />
-                  <MenuItem primaryText="退货" />
-                  <MenuItem primaryText="生成结算单" />
-                  <MenuItem primaryText="完成" />
-                  <MenuItem primaryText="取消" />
+                  <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
+                            onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
+                  <MenuItem primaryText="订单退货" />
+                  <MenuItem primaryText="创建结算单" />
+                  {/*<MenuItem primaryText="已发货" />*/}
+                  {/*<MenuItem primaryText="收货" />*/}
+                  {/*<MenuItem primaryText="退货" />*/}
+                  {/*<MenuItem primaryText="生成结算单" />*/}
+                  {/*<MenuItem primaryText="完成" />*/}
+                  {/*<MenuItem primaryText="取消" />*/}
                 </Menu> : <Menu>
-                  <MenuItem primaryText="生成框架协议" />
-                  <MenuItem primaryText="生成订单" />
-                  <MenuItem primaryText="完成" />
+                  <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
+                            onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
+                  <MenuItem primaryText="订单发货" />
+                  <MenuItem primaryText="创建结算单" />
+                  {/*<MenuItem primaryText="生成框架协议" />*/}
+                  {/*<MenuItem primaryText="生成订单" />*/}
+                  {/*<MenuItem primaryText="完成" />*/}
                 </Menu>}
               </Popover>
             </div>
@@ -273,9 +282,11 @@ export class DetailHeader extends React.PureComponent {
               {this.store.notice_list.map((item, index) => (
                 <span key={index}>{item.name}{index === (this.store.notice_list.length - 1) ? null : '；'}</span>))}
             </p>
-            <button onClick={() => this.setState({openMemberListDialog: true})} style={{margin: '1px 0 0 5px'}}>
-              <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
-            </button>
+            { !this.store.lockModifyBill && (
+              <button onClick={() => this.setState({openMemberListDialog: true})} style={{margin: '1px 0 0 5px'}}>
+                <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
+              </button>
+            )}
             <Dialog
               title='商户成员列表'
               titleStyle={{fontSize: 18}}
@@ -302,7 +313,7 @@ export class DetailHeader extends React.PureComponent {
           </div>
           <div style={{flex: 1}}>
             <SelectField floatingLabelText="付款方式: " value={this.store.pay_type}
-                         disabled={isProcurement}
+                         disabled={isProcurement || this.store.lockModifyBill}
                          onChange={(e, i, v) => this.store.setKey('pay_type', v)} style={{width: 120}}>
               { ['', '现款现结', '月结'].map(((item, index) => <MenuItem value={index} primaryText={item || '暂无'} key={index}/>)) }
             </SelectField>
@@ -313,6 +324,7 @@ export class DetailHeader extends React.PureComponent {
           value={this.store.priority}
           style={{marginBottom: 20}}
           multiple={true}
+          disabled={this.store.lockModifyBill}
           onChange={(event, index, val) => this.store.setKey('priority', (val && val.slice(0, 2)) || "")}
         >
           <MenuItem value='NOT_IMPORTENT' primaryText='不重要' insetChildren={true}
@@ -332,11 +344,11 @@ export class DetailHeader extends React.PureComponent {
           <div style={{flex: 1}}>
             {this.store.valid_begin_time ? (
               <DatePicker floatingLabelText="协议有效开始时间"
-                          disabled={isProcurement}
+                          disabled={isProcurement || this.store.lockModifyBill}
                           defaultDate={new Date(this.store.valid_begin_time)}
                           onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
             ): (
-              <DatePicker floatingLabelText="协议有效开始时间" disabled={isProcurement}
+              <DatePicker floatingLabelText="协议有效开始时间" disabled={isProcurement || this.store.lockModifyBill}
                           onChange={(e, value) => this.store.setKey('valid_begin_time', new Date(value).getTime())}/>
             )}
 
@@ -344,11 +356,11 @@ export class DetailHeader extends React.PureComponent {
           <div style={{flex: 1}}>
             {this.store.valid_end_time ? (
               <DatePicker floatingLabelText="协议有效结束时间"
-                          disabled={isProcurement}
+                          disabled={isProcurement || this.store.lockModifyBill}
                           defaultDate={new Date(this.store.valid_end_time)}
                           onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
             ) : (
-              <DatePicker floatingLabelText="协议有效结束时间" disabled={isProcurement}
+              <DatePicker floatingLabelText="协议有效结束时间" disabled={isProcurement || this.store.lockModifyBill}
                           onChange={(e, value) => this.store.setKey('valid_end_time', new Date(value).getTime())}/>
             )}
           </div>
@@ -365,17 +377,19 @@ export class DetailHeader extends React.PureComponent {
         </div>
         <this.GoodsTable />
         {
-          !isProcurement && <button onClick={() => {this.store.openItemDialog()}}
-                                    className="btn-add-goods" style={{marginLeft: 10}}>
-            <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
-          </button>
+          !isProcurement && !this.store.lockModifyBill && (
+            <button onClick={() => {this.store.openItemDialog()}}
+                    className="btn-add-goods" style={{marginLeft: 10}}>
+              <FontIcon className="material-icons" color="#333" style={{fontSize: 16}}>add_circle_outline</FontIcon>
+            </button>
+          )
         }
       </div>
     );
   });
 
   onCellClick = (row,column) => {
-    if (this.props.detail.isProcurement) return;
+    if (this.store.detail.isProcurement || this.store.lockModifyBill) return;
     if (column > -1) {
       const itemConfirmed = (this.store.item_list[row].relative_confirm_status === 1) || (this.store.item_list[row].confirm_status === 1);
       if (!itemConfirmed) this.store.openItemDialog(this.store.item_list[row]);
@@ -386,7 +400,7 @@ export class DetailHeader extends React.PureComponent {
 
   get enableSelectAllItem() {
     let result = true;
-    if (!this.props.detail.isProcurement) return result;
+    if (!this.store.detail.isProcurement) return result;
     this.store.item_list.forEach(item => {
       if (item.relative_confirm_status === 0) result = false;
     });
@@ -394,11 +408,11 @@ export class DetailHeader extends React.PureComponent {
   }
 
   GoodsTable = observer(() => {
-    const {detail} = this.props;
+    const {detail} = this.store;
     const {styles} = DetailHeader;
     return (
       <Table className="goods-table" multiSelectable onCellClick={this.onCellClick} onRowSelection={this.onRowSelection}>
-        <TableHeader enableSelectAll={this.enableSelectAllItem} >
+        <TableHeader enableSelectAll={this.enableSelectAllItem && !this.store.lockModifyBill} >
           <TableRow>
             <TableHeaderColumn style={{...styles.noPadding, width: 40}}>行号</TableHeaderColumn>
             <TableHeaderColumn style={{...styles.noPadding, width: 60}}>物料号</TableHeaderColumn>
