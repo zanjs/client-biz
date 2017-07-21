@@ -6,9 +6,10 @@ import TextField from 'material-ui/TextField';
 import {formatTime} from "../utils/time";
 import CommentSvc from '../services/comment';
 import {ToastStore as Toast} from "./Toast";
+import Storage from '../utils/storage';
 
 class CommentStore {
-  @observable comments = null;
+  @observable comments = [];
   @observable content = '';
   @observable billNo = null;
   @observable submitting = false;
@@ -40,6 +41,11 @@ class CommentStore {
       const resp = await CommentSvc.create(this.billNo, this.content);
       runInAction('after send', () => {
         if (resp.code === '0') {
+          const current = Storage.getValue('user');
+          const date = formatTime(Date.now(), 'YYYY-MM-DD \u00a0 HH:mm:ss');
+          const newComment = {content: this.content, user_name: current.name, user_id: current.id,
+            create_time: date};
+          this.comments.push(newComment);
           this.content = '';
         } else Toast.show(resp.msg || '抱歉，评论失败，请稍后重新尝试');
       });
@@ -66,12 +72,11 @@ export class Comments extends React.PureComponent {
     },
   };
 
-  showMessage = () => alert('SOME MESSAGE');
-  keydownHandler(e) {
-    if(e.keyCode===13 && e.ctrlKey) this.showMessage()
-  }
+  keydownHandler = e => {
+    if(e.keyCode===13 && e.ctrlKey) this.store.onSend(e);
+  };
   componentWillMount() {
-    this.store.load(this.props.bill_no);
+    this.store.load(this.props.billNo);
   }
   componentDidMount() {
     document.addEventListener('keydown', this.keydownHandler);
@@ -115,16 +120,16 @@ export class Comments extends React.PureComponent {
   // onAt = () => alert('@');
 
 
-  CommentList = () => {
-    const {comments} = this.props;
+  CommentList = observer(() => {
+    const {comments} = this.store;
     return (
       <div className="comment-list">
-        {comments && comments.map((comment, index) => (
+        {comments.map((comment, index) => (
           <div key={index} className="comment-item">
             <div className="flex-row comment-info">
-              <p className="comment-company">{comment.company}</p>
-              <p style={{marginRight: 20}}>{comment.sender.display_name} / {comment.sender.position}</p>
-              <p>{formatTime(comment.timestamp, 'YYYY-MM-D ddd \u00a0 h:mm')}</p>
+              {/*<p className="comment-company">{comment.company}</p>*/}
+              <p style={{marginRight: 20}}>用户: {comment.user_name} (id: {comment.user_id})</p>
+              <p>{comment.create_time}</p>
             </div>
             <p className="comment-content">{comment.content}</p>
           </div>
@@ -167,7 +172,7 @@ export class Comments extends React.PureComponent {
     //     ))}
     //   </div>
     // );
-  };
+  });
 
   render() {
     return (

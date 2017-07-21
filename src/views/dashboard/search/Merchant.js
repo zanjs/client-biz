@@ -23,6 +23,7 @@ import {BizDialog, ComfirmDialog} from "../../../components/Dialog";
 import DialogForm from "../../items/DialogForm";
 import MemberStore from "../../stores/merchantMember";
 import UserDetail, {SetDepartment} from '../../items/UserDetail';
+import Storage from '../../../utils/storage';
 
 class MerchantListStore {
   @observable merchantList = [];
@@ -41,7 +42,29 @@ class MerchantListStore {
       Toast.show('抱歉，发生未知错误，请刷新页面稍后重试');
     }
     this.loading = false;
-  }
+  };
+  @action quitMerchant = async (merchant) => {
+    if (this.quiting) return;
+    this.quiting = true;
+    try {
+      const resp = await MerchantSvc.quitMerchant(merchant.mer_id);
+      runInAction('after quite', () => {
+        if (resp.code === '0') {
+          this.merchantList = this.merchantList.filter(m => m.mer_id !== merchant.mer_id);
+          Toast.show('退出成功');
+          BizDialog.onClose();
+          console.log(Storage.getValue('user'));
+          if (merchant.mer_id === Storage.getValue('user').mer_id) {
+            MemberStore.load();
+            MerchantDepartment.load();
+          }
+        } else Toast.show(resp.msg || '抱歉，退出失败，请刷新页面后重新尝试');
+      });
+    } catch (e) {
+      console.log(e, 'quite merchat');
+    }
+    this.quiting = false;
+  };
 }
 
 class DepartmentStore {
@@ -214,6 +237,7 @@ export default class MerchantInfo extends React.Component {
       <div className="search-content">
         <MerchantList headerTxt={`已加入商户列表(当前id: ${this.props.user.user.current.mer_id})`}
                       listData={this.merchantListStore.merchantList} loading={this.merchantListStore.loading}
+                      quitMerchant={this.merchantListStore.quitMerchant}
                       switchMerchant={this.switchMerchant} currentUser={this.props.user.user.current}/>
         <MemberList headerTxt="当前商户成员" listData={this.memberStore.memberList} loading={this.memberStore.loading}
                     currentUser={this.props.user.user.current} deleteUser={this.memberStore.delete}/>
@@ -255,8 +279,10 @@ const MemberList = ({listData, headerTxt, loading, currentUser, deleteUser}) => 
                 rightIconButton={(
                   <IconMenu iconButtonElement={iconButtonElement}>
                     <MenuItem onTouchTap={() => BizDialog.onOpen('用户资料', <UserDetail user={item}/>)}>查看</MenuItem>
-                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('设置部门', <SetDepartment user={item}/>)}>设置部门</MenuItem>}
-                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('移出商户', <ComfirmDialog submitAction={deleteUser.bind(null, item)}/>)}>移出商户</MenuItem>}
+                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('设置部门',
+                      <SetDepartment user={item}/>)}>设置部门</MenuItem>}
+                    {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('移出商户',
+                      <ComfirmDialog submitAction={deleteUser.bind(null, item)}/>)}>移出商户</MenuItem>}
                   </IconMenu>
                 )}
                 primaryText={item.username || `用户名: ${item.user_name}`}
@@ -280,7 +306,7 @@ const MemberList = ({listData, headerTxt, loading, currentUser, deleteUser}) => 
   );
 };
 
-const MerchantList = ({listData, headerTxt, loading, switchMerchant, currentUser}) => {
+const MerchantList = ({listData, headerTxt, loading, switchMerchant, currentUser, quitMerchant}) => {
   const openApplyDialog = () => BizDialog.onOpen('加入商户', <DialogForm type='apply' hintTxt="请输入商户的ID" submitTxt="申请"/>);
   return (
     <List className='search-list'>
@@ -296,11 +322,11 @@ const MerchantList = ({listData, headerTxt, loading, switchMerchant, currentUser
             <div key={index}>
               <ListItem
                 leftIcon={<MerchantIcon />}
-                rightIconButton={(currentUser && !currentUser.is_admin) ? (
-                  <IconMenu iconButtonElement={iconButtonElement}>
-                    { <MenuItem onTouchTap={switchMerchant.bind(null, item.mer_id)}>切换至该商户</MenuItem>}
-                  </IconMenu>
-                ) : null}
+                rightIconButton={<IconMenu iconButtonElement={iconButtonElement}>
+                  {(currentUser && !currentUser.is_admin) && <MenuItem onTouchTap={switchMerchant.bind(null, item.mer_id)}>切换至该商户</MenuItem>}
+                    <MenuItem onTouchTap={() => BizDialog.onOpen('确认退出',
+                      <ComfirmDialog submitAction={quitMerchant.bind(null, item)}/>)}>退出该商户</MenuItem>
+                  </IconMenu>}
                 primaryText={item.username || `商户名称: ${item.mer_name}`}
                 secondaryText={
                   <p>
@@ -369,7 +395,8 @@ class DepartmentItem extends React.Component {
                 this.store.setParentId(item.id);
                 BizDialog.onOpen('创建部门', <AddDepartment/>);
               }}>创建下属部门</MenuItem>}
-              {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('确认删除', <ComfirmDialog submitAction={this.store.delete.bind(null, item)}/>)}>删除</MenuItem>}
+              {isAdmin && <MenuItem onTouchTap={() => BizDialog.onOpen('确认删除',
+                <ComfirmDialog submitAction={this.store.delete.bind(null, item)}/>)}>删除</MenuItem>}
             </IconMenu>
           )}
           primaryText={`${isNested ? '子部门' : '部门'}: ${item.name}`}

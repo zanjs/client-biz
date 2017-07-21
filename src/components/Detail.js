@@ -346,7 +346,7 @@ export class Detail extends React.PureComponent {
     return (
       <div>
         <DetailHeader onClose={this.props.close} detail={detail} isMail={this.store.isMail}/>
-        {!this.store.isMail && detail.bill_no && <Comments billNo={detail.bill_no}/>}
+        {!this.store.isMail && detail.head.bill_no && <Comments billNo={detail.head.bill_no}/>}
       </div>
     );
   }

@@ -1,10 +1,5 @@
 import axios from './';
 
-const delUser = async (id) => {
-  const resp = await axios.post('/base_gateway/del_user', {id});
-  return resp.data;
-};
-
 const updateUser = async (name, dep_id) => {
   const resp = await axios.post('/base_gateway/update_user', {name, dep_id});
   return resp.data;
@@ -98,7 +93,6 @@ const getPartner = async (partner_id) => {
 };
 
 export default {
-  delUser,
   updateUser,
   getUser,
   getUserList,

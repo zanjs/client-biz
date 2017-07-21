@@ -11,7 +11,7 @@ import AddBill from "./items/AddBill";
 import DialogForm from "./items/DialogForm";
 import ProfileDialog from "./items/ProfileDialog";
 import Toast from "../components/Toast";
-import {DialogComponent, BizDialog} from "../components/Dialog";
+import {DialogComponent, BizDialog, ComfirmDialog} from "../components/Dialog";
 import DetailDrawer from "../components/Drawer";
 
 @inject('user')
@@ -34,7 +34,7 @@ export default class Dashboard extends React.Component {
     const {routes, user} = this.props;
     return (
       <div className="dashboard">
-        <DashboardNav currentUser={user.user.current} logout={this.reLogin}/>
+        <DashboardNav currentUser={user.user.current} logout={this.reLogin} quitMerchant={this.props.user.quiteMerchant}/>
         {routes && routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route}/>
         ))}
@@ -101,7 +101,7 @@ class DashboardNav extends React.Component {
 
   render() {
     const {openQuickCreateMenu, quickCreateAnchorEl} = this.state;
-    const {currentUser} = this.props;
+    const {currentUser, quitMerchant} = this.props;
     const quickCreateAction = currentUser && currentUser.is_admin ? [
       {name: "创建单据", action: this.addBill},
       {name: "邀请用户", action: this.inviteUser},
@@ -145,6 +145,8 @@ class DashboardNav extends React.Component {
             <div className="popover-menu">
               <RaisedButton label="查看个人资料" style={{width: 150}} onTouchTap={this.handleOpenProfileDialog}/>
               {currentUser && !currentUser.is_admin && <RaisedButton label="切换商户" style={{width: 150}} onTouchTap={this.handleSwitchMerchant}/>}
+              <RaisedButton label="退出商户" style={{width: 150}} onTouchTap={() => BizDialog.onOpen('确认退出',
+                <ComfirmDialog submitAction={quitMerchant}/>)}/>
               <RaisedButton label="退出登录" style={{width: 150}} onTouchTap={this.props.logout}/>
             </div>
           </div>

@@ -1,6 +1,5 @@
 import {observable, computed, action, runInAction} from 'mobx';
 import MerchantSvc from '../../services/merchant';
-import BaseSvc from '../../services/baseData';
 import {ToastStore as Toast} from "../../components/Toast";
 
 class MerchantMemberStore {
@@ -28,7 +27,7 @@ class MerchantMemberStore {
   @action delete = async (user) => {
     if (!user) return;
     try {
-      const resp = BaseSvc.delUser(user.user_id);
+      const resp = await MerchantSvc.delUser(user.user_id);
       runInAction('after delete user', () => {
         if (resp.code === '0') {
           this.members = this.members.filter(m => m.user_id !== user.user_id);

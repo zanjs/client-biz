@@ -39,7 +39,7 @@ export class MessageItem extends React.PureComponent {
     const {bill_type} = this.props.message;
     const {isProcurement} = this.props;
     switch (bill_type) {
-      default: return '单据';
+      default: return '单据动态';
       case 1: return '产能反馈单';
       case 2: return '询报价单';
       case 3: return isProcurement ? '采购订单' : '销售订单';
@@ -60,7 +60,10 @@ export class MessageItem extends React.PureComponent {
         <div className="message-detail" onClick={() => DrawerStore.onOpen(message)}
              style={{display: 'block', marginLeft: 5}}>
           <p className="message-title">{this.billTitle}</p>
-          <p className="message-content">单号：{message.bill_no}</p>
+          <p className="message-content">
+            {message.content ? message.content : `单号：${message.bill_no}`}
+          </p>
+          {message.create_time && <p className="message-content">{message.create_time}</p>}
           <div className="message-bottom">
             <div>
               {message.tags && message.tags.map((tag, index) => <p

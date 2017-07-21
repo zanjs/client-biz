@@ -74,6 +74,16 @@ const refuseMerchantInvite = async (id) => {
   return resp.data;
 };
 
+const delUser = async (user_id) => {
+  const resp = await axios.post('/biz_gateway/del_merchant_user', {user_id});
+  return resp.data;
+};
+
+const quitMerchant = async (mer_id ) => {
+  const resp = await axios.post('/biz_gateway/quit_merchant', {mer_id });
+  return resp.data;
+};
+
 export default {
   createMerchant,
   applyMerchant,
@@ -87,4 +97,6 @@ export default {
   switchMerchant,
   getMerchantListByUser,
   getUserListByMerchant,
+  delUser,
+  quitMerchant,
 }
