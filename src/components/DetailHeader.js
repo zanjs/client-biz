@@ -25,6 +25,7 @@ import {BizDialog, ComfirmDialog} from "./Dialog";
 import {CURRENCY} from "../services/bill";
 import {detailStore} from "./Detail";
 import MemberStore from "../views/stores/merchantMember";
+import ManageBillItem from "../views/items/ManageBillItem";
 
 @inject('user')
 @observer
@@ -210,7 +211,8 @@ export class DetailHeader extends React.PureComponent {
                 { this.props.detail.isProcurement ? <Menu>
                   <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
                             onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
-                  <MenuItem primaryText="订单退货" />
+                  <MenuItem primaryText="订单退货"
+                            onTouchTap={() => BizDialog.onOpen('订单退货', <ManageBillItem />)}/>
                   <MenuItem primaryText="创建结算单" />
                   {/*<MenuItem primaryText="已发货" />*/}
                   {/*<MenuItem primaryText="收货" />*/}
@@ -221,7 +223,8 @@ export class DetailHeader extends React.PureComponent {
                 </Menu> : <Menu>
                   <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
                             onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
-                  <MenuItem primaryText="订单发货" />
+                  <MenuItem primaryText="订单发货"
+                            onTouchTap={() => BizDialog.onOpen('订单发货', <ManageBillItem />)}/>
                   <MenuItem primaryText="创建结算单" />
                   {/*<MenuItem primaryText="生成框架协议" />*/}
                   {/*<MenuItem primaryText="生成订单" />*/}
@@ -431,7 +434,7 @@ export class DetailHeader extends React.PureComponent {
         <TableBody showRowHover deselectOnClickaway={false}>
           {this.store.item_list.map((item, index) => (
             <TableRow key={index}
-                      selectable={true}
+                      selectable={!this.store.lockModifyBill}
                       selected={this.store.currentComfirmedItems.findIndex(i => i === index) > -1}>
               <TableRowColumn style={{...styles.noPadding, width: 40}}>
                 {/* 扩展行点击事件， 以修复点击行而不触发checkbox */}

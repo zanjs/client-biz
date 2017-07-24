@@ -27,6 +27,12 @@ class DetailStore {
   @observable editingMaterial = null;
   @observable confirm_status = 0;
 
+  @computed get confirmedItemDS() {
+    const items = [];
+    this.comfirmedItems.forEach(index => items.push(this.item_list[index]));
+    return items;
+  }
+
   @computed get comfirmedItemChanged() {
     if (this.comfirmedItems.length !== this.currentComfirmedItems.length) return true;
     let result = false;
