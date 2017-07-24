@@ -26,6 +26,7 @@ import {CURRENCY} from "../services/bill";
 import {detailStore} from "./Detail";
 import MemberStore from "../views/stores/merchantMember";
 import ManageBillItem from "../views/items/ManageBillItem";
+import AddFinancialBill from '../views/items/AddFinancialBill';
 
 @inject('user')
 @observer
@@ -165,6 +166,27 @@ export class DetailHeader extends React.PureComponent {
     }
   }
 
+  openAddFinBillDialog = () => {
+    this.setState({openFollowActions: false});
+    BizDialog.onOpen('创建结算单', <AddFinancialBill />);
+  };
+
+  openManageBillDialog = title => {
+    this.setState({openFollowActions: false});
+    const isSend = (title === '订单发货');
+    BizDialog.onOpen(title, <ManageBillItem isSend={isSend}/>)
+  };
+
+  cancelConfirmBill = () => {
+    this.setState({openFollowActions: false});
+    this.store.cancelConfirmBill();
+  };
+
+  confirmBill = () => {
+    this.setState({openFollowActions: false});
+    this.store.confirmBill();
+  };
+
   TitleItem = observer(() => {
     const {detail, isMail, confirm_status} = this.store;
     // const {head} = detail;
@@ -210,10 +232,12 @@ export class DetailHeader extends React.PureComponent {
                 onRequestClose={this.handleFollowActionsClose}>
                 { this.props.detail.isProcurement ? <Menu>
                   <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
-                            onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
+                            onTouchTap={confirm_status ? this.cancelConfirmBill : this.confirmBill}/>
                   <MenuItem primaryText="订单退货"
-                            onTouchTap={() => BizDialog.onOpen('订单退货', <ManageBillItem />)}/>
-                  <MenuItem primaryText="创建结算单" />
+                            onTouchTap={this.openManageBillDialog.bind(null, '订单退货')}/>
+                  {this.store.detail.head.bill_type === 3 && (
+                    <MenuItem primaryText="创建结算单" onTouchTap={this.openAddFinBillDialog}/>
+                  )}
                   {/*<MenuItem primaryText="已发货" />*/}
                   {/*<MenuItem primaryText="收货" />*/}
                   {/*<MenuItem primaryText="退货" />*/}
@@ -222,10 +246,12 @@ export class DetailHeader extends React.PureComponent {
                   {/*<MenuItem primaryText="取消" />*/}
                 </Menu> : <Menu>
                   <MenuItem primaryText={confirm_status ? "取消确认单据" : "确认单据"}
-                            onTouchTap={confirm_status ? this.store.cancelConfirmBill : this.store.confirmBill}/>
+                            onTouchTap={confirm_status ? this.cancelConfirmBill : this.confirmBill}/>
                   <MenuItem primaryText="订单发货"
-                            onTouchTap={() => BizDialog.onOpen('订单发货', <ManageBillItem />)}/>
-                  <MenuItem primaryText="创建结算单" />
+                            onTouchTap={this.openManageBillDialog.bind(null, '订单发货')}/>
+                  {this.store.detail.head.bill_type === 3 && (
+                    <MenuItem primaryText="创建结算单" onTouchTap={this.openAddFinBillDialog}/>
+                  )}
                   {/*<MenuItem primaryText="生成框架协议" />*/}
                   {/*<MenuItem primaryText="生成订单" />*/}
                   {/*<MenuItem primaryText="完成" />*/}

@@ -45,20 +45,22 @@ class ManageBillItemState {
     this.submitQuatity = {...this.submitQuatity};
   };
 
-  @action submit = async () => {
+  @action submit = async (isSend) => {
     const billNo = detailStore.detail.head.bill_no;
     if (this.submitting || !this.validated || !billNo) return;
     this.submitting = true;
     try {
+      const service = isSend ? BillSvc.sendItem : BillSvc.returnItem
       const line_no = this.submitLineNo.join(',');
       let quantity = '';
-      this.submitLineNo.forEach(no => quantity += this.submitQuatity[no]);
-      const resp = await BillSvc.sendItem(billNo, line_no, quantity);
+      this.submitLineNo.forEach(no => quantity += (quantity ? `,${this.submitQuatity[no]}` : `${this.submitQuatity[no]}`));
+      const resp = await service(billNo, line_no, quantity);
       runInAction('after submit send', () => {
         if (resp.code === '0') {
-          Toast.show('发货成功');
+          Toast.show(isSend ? '设置发货成功' : '设置退货成功');
+          BizDialog.onClose();
         }
-        else Toast.show(resp.msg || '抱歉，发货失败，请稍后重试');
+        else Toast.show(resp.msg || '抱歉，操作失败，请刷新稍后重试');
       })
     } catch (e) {
       console.log(e, 'submit send item');
@@ -74,7 +76,7 @@ class ManageBillItem extends React.PureComponent {
   billStore = detailStore;
   render() {
     return (
-      <form onSubmit={this.store.submit}>
+      <form onSubmit={this.store.submit.bind(null, this.props.isSend)}>
         <SelectField
           floatingLabelText="需要发货的物料行号"
           value={this.store.submitLineNo}
@@ -89,7 +91,7 @@ class ManageBillItem extends React.PureComponent {
           ))}
         </SelectField><br/>
         {this.store.submitItems.map((item, index) => (
-          <TextField floatingLabelText={`行号: ${item.line_no} 发货数量`}
+          <TextField floatingLabelText={`行号: ${item.line_no} 发货数量（最大：${item.quantity}）`}
           value={this.store.submitQuatity[item.line_no] || ''} style={{marginRight: 20}} type="number"
           errorText={this.store.submitQuatity[item.line_no] > item.quantity ? '发货数量不能超过订货数量' : null}
           onChange={(e, value) => this.store.setQuatity(item.line_no, value)} key={index}/>
@@ -98,7 +100,7 @@ class ManageBillItem extends React.PureComponent {
           <RaisedButton style={{ marginTop: 20 }} label={this.store.submitting ? null : '提交'}
                         icon={this.store.submitting ? <CircularProgress size={28}/> : null}
                         primary={!!this.store.validated} disabled={!this.store.validated}
-                        onClick={this.store.submit} />
+                        onClick={this.store.submit.bind(null, this.props.isSend)} />
           <RaisedButton style={{ marginTop: 20, marginLeft: 20 }} label="取消"
                         primary={false} onClick={BizDialog.onClose} />
         </div>

@@ -222,7 +222,7 @@ class DetailStore {
 
     if (confirmResp.finished && unConfrimResp.finished) {
       this.comfirmedItems = [...this.currentComfirmedItems];
-      Toast.show('更新物料状态成功');
+      // Toast.show('更新物料状态成功');
     } else Toast.show('抱歉，更新物料确认情况失败，请刷新页面后重新尝试');
   };
 

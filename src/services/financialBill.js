@@ -1,9 +1,10 @@
 import axios from './';
 
-const create = async (bill_no, settle_type, invoice_type, relative_mer_id, currency, pay_type, tax_flag, total_amount,
+const create = async (bill_no, settle_type, invoice_type, relative_mer_id, currency, pay_type, tax_type, total_amount,
                       invoiced_amount, pay_amount, settle_list) => {
+  const tax_flag = tax_type;
   const resp = await axios.post('/fin_gateway/create_bill', {bill_no, settle_type, invoice_type, relative_mer_id,
-    currency, pay_type, tax_flag, total_amount, invoiced_amount, pay_amount, settle_list});
+    currency, pay_type, tax_type, total_amount, invoiced_amount, pay_amount, settle_list, tax_flag});
   return resp.data;
 };
 
