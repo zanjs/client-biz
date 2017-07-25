@@ -28,10 +28,22 @@ const getBillList = async (page_no, page_size) => {
   return resp.data;
 };
 
+const confirmBill = async (bill_no) => {
+  const resp = await axios.post('/fin_gateway/confirm_bill', {bill_no});
+  return resp.data;
+};
+
+const unConfirmBill = async (bill_no) => {
+  const resp = await axios.post('/fin_gateway/unconfirm_bill', {bill_no});
+  return resp.data;
+};
+
 export default {
   create,
   update,
   abort,
   getBill,
   getBillList,
+  confirmBill,
+  unConfirmBill,
 }

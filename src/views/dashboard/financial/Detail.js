@@ -144,8 +144,24 @@ class DrawerState {
   };
 
   @action onCheck = async (value) => {
-    // TODO
-    this.confirm_status = (value ? 1 : 0);
+    if (this.updating) return;
+    this.updating = true;
+    try {
+      const service = this.confirm_status ? FinancialSvc.unConfirmBill : FinancialSvc.confirmBill;
+      this.confirm_status = (value ? 1 : 0);
+      const resp = await service(this.bill_no);
+      runInAction("after update", () => {
+        if (resp.code === '0') {
+          Toast.show('更新成功');
+        } else {
+          Toast.show(resp.msg || '抱歉，更新失败，请刷新页面后重新尝试');
+          this.confirm_status = this.confirm_status ? 0 : 1;
+        }
+      });
+    } catch (e) {
+      console.log(e, 'updating confirm status');
+    }
+    this.updating = false;
   }
 }
 
