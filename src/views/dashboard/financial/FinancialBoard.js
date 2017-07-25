@@ -17,7 +17,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import SearchIcon from 'material-ui/svg-icons/action/search';
 import FinancialSvc from '../../../services/financialBill';
 import {ToastStore as Toast} from "../../../components/Toast";
-import {BizDialog} from "../../../components/Dialog";
+// import {BizDialog} from "../../../components/Dialog";
 import FinancialDetail, {FinancialDrawer} from "./Detail";
 // import {DrawerStore} from "../../../components/Drawer";
 
@@ -127,7 +127,7 @@ export default class FinancialBoard extends React.PureComponent {
       <div className="bill-board financial-board">
         <DataList listData={this.store.DS} landed={this.store.landed} loadMore={this.loadMore}
                   abort={this.store.abort} hasMore={this.store.hasMore}/>
-        <div style={{flex: 1}}>
+        <div className="board-search">
           <h3>查找结算单</h3>
           <TextField
             floatingLabelText="请输入查找的单据号"

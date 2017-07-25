@@ -77,7 +77,7 @@ export class SetDepartment extends React.PureComponent {
         />
         <TextField
           floatingLabelText="需要配置的部门id"
-          value={this.state.id}
+          value={this.state.id || ''}
           type="number"
           onChange={e => this.setState({id: e.target.value})}
           style={{marginRight: 20}}

@@ -10,6 +10,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import BillSvc from '../../../services/bill';
 import {ToastStore as Toast} from "../../../components/Toast";
+import SearchBill from '../../items/SearchBill';
 
 class ProcurementBillStore {
   @observable DS = [];
@@ -46,7 +47,7 @@ class ProcurementBillStore {
     }
     this.loading = false;
     if (!this.landed) this.landed = true;
-  }
+  };
 }
 
 const ProcurementStore = new ProcurementBillStore();
@@ -156,31 +157,34 @@ export default class ProcurementBoard extends React.PureComponent {
 
   render() {
     return (
-      <div className="bill-board">
-        <div className="bill-header">
-          <div className="header-left">
-            <p className="title">采购任务</p>
-            {/*<SelectItem selections={this.selectionsA} selectionCount={this.selectionCountA} onSelect={this.onSelectA}/>&nbsp;*/}
-            {/*<SelectItem selections={this.selectionsB} selectionCount={this.selectionCountB} onSelect={this.onSelectB}/>*/}
-          </div>
-          {/*<div className="header-right">*/}
+      <div className="bill-board procurement-bill">
+        <div>
+          <div className="bill-header">
+            <div className="header-left">
+              <p className="title">采购任务</p>
+              {/*<SelectItem selections={this.selectionsA} selectionCount={this.selectionCountA} onSelect={this.onSelectA}/>&nbsp;*/}
+              {/*<SelectItem selections={this.selectionsB} selectionCount={this.selectionCountB} onSelect={this.onSelectB}/>*/}
+            </div>
+            {/*<div className="header-right">*/}
             {/*<this.ActionButton icon='send' action={this.onSend}/>*/}
             {/*<this.ActionButton icon='save' action={this.onSave}/>*/}
             {/*<this.ActionButton icon='attachment' action={this.onAttach}/>*/}
             {/*<this.ActionButton icon='content_copy' action={this.onCopy}/>*/}
             {/*<this.FollowActions/>*/}
             {/*<this.ActionButton icon='share' action={this.onShare}/>*/}
-          {/*</div>*/}
-        </div>
-        <div className="bill-list">
-          {!this.store.DS.length && <p className="none-data">暂无业务单据</p>}
-          {this.store.DS.map((data, index) => (
-            <MessageItem message={data} isProcurement key={index}/>
-          ))}
-          <div style={{width: '100%', textAlign: 'right'}}>
-            {this.store.hasMore && <FlatButton label="加载更多" primary onTouchTap={this.store.load}/>}
+            {/*</div>*/}
+          </div>
+          <div className="bill-list">
+            {!this.store.DS.length && <p className="none-data">暂无业务单据</p>}
+            {this.store.DS.map((data, index) => (
+              <MessageItem message={data} isProcurement key={index}/>
+            ))}
+            <div style={{width: '100%', textAlign: 'right'}}>
+              {this.store.hasMore && <FlatButton label="加载更多" primary onTouchTap={this.store.load}/>}
+            </div>
           </div>
         </div>
+        <SearchBill isProcurement title="查找采购单据"/>
       </div>
     );
   }
