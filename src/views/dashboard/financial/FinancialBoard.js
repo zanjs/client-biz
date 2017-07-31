@@ -21,7 +21,7 @@ import {ToastStore as Toast} from "../../../components/Toast";
 import FinancialDetail, {FinancialDrawer} from "./Detail";
 // import {DrawerStore} from "../../../components/Drawer";
 
-class SaleBillStore {
+class FinBillStore {
   @observable DS = [];
   @observable recordCount = 0;
   @observable pageNo = 1;
@@ -67,9 +67,16 @@ class SaleBillStore {
     if (!this.landed) this.landed = true;
   };
 
+  @action updateItemConfirm = item => {
+    this.DS.forEach(data => {
+      if (data.bill_no === item.bill_no) data.confirm_status = item.confirm_status;
+    });
+    this.DS = [...this.DS];
+  };
+
   @action abort = async (item) => {
     if (this.aborting) return;
-    if (!item.confirm_status || !item.relative_confirm_status) {
+    if (!!item.confirm_status || !!item.relative_confirm_status) {
       Toast.show('只有在双方都取消确认的情况下才能作废');
       return;
     }
@@ -108,12 +115,12 @@ class SaleBillStore {
   }
 }
 
-const SaleStore = new SaleBillStore();
+export const FinStore = new FinBillStore();
 
 @inject('user')
 @observer
 export default class FinancialBoard extends React.PureComponent {
-  store = SaleStore;
+  store = FinStore;
   async componentWillMount() {
     this.store.load();
   }

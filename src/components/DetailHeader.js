@@ -300,7 +300,7 @@ export class DetailHeader extends React.PureComponent {
       <div className="order-info-item">
         <div className="order-source">
           <p style={{maxWidth: 260}}>{isProcurement ? '供应商：' : '客户：'}{head.mer_name}</p>
-          <p style={{maxWidth: 160}}>{head.user_name}</p>
+          <p style={{maxWidth: 160}}>负责人: {head.user_name}</p>
           <p>{head.create_time}</p>
           {/*<this.ActionButton icon='note_add' tooltip='添加备注' action={this.onAddNote}/>*/}
         </div>

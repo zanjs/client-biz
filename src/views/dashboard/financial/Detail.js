@@ -22,6 +22,7 @@ import {BizDialog, ComfirmDialog} from "../../../components/Dialog";
 import FinancialSvc from '../../../services/financialBill';
 import {ToastStore as Toast} from "../../../components/Toast";
 import {CURRENCY} from "../../../services/bill";
+import {FinStore} from './FinancialBoard';
 
 class DrawerState {
   @observable open = false;
@@ -33,6 +34,10 @@ class DrawerState {
   @observable openSettleItemDialog = false;
   @observable confirm_status = 0;
   bill_no = null;
+
+  @computed get billLocked() {
+    return !!this.confirm_status || !!this.detail.head.relative_confirm_status;
+  }
 
   @computed get needSaveChange() {
     const invoicedChanged = (this.invoiced_amount !== this.detail.head.invoiced_amount);
@@ -153,6 +158,8 @@ class DrawerState {
       runInAction("after update", () => {
         if (resp.code === '0') {
           Toast.show('更新成功');
+          const detail = {...this.detail.head, confirm_status: this.confirm_status};
+          FinStore.updateItemConfirm(detail);
         } else {
           Toast.show(resp.msg || '抱歉，更新失败，请刷新页面后重新尝试');
           this.confirm_status = this.confirm_status ? 0 : 1;
@@ -246,6 +253,9 @@ export default class FinancialDetail extends React.PureComponent {
             <div style={{paddingLeft: 20}}>
               <TextField floatingLabelText="合作商户" value={detail.head.mer_name} disabled style={{marginRight: 20}}/>
               <TextField floatingLabelText="合作商户ID" value={detail.head.mer_id} disabled style={{marginRight: 20}}/>
+              <TextField floatingLabelText="负责人" value={`${detail.head.user_name} (id: ${detail.head.user_id})`}
+                         disabled style={{marginRight: 20}}/>
+              <br/>
               <Checkbox
                 label={this.store.confirm_status === 1 ? '取消确认结算单' : '确认结算单'}
                 checked={this.store.confirm_status === 1}
@@ -263,11 +273,13 @@ export default class FinancialDetail extends React.PureComponent {
                          value={this.store.invoiced_amount || '未设置'}
                          style={{marginRight: 20}}
                          type="number"
+                         disabled={this.store.billLocked}
                          onChange={e => this.store.setKey('invoiced_amount', e.target.value)}/>
               <TextField floatingLabelText="客户已付款金额"
                          value={this.store.pay_amount || '未设置'}
                          style={{marginRight: 20}}
                          type="number"
+                         disabled={this.store.billLocked}
                          onChange={e => this.store.setKey('pay_amount', e.target.value)}/>
               <TextField floatingLabelText="开票总金额"
                          value={detail.head.total_amount || ''}
@@ -311,6 +323,7 @@ export default class FinancialDetail extends React.PureComponent {
                       <TableRowColumn style={{width: 40}}>
                         <button className="btn-material-action" onClick={e => {
                           e.preventDefault();
+                          if (this.store.billLocked) return;
                           this.store.handleOpenSettleDialog(item);
                         }}>
                           修改
