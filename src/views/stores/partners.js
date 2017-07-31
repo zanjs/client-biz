@@ -6,14 +6,15 @@ import {BizDialog} from "../../components/Dialog";
 class Partners {
   @observable DS = [];
   @observable loading = false;
-  @observable hasMore = true;
+  @observable hasMore = false;
   @observable pageNo = 1;
   @observable recordCount = 0;
   pageSize = 20;
+  landed = false;
 
   @action load = async () => {
     if (this.loading) return;
-    this.loading = true;
+    if (!this.landed) this.loading = true;
     const pageNo = this.pageNo > 1 ? this.pageNo : null;
     try {
       const resp = await BaseSvc.getPartnerList(pageNo, this.pageSize);
@@ -30,6 +31,12 @@ class Partners {
       Toast.show('抱歉，发生未知错误，请检查网络连接稍后重试');
     }
     this.loading = false;
+    if (!this.landed) this.landed = true;
+  };
+
+  @action refresh = () => {
+    this.pageNo = 1;
+    this.load();
   };
 
   @action delete = async (partner) => {

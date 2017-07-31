@@ -47,12 +47,10 @@ class AddPartnerState {
       const partner_type = [...this.partner_type].join(',');
       const resp = await service(partner_id, this.partner_flag, partner_type,
         this.inner_partner_id, this.inner_partner_name, this.tel, this.address);
-      console.log(resp);
       runInAction('after submit add', () => {
         if (resp.code === '0') {
           Toast.show(type === this.submitType.ADD ? '已发送合作申请，请等待或通知对方确认' : '修改成功');
-          console.log(partnerStore.DS);
-          partnerStore.load();
+          if (type !== this.submitType.ADD) partnerStore.refresh();
           BizDialog.onClose();
         }
         else Toast.show(resp.msg || '抱歉，操作失败，请稍后重试');

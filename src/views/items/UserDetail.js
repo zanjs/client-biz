@@ -10,6 +10,7 @@ import MerchantMembers from '../stores/merchantMember';
 class UserDetail extends React.PureComponent {
   render() {
     const {user} = this.props;
+    const depName = user.dep_id ? user.dep_name : '暂无部门';
     return (
       <form>
         <TextField
@@ -28,7 +29,7 @@ class UserDetail extends React.PureComponent {
         />
         <TextField
           floatingLabelText="部门"
-          value={`${user.dep_name || '暂无部门'} (id: ${user.dep_id || ''})`}
+          value={`${depName || '暂无部门名称'} (id: ${user.dep_id || ''})`}
           type="text"
           readOnly={true}
           style={{marginRight: 20}}

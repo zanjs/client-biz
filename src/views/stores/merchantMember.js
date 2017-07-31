@@ -41,10 +41,12 @@ class MerchantMemberStore {
   };
   @action updateUser = user => {
     this.members.forEach(member => {
-      if (member.user_id === user.user_id) member = user;
+      if (member.user_id === user.user_id) {
+        member.dep_id = user.dep_id;
+        member.dep_name = user.dep_name;
+      }
     });
-    console.log(this.members);
-    // this.members = [...this.members];
+    this.members = [...this.members];
   }
 }
 

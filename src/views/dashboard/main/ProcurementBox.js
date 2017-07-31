@@ -1,10 +1,11 @@
 import React from 'react';
-import {observer} from 'mobx-react';
+import {observer, inject} from 'mobx-react';
 import {BoxHeader} from "../../../components/BoxHeader";
 import {MessageItem} from "../../../components/ListItem";
 import FlatButton from 'material-ui/FlatButton';
 import ProcurementActivitiesStore from "../../stores/procurement-activies";
 
+@inject('user')
 @observer
 export default class ProcurementBox extends React.PureComponent {
   store = ProcurementActivitiesStore;
@@ -50,7 +51,9 @@ export default class ProcurementBox extends React.PureComponent {
                    selectionCount={this.selectionCount}/>
         <div className="message-list">
           {this.messagesDS.map((messages, index) => <MessageItem message={messages} isProcurement key={index}/>)}
-          {!this.messagesDS.length && <p className="none-data">暂无内容</p>}
+          {!this.messagesDS.length && <p className="none-data">
+            {this.props.user.user.current.is_admin ? '管理员无法获得业务动态' : '暂无内容'}
+          </p>}
           <div style={{width: '100%', textAlign: 'right'}}>
             {this.store.hasMore && <FlatButton label="加载更多" primary onTouchTap={this.store.load}/>}
           </div>
